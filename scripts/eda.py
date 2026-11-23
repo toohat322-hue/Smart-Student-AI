@@ -278,6 +278,8 @@ def fig_g3_zero(dfs: dict[str, pd.DataFrame]) -> Path:
 
 # --------------------------------------------------------------------------- main
 def main() -> int:
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")  # Windows consoles default to cp1252
     dfs: dict[str, pd.DataFrame] = {}
     for s in SUBJECT_ORDER:
         df = add_target(load_subject(s))
