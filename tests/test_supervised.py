@@ -6,18 +6,33 @@ import numpy as np
 import pytest
 from sklearn.dummy import DummyClassifier
 from sklearn.metrics import f1_score
+from sklearn.model_selection import FixedThresholdClassifier, cross_val_predict
 
 from src.config import SUBJECTS
-from src.data import TARGET_COL
-from src.preprocessing import SCENARIOS, build_preprocessor, feature_columns
+from src.data import FEATURE_SPEC, TARGET_COL
+from src.metrics_io import load_metrics
+from src.preprocessing import (
+    SCENARIOS,
+    build_preprocessor,
+    feature_columns,
+    monotonic_constraints,
+    output_feature_names,
+)
 from src.supervised import (
+    AT_RISK,
+    PASS,
     InputValidationError,
+    cv_splitter,
+    evaluate,
+    labels_at,
     load_model,
+    make_logreg,
     model_path,
     predict,
     prepare_subject,
     proba_pass,
     split_indices,
+    tune_threshold,
 )
 
 CASES = [(s, sc) for s in sorted(SUBJECTS) for sc in SCENARIOS]
@@ -115,7 +130,8 @@ def test_predict_output_contract(subject, scenario, data):
     out = predict(subject, scenario, student(df, scenario, i=5))
     assert set(out) == {"label", "proba_pass", "top_factors"}
     assert 0 <= out["proba_pass"] <= 1
-    assert out["label"] == ("Likely to Pass" if out["proba_pass"] >= 0.5 else "At Risk")
+    threshold = load_model(subject, scenario).threshold
+    assert out["label"] == ("Likely to Pass" if out["proba_pass"] >= threshold else "At Risk")
     assert len(out["top_factors"]) == 3
     for f in out["top_factors"]:
         assert f["feature"] in feature_columns(scenario)
@@ -176,3 +192,107 @@ def test_predict_rejects_unknown_subject_or_scenario(subject, scenario):
 def test_predict_rejects_non_dict():
     with pytest.raises(InputValidationError):
         predict("por", "early", ["not", "a", "dict"])
+
+
+# --------------------------------------------------------------------------- monotonic absences
+@pytest.mark.parametrize("scenario", SCENARIOS)
+def test_output_layout_is_known_before_fit(scenario, data):
+    features = feature_columns(scenario)
+    df, _, _ = data["mat"]
+    fitted = build_preprocessor(features).fit(df[features])
+    assert list(fitted.get_feature_names_out()) == output_feature_names(features)
+    cst = monotonic_constraints(features)
+    assert len(cst) == len(output_feature_names(features))
+    assert [n for n, c in zip(output_feature_names(features), cst) if c != 0] == ["absences"]
+    assert cst[output_feature_names(features).index("absences")] == -1
+
+
+@pytest.mark.parametrize("subject,scenario", CASES)
+def test_saved_rf_has_absences_constraint_on_right_column(subject, scenario):
+    model = load_model(subject, scenario)
+    pipe = model.estimator_
+    names = list(pipe.named_steps["prep"].get_feature_names_out())
+    cst = np.asarray(pipe.named_steps["clf"].monotonic_cst)
+    assert len(cst) == len(names) == pipe.named_steps["clf"].n_features_in_
+    assert names[int(np.flatnonzero(cst)[0])] == "absences"
+    assert cst[names.index("absences")] == -1 and np.count_nonzero(cst) == 1
+
+
+@pytest.mark.parametrize("subject,scenario", CASES)
+def test_pass_probability_never_rises_with_absences(subject, scenario, data):
+    """Only absences changes (0..93, the data-dictionary range); P(pass) must be non-increasing."""
+    df, _, test_idx = data[subject]
+    X = df[feature_columns(scenario)].iloc[test_idx]
+    model = load_model(subject, scenario)
+    lo, hi = FEATURE_SPEC["absences"]
+    grid = np.arange(lo, hi + 1)
+    probs = np.column_stack([proba_pass(model, X.assign(absences=int(v))) for v in grid])  # rows x values
+    assert (np.diff(probs, axis=1) <= 1e-12).all()
+
+
+# --------------------------------------------------------------------------- alert cut-off
+@pytest.mark.parametrize("subject,scenario", CASES)
+def test_saved_model_carries_tuned_threshold(subject, scenario):
+    model = load_model(subject, scenario)
+    assert isinstance(model, FixedThresholdClassifier)
+    meta = load_metrics()["supervised"]["subjects"][subject][scenario]
+    assert 0 < model.threshold < 1
+    assert model.threshold == meta["threshold"] == meta["models"]["rf"]["threshold_tuning"]["threshold"]
+    assert meta["models"]["rf"]["threshold_tuning"]["oof_at_risk_recall"] >= 0.70
+
+
+@pytest.mark.parametrize("subject,scenario", CASES)
+def test_model_predict_uses_threshold(subject, scenario, data):
+    df, _, test_idx = data[subject]
+    X = df[feature_columns(scenario)].iloc[test_idx]
+    model = load_model(subject, scenario)
+    assert np.array_equal(model.predict(X), labels_at(proba_pass(model, X), model.threshold))
+
+
+def test_labels_at_boundary():
+    assert labels_at(np.array([0.59, 0.6, 0.61]), 0.6).tolist() == [AT_RISK, PASS, PASS]
+
+
+def test_tune_threshold_picks_smallest_cutoff_reaching_target(data):
+    df, train_idx, _ = data["por"]
+    features = feature_columns("early")
+    X, y = df[features].iloc[train_idx], df[TARGET_COL].iloc[train_idx]
+    est = make_logreg(features)
+    res = tune_threshold(est, X, y, target_recall=0.7, n_jobs=1)
+    oof = cross_val_predict(est, X, y, cv=cv_splitter(), method="predict_proba")[:, PASS]
+    risk = (y == AT_RISK).to_numpy()
+
+    def recall(t):
+        return (labels_at(oof, t)[risk] == AT_RISK).mean()
+
+    assert recall(res["threshold"]) >= 0.7
+    assert abs(recall(res["threshold"]) - res["oof_at_risk_recall"]) < 1e-4
+    assert recall(round(res["threshold"] - 0.005, 3)) < 0.7  # one grid step lower misses the target
+
+
+def test_evaluate_false_alerts_match_confusion_matrix(data):
+    df, _, test_idx = data["mat"]
+    X, y = df[feature_columns("early")].iloc[test_idx], df[TARGET_COL].iloc[test_idx]
+    model = load_model("mat", "early")
+    for t in (0.5, model.threshold):
+        m = evaluate(model, X, y, t, include_curves=False)
+        cm = np.array(m["confusion_matrix"]["matrix"])  # rows true [AR, Pass], cols predicted
+        assert m["false_alerts"] == cm[1, 0]
+        assert m["at_risk_recall"] == round(cm[0, 0] / cm[0].sum(), 4)
+        assert m["at_risk_precision"] == round(cm[0, 0] / cm[:, 0].sum(), 4)
+
+
+def test_split_seed_changes_split(data):
+    df, train_idx, _ = data["por"]
+    other, _ = split_indices(df, seed=0)
+    assert not np.array_equal(train_idx, other)
+
+
+# --------------------------------------------------------------------------- repeated splits
+@pytest.mark.parametrize("subject,scenario", CASES)
+def test_repeated_split_results_present(subject, scenario):
+    rep = load_metrics()["supervised_repeated_splits"]["subjects"][subject][scenario]
+    assert rep["n_splits"] == 20 and sorted(rep["seeds"]) == list(range(20))
+    for mk in ("dummy", "logreg", "rf_default", "rf_tuned"):
+        for k in ("f1_macro", "at_risk_recall"):
+            assert 0 <= rep[mk][k]["mean"] <= 1 and rep[mk][k]["std"] >= 0

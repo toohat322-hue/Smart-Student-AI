@@ -1,6 +1,11 @@
 """Supervised learning (spec §6): pass / At-Risk classification.
 
 Label convention: 0 = At Risk (G3 < 10), 1 = Likely to Pass (G3 >= 10).
+
+Saved models are ``FixedThresholdClassifier(Pipeline(preprocessor, RandomForest))``: the RF
+has a monotonic constraint (P(pass) never rises with absences) and the wrapper carries the
+alert cut-off chosen from out-of-fold predictions on the training set. A student is predicted
+"Likely to Pass" when P(pass) >= threshold, otherwise "At Risk".
 """
 from __future__ import annotations
 
@@ -20,17 +25,31 @@ from sklearn.metrics import (
     classification_report,
     confusion_matrix,
     f1_score,
+    precision_score,
     recall_score,
     roc_auc_score,
     roc_curve,
 )
-from sklearn.model_selection import GridSearchCV, StratifiedKFold, cross_val_score, train_test_split
+from sklearn.model_selection import (
+    FixedThresholdClassifier,
+    GridSearchCV,
+    StratifiedKFold,
+    cross_val_predict,
+    cross_val_score,
+    train_test_split,
+)
 from sklearn.pipeline import Pipeline
 
 from src.config import MODELS_DIR, RANDOM_STATE, SUBJECTS
 from src.data import FEATURE_SPEC, TARGET_COL, add_target, load_subject, validate_schema
 from src.metrics_io import load_metrics
-from src.preprocessing import CATEGORICAL_COLS, SCENARIOS, build_preprocessor, feature_columns
+from src.preprocessing import (
+    CATEGORICAL_COLS,
+    SCENARIOS,
+    build_preprocessor,
+    feature_columns,
+    monotonic_constraints,
+)
 
 AT_RISK, PASS = 0, 1
 LABEL_NAMES = {AT_RISK: "At Risk", PASS: "Likely to Pass"}
@@ -42,6 +61,9 @@ RF_PARAM_GRID = {
     "clf__max_depth": [None, 5, 10],
     "clf__min_samples_leaf": [1, 3, 5],
 }
+DEFAULT_THRESHOLD = 0.5
+TARGET_AT_RISK_RECALL = 0.70
+THRESHOLD_GRID = np.round(np.arange(0.01, 1.0, 0.005), 3)
 PERM_REPEATS = 20
 TOP_N_IMPORTANCE = 10
 N_TOP_FACTORS = 3
@@ -56,12 +78,10 @@ def prepare_subject(subject: str) -> pd.DataFrame:
     return df
 
 
-def split_indices(df: pd.DataFrame) -> tuple[np.ndarray, np.ndarray]:
-    """Stratified 80/20 split; identical for every model of a subject."""
+def split_indices(df: pd.DataFrame, seed: int = RANDOM_STATE) -> tuple[np.ndarray, np.ndarray]:
+    """Stratified 80/20 split; identical for every model of a subject (seed 42 by default)."""
     idx = np.arange(len(df))
-    train_idx, test_idx = train_test_split(
-        idx, test_size=TEST_SIZE, stratify=df[TARGET_COL], random_state=RANDOM_STATE
-    )
+    train_idx, test_idx = train_test_split(idx, test_size=TEST_SIZE, stratify=df[TARGET_COL], random_state=seed)
     return np.sort(train_idx), np.sort(test_idx)
 
 
@@ -84,36 +104,75 @@ def make_logreg(features: list[str]) -> Pipeline:
     ])
 
 
-def make_rf_search(features: list[str]) -> GridSearchCV:
-    pipe = Pipeline([
-        ("prep", build_preprocessor(features)),
-        ("clf", RandomForestClassifier(class_weight="balanced", random_state=RANDOM_STATE, n_jobs=1)),
-    ])
-    return GridSearchCV(pipe, RF_PARAM_GRID, scoring=SCORING, cv=cv_splitter(), n_jobs=-1, refit=True)
+def make_rf_search(features: list[str], monotonic: bool = True, n_jobs: int = -1) -> GridSearchCV:
+    rf = RandomForestClassifier(
+        class_weight="balanced", random_state=RANDOM_STATE, n_jobs=1,
+        monotonic_cst=monotonic_constraints(features) if monotonic else None,
+    )
+    pipe = Pipeline([("prep", build_preprocessor(features)), ("clf", rf)])
+    return GridSearchCV(pipe, RF_PARAM_GRID, scoring=SCORING, cv=cv_splitter(), n_jobs=n_jobs, refit=True)
 
 
-# --------------------------------------------------------------------------- evaluation
+# --------------------------------------------------------------------------- threshold
 def proba_pass(model, X: pd.DataFrame) -> np.ndarray:
     classes = list(model.classes_)
     return model.predict_proba(X)[:, classes.index(PASS)]
 
 
-def evaluate(model, X: pd.DataFrame, y: pd.Series) -> dict[str, Any]:
-    """Test-set metrics. At-Risk (class 0) recall is the headline number."""
-    y_pred = model.predict(X)
+def labels_at(p_pass: np.ndarray, threshold: float) -> np.ndarray:
+    """Likely to Pass iff P(pass) >= threshold (same rule as FixedThresholdClassifier)."""
+    return np.where(p_pass >= threshold, PASS, AT_RISK)
+
+
+def tune_threshold(estimator: Pipeline, X_train: pd.DataFrame, y_train: pd.Series,
+                   target_recall: float = TARGET_AT_RISK_RECALL, n_jobs: int = -1) -> dict[str, Any]:
+    """Smallest cut-off whose out-of-fold At-Risk recall on the TRAINING set is >= target.
+
+    The smallest such cut-off raises the fewest false alerts. The test set is never used.
+    """
+    oof = cross_val_predict(clone(estimator), X_train, y_train, cv=cv_splitter(),
+                            method="predict_proba", n_jobs=n_jobs)[:, PASS]
+    y = np.asarray(y_train)
+    is_risk = y == AT_RISK
+    for t in THRESHOLD_GRID:
+        pred = labels_at(oof, t)
+        rec = float((pred[is_risk] == AT_RISK).mean())
+        if rec >= target_recall:
+            break
+    pred = labels_at(oof, t)
+    return {
+        "threshold": float(t),
+        "target_at_risk_recall": target_recall,
+        "oof_at_risk_recall": round(rec, 4),
+        "oof_at_risk_precision": round(precision_score(y, pred, pos_label=AT_RISK, zero_division=0), 4),
+        "oof_f1_macro": round(f1_score(y, pred, average="macro"), 4),
+        "oof_at_risk_recall_at_default": round(float((labels_at(oof, DEFAULT_THRESHOLD)[is_risk] == AT_RISK).mean()), 4),
+    }
+
+
+# --------------------------------------------------------------------------- evaluation
+def evaluate(model, X: pd.DataFrame, y: pd.Series, threshold: float = DEFAULT_THRESHOLD,
+             include_curves: bool = True) -> dict[str, Any]:
+    """Test-set metrics at a given cut-off. At-Risk (class 0) recall is the headline number."""
     p = proba_pass(model, X)
+    y = np.asarray(y)
+    y_pred = labels_at(p, threshold)
     report = classification_report(
         y, y_pred, labels=[AT_RISK, PASS], target_names=[LABEL_NAMES[AT_RISK], LABEL_NAMES[PASS]],
         output_dict=True, zero_division=0,
     )
-    fpr, tpr, _ = roc_curve(y, p, pos_label=PASS)
-    return {
+    false_alerts = int(((y == PASS) & (y_pred == AT_RISK)).sum())
+    out = {
+        "threshold": float(threshold),
         "n": int(len(y)),
         "n_at_risk": int((y == AT_RISK).sum()),
         "accuracy": round(accuracy_score(y, y_pred), 4),
         "at_risk_recall": round(recall_score(y, y_pred, pos_label=AT_RISK, zero_division=0), 4),
+        "at_risk_precision": round(precision_score(y, y_pred, pos_label=AT_RISK, zero_division=0), 4),
         "f1_macro": round(f1_score(y, y_pred, average="macro", zero_division=0), 4),
         "roc_auc": round(roc_auc_score(y, p), 4),
+        "false_alerts": false_alerts,
+        "false_alert_rate": round(false_alerts / max(int((y == PASS).sum()), 1), 4),
         "per_class": {
             name: {k: round(report[name][k], 4) for k in ("precision", "recall", "f1-score", "support")}
             for name in (LABEL_NAMES[AT_RISK], LABEL_NAMES[PASS])
@@ -122,19 +181,24 @@ def evaluate(model, X: pd.DataFrame, y: pd.Series) -> dict[str, Any]:
             "labels": [LABEL_NAMES[AT_RISK], LABEL_NAMES[PASS]],  # rows = true, cols = predicted
             "matrix": confusion_matrix(y, y_pred, labels=[AT_RISK, PASS]).tolist(),
         },
-        "roc_curve": {"fpr": np.round(fpr, 4).tolist(), "tpr": np.round(tpr, 4).tolist()},
     }
+    if include_curves:
+        fpr, tpr, _ = roc_curve(y, p, pos_label=PASS)
+        out["roc_curve"] = {"fpr": np.round(fpr, 4).tolist(), "tpr": np.round(tpr, 4).tolist()}
+    return out
 
 
-def baseline_cv(model: Pipeline, X: pd.DataFrame, y: pd.Series) -> dict[str, float]:
-    scores = cross_val_score(clone(model), X, y, scoring=SCORING, cv=cv_splitter(), n_jobs=-1)
+def baseline_cv(model: Pipeline, X: pd.DataFrame, y: pd.Series, n_jobs: int = -1) -> dict[str, float]:
+    scores = cross_val_score(clone(model), X, y, scoring=SCORING, cv=cv_splitter(), n_jobs=n_jobs)
     return {"metric": SCORING, "mean": round(scores.mean(), 4), "std": round(scores.std(), 4)}
 
 
 def search_cv(search: GridSearchCV) -> dict[str, float]:
+    """GridSearchCV's validation score (mean_test_score over held-out folds) for the best params."""
     i = search.best_index_
     return {
         "metric": SCORING,
+        "source": "GridSearchCV.cv_results_['mean_test_score'] (held-out folds)",
         "mean": round(float(search.cv_results_["mean_test_score"][i]), 4),
         "std": round(float(search.cv_results_["std_test_score"][i]), 4),
     }
@@ -145,7 +209,7 @@ def best_params(search: GridSearchCV) -> dict[str, Any]:
 
 
 def permutation_top(model, X: pd.DataFrame, y: pd.Series, top_n: int = TOP_N_IMPORTANCE) -> list[dict]:
-    """Permutation importance on raw input columns (drop in test macro-F1)."""
+    """Permutation importance on raw input columns (drop in test macro-F1, at the model's cut-off)."""
     r = permutation_importance(
         model, X, y, scoring=SCORING, n_repeats=PERM_REPEATS, random_state=RANDOM_STATE, n_jobs=-1
     )
@@ -157,16 +221,17 @@ def permutation_top(model, X: pd.DataFrame, y: pd.Series, top_n: int = TOP_N_IMP
     ]
 
 
-def fairness_check(model, X: pd.DataFrame, y: pd.Series, sex: pd.Series) -> dict[str, dict]:
+def fairness_check(model, X: pd.DataFrame, y: pd.Series, sex: pd.Series,
+                   threshold: float = DEFAULT_THRESHOLD) -> dict[str, dict]:
     """At-Risk recall per sex on the test set (sex is NOT a model feature)."""
-    y_pred = pd.Series(model.predict(X), index=X.index)
+    y_pred = pd.Series(labels_at(proba_pass(model, X), threshold), index=X.index)
     out = {}
     for group in ("F", "M"):
         mask = (sex == group) & (y == AT_RISK)
         n = int(mask.sum())
-        rec = float((y_pred[mask] == AT_RISK).mean()) if n else None
-        out[group] = {"n_test": int((sex == group).sum()), "n_at_risk": n,
-                      "at_risk_recall": round(rec, 4) if rec is not None else None}
+        caught = int((y_pred[mask] == AT_RISK).sum())
+        out[group] = {"n_test": int((sex == group).sum()), "n_at_risk": n, "n_caught": caught,
+                      "at_risk_recall": round(caught / n, 4) if n else None}
     return out
 
 
@@ -194,9 +259,24 @@ def absences_partial_dependence(model, X: pd.DataFrame) -> dict[str, Any]:
 
 
 # --------------------------------------------------------------------------- training
+def fit_rf(features: list[str], X_train: pd.DataFrame, y_train: pd.Series, monotonic: bool = True,
+           n_jobs: int = -1) -> tuple[FixedThresholdClassifier, dict[str, Any]]:
+    """GridSearchCV -> best pipeline -> OOF cut-off on train -> FixedThresholdClassifier."""
+    search = make_rf_search(features, monotonic=monotonic, n_jobs=n_jobs)
+    search.fit(X_train, y_train)
+    thr = tune_threshold(search.best_estimator_, X_train, y_train, n_jobs=n_jobs)
+    model = FixedThresholdClassifier(search.best_estimator_, threshold=thr["threshold"], pos_label=PASS,
+                                     response_method="predict_proba")
+    model.fit(X_train, y_train)  # refits a clone with the same params and seed => identical forest
+    info = {"cv": search_cv(search), "best_params": best_params(search), "monotonic_absences": monotonic,
+            "threshold_tuning": thr}
+    return model, info
+
+
 def train_scenario(df: pd.DataFrame, train_idx: np.ndarray, test_idx: np.ndarray, scenario: str,
-                   with_baselines: bool = True) -> tuple[dict[str, Any], dict[str, Any]]:
-    """Fit baselines + tuned RF on train rows; evaluate once on test rows."""
+                   with_baselines: bool = True, with_unconstrained: bool = True, n_jobs: int = -1,
+                   include_curves: bool = True) -> tuple[dict[str, Any], dict[str, Any]]:
+    """Fit baselines + tuned RFs on train rows; evaluate once on test rows at 0.5 and at the cut-off."""
     features = feature_columns(scenario)
     X, y = df[features], df[TARGET_COL]
     X_tr, y_tr, X_te, y_te = X.iloc[train_idx], y.iloc[train_idx], X.iloc[test_idx], y.iloc[test_idx]
@@ -205,17 +285,20 @@ def train_scenario(df: pd.DataFrame, train_idx: np.ndarray, test_idx: np.ndarray
     metrics: dict[str, Any] = {}
     if with_baselines:
         for name, model in (("dummy", make_dummy(features)), ("logreg", make_logreg(features))):
-            cv = baseline_cv(model, X_tr, y_tr)
+            cv = baseline_cv(model, X_tr, y_tr, n_jobs=n_jobs)
             model.fit(X_tr, y_tr)
             models[name] = model
-            metrics[name] = {"cv": cv, "test": evaluate(model, X_te, y_te)}
+            metrics[name] = {"cv": cv, "test_default": evaluate(model, X_te, y_te, include_curves=include_curves)}
 
-    search = make_rf_search(features)
-    search.fit(X_tr, y_tr)
-    rf = search.best_estimator_
-    models["rf"] = rf
-    metrics["rf"] = {"cv": search_cv(search), "best_params": best_params(search),
-                     "test": evaluate(rf, X_te, y_te)}
+    variants = [("rf", True)] + ([("rf_unconstrained", False)] if with_unconstrained else [])
+    for name, monotonic in variants:
+        model, info = fit_rf(features, X_tr, y_tr, monotonic=monotonic, n_jobs=n_jobs)
+        models[name] = model
+        metrics[name] = {
+            **info,
+            "test_default": evaluate(model, X_te, y_te, DEFAULT_THRESHOLD, include_curves=include_curves),
+            "test_tuned": evaluate(model, X_te, y_te, model.threshold, include_curves=False),
+        }
     return models, metrics
 
 
@@ -234,13 +317,42 @@ def model_path(subject: str, scenario: str):
     return MODELS_DIR / f"clf_{subject}_{scenario}.joblib"
 
 
+# --------------------------------------------------------------------------- repeated splits
+REPEATED_KEYS = ("accuracy", "f1_macro", "at_risk_recall", "at_risk_precision", "roc_auc", "false_alerts")
+
+
+def run_split(subject: str, scenario: str, seed: int) -> dict[str, Any]:
+    """Full procedure on one stratified split (seed): baselines + constrained RF + OOF cut-off.
+
+    Runs single-threaded so many seeds can run in parallel.
+    """
+    df = prepare_subject(subject)
+    train_idx, test_idx = split_indices(df, seed=seed)
+    _, m = train_scenario(df, train_idx, test_idx, scenario, with_unconstrained=False, n_jobs=1,
+                          include_curves=False)
+
+    def pick(t: dict) -> dict:
+        return {k: t[k] for k in REPEATED_KEYS}
+
+    return {
+        "subject": subject, "scenario": scenario, "seed": seed,
+        "dummy": pick(m["dummy"]["test_default"]),
+        "logreg": pick(m["logreg"]["test_default"]),
+        "rf_default": pick(m["rf"]["test_default"]),
+        "rf_tuned": pick(m["rf"]["test_tuned"]),
+        "rf_cv_f1_macro": m["rf"]["cv"]["mean"],
+        "rf_threshold": m["rf"]["threshold_tuning"]["threshold"],
+        "n_test_at_risk": m["rf"]["test_default"]["n_at_risk"],
+    }
+
+
 # --------------------------------------------------------------------------- prediction
 class InputValidationError(ValueError):
     """Raised when predict() receives missing, unknown or out-of-range values."""
 
 
 @lru_cache(maxsize=None)
-def load_model(subject: str, scenario: str) -> Pipeline:
+def load_model(subject: str, scenario: str) -> FixedThresholdClassifier:
     path = model_path(subject, scenario)
     if not path.is_file():
         raise FileNotFoundError(f"{path} not found. Run `python scripts/train_supervised.py` first.")
@@ -302,7 +414,8 @@ def validate_input(input_dict: dict[str, Any], features: list[str]) -> pd.DataFr
 def predict(subject: str, scenario: str, input_dict: dict[str, Any]) -> dict[str, Any]:
     """Predict one student.
 
-    Returns {"label", "proba_pass", "top_factors"}. top_factors are the 3 globally most
+    Returns {"label", "proba_pass", "top_factors"}. The label uses the model's tuned alert
+    cut-off (Likely to Pass iff proba_pass >= threshold). top_factors are the 3 globally most
     important features (test-set permutation importance) with this student's value, the
     training median (numeric) or most common value (categorical), and the effect of the
     student's value vs that reference on P(pass), all other inputs held fixed.
@@ -317,7 +430,7 @@ def predict(subject: str, scenario: str, input_dict: dict[str, Any]) -> dict[str
     meta = _supervised_meta(subject, scenario)
 
     p = float(proba_pass(model, X)[0])
-    label = LABEL_NAMES[PASS] if p >= 0.5 else LABEL_NAMES[AT_RISK]
+    label = LABEL_NAMES[int(model.predict(X)[0])]
 
     factors = []
     for item in meta["permutation_importance"][:N_TOP_FACTORS]:

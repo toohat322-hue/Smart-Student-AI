@@ -1,8 +1,10 @@
 """Phase 4 — Supervised learning runner.
 
-Trains Dummy / LogisticRegression / tuned RandomForest for 2 subjects x 2 scenarios,
-saves the 4 main RF pipelines to models/, runs the G3 = 0 sensitivity check and the
-absences partial-dependence check, writes reports/metrics.json["supervised"] and figures.
+Trains Dummy / LogisticRegression / tuned RandomForest for 2 subjects x 2 scenarios.
+Main RF = monotonic in absences + alert cut-off tuned on training out-of-fold predictions;
+it is wrapped in FixedThresholdClassifier and saved to models/. For comparison (not saved):
+the unconstrained RF, and the RF retrained without G3 = 0 students.
+Writes reports/metrics.json["supervised"] and figures 07–12.
 
 Usage:
     python scripts/train_supervised.py
@@ -26,9 +28,9 @@ sys.path.insert(0, str(ROOT_DIR))
 from src.config import FIGURES_DIR, MODELS_DIR, RANDOM_STATE  # noqa: E402
 from src.data import TARGET_COL  # noqa: E402
 from src.metrics_io import update_metrics  # noqa: E402
-from src.preprocessing import SCENARIOS, feature_columns  # noqa: E402
+from src.preprocessing import MONOTONIC_DECREASING, SCENARIOS, feature_columns  # noqa: E402
 from src.supervised import (  # noqa: E402
-    CV_FOLDS, PERM_REPEATS, RF_PARAM_GRID, SCORING, TEST_SIZE,
+    CV_FOLDS, DEFAULT_THRESHOLD, PERM_REPEATS, RF_PARAM_GRID, SCORING, TARGET_AT_RISK_RECALL, TEST_SIZE,
     absences_partial_dependence, evaluate, fairness_check, model_path, permutation_top,
     prepare_subject, split_indices, train_reference, train_scenario,
 )
@@ -63,6 +65,11 @@ def run() -> dict:
             "cv_scoring": SCORING, "rf_param_grid": {k.removeprefix("clf__"): v for k, v in RF_PARAM_GRID.items()},
             "permutation_repeats": PERM_REPEATS, "permutation_scoring": SCORING,
             "label_names": {"0": "At Risk", "1": "Likely to Pass"}, "headline_metric": "at_risk_recall",
+            "monotonic_decreasing_features": MONOTONIC_DECREASING,
+            "default_threshold": DEFAULT_THRESHOLD,
+            "threshold_rule": (f"smallest cut-off with out-of-fold At-Risk recall >= {TARGET_AT_RISK_RECALL:.0%} "
+                               "on the training set (5-fold, best RF params); Likely to Pass iff P(pass) >= cut-off"),
+            "saved_model": "FixedThresholdClassifier(Pipeline(preprocessor, RandomForest with monotonic_cst))",
             "features": {s: feature_columns(s) for s in SCENARIOS},
         },
         "subjects": {},
@@ -89,35 +96,46 @@ def run() -> dict:
             features = feature_columns(scenario)
             X = df[features]
             X_te, y_te = X.iloc[test_idx], y.iloc[test_idx]
+            sex_te = df["sex"].iloc[test_idx]
 
             models, metrics = train_scenario(df, train_idx, test_idx, scenario)
-            rf = models["rf"]
+            rf, rf_old = models["rf"], models["rf_unconstrained"]
             joblib.dump(rf, model_path(subject, scenario))
 
             # Sensitivity: same procedure without G3 = 0 students (not saved).
-            sens_models, sens_metrics = train_scenario(df, train_nz, test_nz, scenario, with_baselines=False)
-            rf_sens = sens_models["rf"]
+            sens_models, sens_metrics = train_scenario(df, train_nz, test_nz, scenario, with_baselines=False,
+                                                       with_unconstrained=False)
+            X_nz, y_nz = X.iloc[test_nz], y.iloc[test_nz]
 
             entry = {
                 "features": features,
+                "threshold": rf.threshold,
                 "models": metrics,
                 "permutation_importance": permutation_top(rf, X_te, y_te),
-                "fairness": fairness_check(rf, X_te, y_te, df["sex"].iloc[test_idx]),
+                "fairness": {
+                    "rf_default": fairness_check(rf, X_te, y_te, sex_te, DEFAULT_THRESHOLD),
+                    "rf_tuned": fairness_check(rf, X_te, y_te, sex_te, rf.threshold),
+                    "rf_unconstrained_default": fairness_check(rf_old, X_te, y_te, sex_te, DEFAULT_THRESHOLD),
+                },
                 "train_reference": train_reference(X.iloc[train_idx]),
                 "sensitivity_excl_g3_zero": {
                     "note": "RF retrained and tested without G3 = 0 students; metrics only, model not saved.",
-                    "rf_main_on_test_excl_g3_zero": evaluate(rf, X.iloc[test_nz], y.iloc[test_nz]),
+                    "rf_main_on_test_excl_g3_zero": {
+                        "test_default": evaluate(rf, X_nz, y_nz, DEFAULT_THRESHOLD, include_curves=False),
+                        "test_tuned": evaluate(rf, X_nz, y_nz, rf.threshold, include_curves=False),
+                    },
                     "rf_excl_g3_zero": sens_metrics["rf"],
                 },
                 "absences_partial_dependence": {
                     "note": "Mean P(pass) over all students of the subject with absences set to each value.",
                     "rf_main": absences_partial_dependence(rf, X),
-                    "rf_excl_g3_zero": absences_partial_dependence(rf_sens, X),
+                    "rf_unconstrained": absences_partial_dependence(rf_old, X),
+                    "rf_excl_g3_zero": absences_partial_dependence(sens_models["rf"], X),
                 },
             }
             subj[scenario] = entry
-            print(f"  {subject}/{scenario}: done in {time.time() - t0:.0f}s "
-                  f"(RF best {metrics['rf']['best_params']})", flush=True)
+            print(f"  {subject}/{scenario}: done in {time.time() - t0:.0f}s (RF best {metrics['rf']['best_params']}, "
+                  f"cut-off {rf.threshold})", flush=True)
         results["subjects"][subject] = subj
     return results
 
@@ -131,7 +149,8 @@ def grid_axes(figsize=(10, 8.5), **kw):
 def fig_confusion(res: dict) -> str:
     fig, axes = grid_axes(figsize=(9, 8))
     for (s, sc), ax in axes.items():
-        cm = np.array(res["subjects"][s][sc]["models"]["rf"]["test"]["confusion_matrix"]["matrix"])
+        t = res["subjects"][s][sc]["models"]["rf"]["test_tuned"]
+        cm = np.array(t["confusion_matrix"]["matrix"])
         ax.imshow(cm, cmap="Blues", vmin=0, vmax=cm.max() * 1.3)
         for i in range(2):
             for j in range(2):
@@ -142,9 +161,10 @@ def fig_confusion(res: dict) -> str:
         ax.set_xlabel("Predicted")
         ax.set_ylabel("Actual")
         ax.grid(False)
-        rec = res["subjects"][s][sc]["models"]["rf"]["test"]["at_risk_recall"]
-        ax.set_title(f"{SUBJECT_NAMES[s]} — {SCENARIO_NAMES[sc]}\nAt-Risk recall {rec:.0%}")
-    fig.suptitle("Random Forest confusion matrices (held-out test set)", fontweight="bold")
+        ax.set_title(f"{SUBJECT_NAMES[s]} — {SCENARIO_NAMES[sc]} (cut-off {t['threshold']:.3f})\n"
+                     f"At-Risk recall {t['at_risk_recall']:.0%}, false alerts {t['false_alerts']}")
+    fig.suptitle("Random Forest confusion matrices at the tuned alert cut-off (held-out test set)",
+                 fontweight="bold")
     fig.tight_layout()
     return save(fig, "07_confusion_matrices.png")
 
@@ -157,7 +177,7 @@ def fig_roc(res: dict) -> str:
         m = res["subjects"][s][sc]["models"]
         for key in ("rf", "logreg", "dummy"):
             name, color, ls = styles[key]
-            t = m[key]["test"]
+            t = m[key]["test_default"]
             ax.plot(t["roc_curve"]["fpr"], t["roc_curve"]["tpr"], color=color, linestyle=ls, linewidth=2,
                     label=f"{name} (AUC {t['roc_auc']:.2f})")
         ax.plot([0, 1], [0, 1], color="#c3c2b7", linewidth=0.8, linestyle=":")
@@ -181,48 +201,50 @@ def fig_importance(res: dict) -> str:
         ax.set_title(f"{SUBJECT_NAMES[s]} — {SCENARIO_NAMES[sc]}")
         ax.set_xlabel("Drop in test macro-F1 when shuffled")
         ax.grid(axis="y", visible=False)
-    fig.suptitle(f"Random Forest permutation importance, top 10 (test set, {PERM_REPEATS} repeats, ± std)",
-                 fontweight="bold")
+    fig.suptitle(f"Random Forest permutation importance, top 10 (test set, tuned cut-off, {PERM_REPEATS} "
+                 "repeats, ± std)", fontweight="bold")
     fig.tight_layout()
     return save(fig, "09_feature_importance.png")
 
 
 def fig_early_vs_midterm(res: dict) -> str:
     keys = [("accuracy", "Accuracy"), ("f1_macro", "Macro F1"), ("at_risk_recall", "At-Risk recall"),
-            ("roc_auc", "ROC-AUC")]
-    fig, axes = plt.subplots(1, 2, figsize=(12, 4.6), sharey=True)
+            ("at_risk_precision", "At-Risk precision"), ("roc_auc", "ROC-AUC")]
+    fig, axes = plt.subplots(1, 2, figsize=(13, 4.8), sharey=True)
     x = np.arange(len(keys))
     w = 0.38
     for ax, s in zip(axes, SUBJECT_ORDER):
         for i, (sc, color) in enumerate((("early", C_BLUE), ("midterm", C_AQUA))):
-            t = res["subjects"][s][sc]["models"]["rf"]["test"]
+            t = res["subjects"][s][sc]["models"]["rf"]["test_tuned"]
             vals = [t[k] for k, _ in keys]
             xs = x + (i - 0.5) * (w + 0.02)
-            ax.bar(xs, vals, width=w, color=color, label=SCENARIO_NAMES[sc])
+            ax.bar(xs, vals, width=w, color=color, label=f"{SCENARIO_NAMES[sc]} (cut-off {t['threshold']:.2f})")
             for xi, v in zip(xs, vals):
                 ax.text(xi, v + 0.015, f"{v:.2f}", ha="center", va="bottom", fontsize=8.5)
-        ax.set_xticks(x, labels=[n for _, n in keys])
-        ax.set_ylim(0, 1.12)
+        ax.set_xticks(x, labels=[n for _, n in keys], fontsize=9)
+        ax.set_ylim(0, 1.15)
         ax.set_title(SUBJECT_NAMES[s])
         ax.grid(axis="x", visible=False)
+        ax.legend(loc="upper left", ncol=2, fontsize=9)
     axes[0].set_ylabel("Score (test set)")
-    axes[0].legend(loc="upper left", ncol=2)
-    fig.suptitle("Random Forest: Early (no grades) vs Mid-term (with G1, G2)", fontweight="bold")
+    fig.suptitle("Random Forest at tuned cut-off: Early (no grades) vs Mid-term (with G1, G2)", fontweight="bold")
     fig.tight_layout()
     return save(fig, "10_early_vs_midterm.png")
 
 
 def fig_absences_pd(res: dict) -> str:
     fig, axes = plt.subplots(2, 2, figsize=(11, 8), sharex=True)
+    lines = (("rf_unconstrained", "RF unconstrained (old)", C_GRAY, "--"),
+             ("rf_main", "RF monotonic (saved)", C_BLUE, "-"),
+             ("rf_excl_g3_zero", "RF monotonic, without G3 = 0", C_AQUA, "-"))
     for i, s in enumerate(SUBJECT_ORDER):
         for j, sc in enumerate(SCENARIOS):
             ax = axes[i, j]
             pdd = res["subjects"][s][sc]["absences_partial_dependence"]
-            for key, name, color in (("rf_main", "RF main (G3 = 0 kept)", C_BLUE),
-                                     ("rf_excl_g3_zero", "RF without G3 = 0", C_AQUA)):
+            for key, name, color, ls in lines:
                 curve = pdd[key]["curve_0_30"]
-                xs = [int(k) for k in curve]
-                ax.plot(xs, list(curve.values()), color=color, linewidth=2, marker="o", markersize=3, label=name)
+                ax.plot([int(k) for k in curve], list(curve.values()), color=color, linestyle=ls, linewidth=2,
+                        marker="o", markersize=3, label=name)
             ax.set_title(f"{SUBJECT_NAMES[s]} — {SCENARIO_NAMES[sc]}")
             ax.set_xlabel("absences (set for every student)")
             ax.set_ylabel("Mean predicted P(pass)")
@@ -232,55 +254,98 @@ def fig_absences_pd(res: dict) -> str:
     return save(fig, "11_absences_partial_dependence.png")
 
 
+def fig_threshold_effect(res: dict) -> str:
+    """At-Risk recall and false alerts at 0.5 vs tuned cut-off."""
+    fig, axes = plt.subplots(1, 2, figsize=(12, 4.6))
+    labels = [f"{s} / {sc}" for s in SUBJECT_ORDER for sc in SCENARIOS]
+    x = np.arange(len(labels))
+    w = 0.38
+    for ax, key, ylabel in ((axes[0], "at_risk_recall", "At-Risk recall"),
+                            (axes[1], "false_alert_rate", "False-alert rate (share of passing students)")):
+        for i, (mode, name, color) in enumerate((("test_default", "cut-off 0.5", C_GRAY),
+                                                 ("test_tuned", "tuned cut-off", C_BLUE))):
+            vals = [res["subjects"][s][sc]["models"]["rf"][mode][key] for s in SUBJECT_ORDER for sc in SCENARIOS]
+            xs = x + (i - 0.5) * (w + 0.02)
+            ax.bar(xs, vals, width=w, color=color, label=name)
+            for xi, v in zip(xs, vals):
+                ax.text(xi, v + 0.015, f"{v:.0%}", ha="center", va="bottom", fontsize=8.5)
+        ax.set_xticks(x, labels=labels)
+        ax.set_ylim(0, 1.1)
+        ax.set_ylabel(ylabel)
+        ax.grid(axis="x", visible=False)
+        ax.legend(loc="upper left", ncol=2)
+    axes[0].axhline(TARGET_AT_RISK_RECALL, color=C_TEXT2, linestyle=":", linewidth=1)
+    fig.suptitle("Effect of the tuned alert cut-off on the test set (monotonic RF)", fontweight="bold")
+    fig.tight_layout()
+    return save(fig, "12_threshold_effect.png")
+
+
 # --------------------------------------------------------------------------- summary
+def row(name: str, t: dict) -> str:
+    return (f"  {name:34s} {t['threshold']:6.3f} {t['accuracy']:6.3f} {t['f1_macro']:6.3f} "
+            f"{t['at_risk_recall']:7.3f} {t['at_risk_precision']:7.3f} {t['roc_auc']:6.3f} "
+            f"{t['false_alerts']:4d}/{t['n'] - t['n_at_risk']:<4d}")
+
+
 def print_summary(res: dict) -> None:
-    print("\n" + "=" * 100)
-    print("TEST-SET COMPARISON  (RF w/o G3=0 is trained and tested without G3 = 0 students;"
-          " 'RF main*' = main RF on that same reduced test set)")
-    print("=" * 100)
-    hdr = f"{'subject/scenario':18s} {'model':22s} {'n_test':>6s} {'acc':>6s} {'F1mac':>6s} {'AR-rec':>7s} {'AUC':>6s}"
-    print(hdr)
-    print("-" * len(hdr))
+    print("\n" + "=" * 104)
+    print("TEST-SET COMPARISON (seed-42 split)")
+    print("=" * 104)
+    hdr = (f"  {'model':34s} {'cut':>6s} {'acc':>6s} {'F1mac':>6s} {'AR-rec':>7s} {'AR-prec':>7s} {'AUC':>6s} "
+           f"{'false alerts':>12s}")
     for s in SUBJECT_ORDER:
         for sc in SCENARIOS:
             e = res["subjects"][s][sc]
-            rows = [("Dummy", e["models"]["dummy"]["test"]), ("LogReg", e["models"]["logreg"]["test"]),
-                    ("RF main", e["models"]["rf"]["test"]),
-                    ("RF main* (test w/o 0)", e["sensitivity_excl_g3_zero"]["rf_main_on_test_excl_g3_zero"]),
-                    ("RF w/o G3=0", e["sensitivity_excl_g3_zero"]["rf_excl_g3_zero"]["test"])]
-            for k, (name, t) in enumerate(rows):
-                tag = f"{s}/{sc}" if k == 0 else ""
-                print(f"{tag:18s} {name:22s} {t['n']:6d} {t['accuracy']:6.3f} {t['f1_macro']:6.3f} "
-                      f"{t['at_risk_recall']:7.3f} {t['roc_auc']:6.3f}")
-            print()
+            m = e["models"]
+            print(f"\n[{s} / {sc}]   n_test={m['rf']['test_default']['n']}, "
+                  f"At Risk={m['rf']['test_default']['n_at_risk']}")
+            print(hdr)
+            print(row("Dummy", m["dummy"]["test_default"]))
+            print(row("LogReg", m["logreg"]["test_default"]))
+            print(row("RF old (unconstrained) @0.5", m["rf_unconstrained"]["test_default"]))
+            print(row("RF old (unconstrained) @tuned", m["rf_unconstrained"]["test_tuned"]))
+            print(row("RF monotonic @0.5", m["rf"]["test_default"]))
+            print(row("RF monotonic @tuned  [SAVED]", m["rf"]["test_tuned"]))
+            sens = e["sensitivity_excl_g3_zero"]
+            print(row("RF monotonic @tuned, test w/o G3=0", sens["rf_main_on_test_excl_g3_zero"]["test_tuned"]))
+            print(row("RF w/o G3=0 @tuned, test w/o G3=0", sens["rf_excl_g3_zero"]["test_tuned"]))
 
-    print("CV macro-F1 (train, 5-fold) and RF best params:")
+    print("\nCut-off tuning (training out-of-fold) and CV macro-F1 (GridSearchCV mean_test_score):")
     for s in SUBJECT_ORDER:
         for sc in SCENARIOS:
-            m = res["subjects"][s][sc]["models"]
-            cv = {k: f"{m[k]['cv']['mean']:.3f}±{m[k]['cv']['std']:.3f}" for k in ("dummy", "logreg", "rf")}
-            print(f"  {s}/{sc:8s} dummy {cv['dummy']}  logreg {cv['logreg']}  rf {cv['rf']}  {m['rf']['best_params']}")
+            for key in ("rf", "rf_unconstrained"):
+                m = res["subjects"][s][sc]["models"][key]
+                t = m["threshold_tuning"]
+                print(f"  {s}/{sc:8s} {key:17s} cut-off {t['threshold']:.3f}  OOF AR-recall "
+                      f"{t['oof_at_risk_recall_at_default']:.2f} -> {t['oof_at_risk_recall']:.2f}  "
+                      f"OOF AR-prec {t['oof_at_risk_precision']:.2f}  CV F1 {m['cv']['mean']:.3f}±{m['cv']['std']:.3f}  "
+                      f"{m['best_params']}")
 
-    print("\nTop 5 permutation importance (RF main):")
+    print("\nTop 5 permutation importance (saved model):")
     for s in SUBJECT_ORDER:
         for sc in SCENARIOS:
             imp = res["subjects"][s][sc]["permutation_importance"][:5]
             print(f"  {s}/{sc:8s} " + ", ".join(f"{d['feature']} {d['mean']:.3f}" for d in imp))
 
-    print("\nFairness — At-Risk recall by sex (test set, RF main):")
+    print("\nFairness — At-Risk recall by sex on the test set (caught / At-Risk):")
     for s in SUBJECT_ORDER:
         for sc in SCENARIOS:
             f = res["subjects"][s][sc]["fairness"]
-            print(f"  {s}/{sc:8s} F {f['F']['at_risk_recall']:.2f} (n={f['F']['n_at_risk']})   "
-                  f"M {f['M']['at_risk_recall']:.2f} (n={f['M']['n_at_risk']})")
+            parts = []
+            for key, name in (("rf_unconstrained_default", "old@0.5"), ("rf_default", "mono@0.5"),
+                              ("rf_tuned", "mono@tuned")):
+                g = f[key]
+                parts.append(f"{name}: F {g['F']['at_risk_recall']:.2f} ({g['F']['n_caught']}/{g['F']['n_at_risk']})"
+                             f"  M {g['M']['at_risk_recall']:.2f} ({g['M']['n_caught']}/{g['M']['n_at_risk']})")
+            print(f"  {s}/{sc:8s} " + "  |  ".join(parts))
 
     print("\nAbsences partial dependence — mean P(pass) by absences bin:")
     for s in SUBJECT_ORDER:
         for sc in SCENARIOS:
-            for key in ("rf_main", "rf_excl_g3_zero"):
+            for key in ("rf_unconstrained", "rf_main", "rf_excl_g3_zero"):
                 b = res["subjects"][s][sc]["absences_partial_dependence"][key]["by_bin"]
                 flag = "  <-- 0 absences => higher risk" if b["0"] < b["1–5"] - PD_GAP else ""
-                print(f"  {s}/{sc:8s} {key:16s} " + "  ".join(f"{k}: {v:.3f}" for k, v in b.items()) + flag)
+                print(f"  {s}/{sc:8s} {key:17s} " + "  ".join(f"{k}: {v:.3f}" for k, v in b.items()) + flag)
 
 
 def main() -> int:
@@ -290,7 +355,7 @@ def main() -> int:
     print("Training supervised models ...", flush=True)
     res = run()
     res["figures"] = [fig_confusion(res), fig_roc(res), fig_importance(res), fig_early_vs_midterm(res),
-                      fig_absences_pd(res)]
+                      fig_absences_pd(res), fig_threshold_effect(res)]
     update_metrics("supervised", res)
     print_summary(res)
     print("\nSaved models:", ", ".join(f"models/{model_path(s, sc).name}" for s in SUBJECT_ORDER for sc in SCENARIOS))
