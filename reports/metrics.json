@@ -15455,7 +15455,9 @@
       "skip_coef": {
         "absences": 0.05
       },
-      "alpha": 0.1,
+      "alpha_schedule": "max(0.01, 1 / visits**0.6) per (state, action)",
+      "alpha_power": 0.6,
+      "comparison_constant_alpha": 0.1,
       "gamma": 0.9,
       "eps_start": 1.0,
       "eps_end": 0.05,
@@ -15583,10 +15585,10 @@
           "evaluation": {
             "learned": {
               "n_episodes": 1000,
-              "mean_reward": 47.025,
-              "std_reward": 9.9461,
-              "mastery_rate": 0.953,
-              "mean_steps_to_mastery": 10.9391
+              "mean_reward": 48.969,
+              "std_reward": 7.4577,
+              "mastery_rate": 0.973,
+              "mean_steps_to_mastery": 9.9394
             },
             "random": {
               "n_episodes": 1000,
@@ -15642,35 +15644,35 @@
             }
           },
           "learned_minus_best_fixed": {
-            "mean": 10.511,
-            "se": 0.556,
-            "share_episodes_better": 0.623
+            "mean": 12.455,
+            "se": 0.548,
+            "share_episodes_better": 0.708
           },
           "learned_minus_random": {
-            "mean": 12.834,
-            "se": 0.599,
-            "share_episodes_better": 0.744
+            "mean": 14.778,
+            "se": 0.605,
+            "share_episodes_better": 0.81
           },
           "optimal_minus_learned": {
-            "mean": 1.944,
-            "se": 0.304,
-            "share_episodes_better": 0.517
+            "mean": 0.0,
+            "se": 0.0,
+            "share_episodes_better": 0.0
           },
           "policy": [
             [
+              1,
               2,
-              2,
-              0
-            ],
-            [
-              2,
-              2,
-              0
+              1
             ],
             [
               2,
               2,
               1
+            ],
+            [
+              2,
+              2,
+              0
             ],
             [
               2,
@@ -15712,64 +15714,64 @@
           ],
           "q_table": [
             [
-              15.0102,
-              17.0649,
-              18.4358
+              17.5317,
+              19.1317,
+              18.0629
             ],
             [
-              19.3349,
-              19.7578,
-              24.9708
+              19.6434,
+              21.8624,
+              22.6583
             ],
             [
-              28.0225,
-              23.8787,
-              21.6323
+              25.8857,
+              26.5855,
+              25.2803
             ],
             [
-              17.8339,
-              18.1861,
-              19.0715
+              16.894,
+              17.808,
+              18.334
             ],
             [
-              18.0125,
-              18.5053,
-              21.9028
+              17.5974,
+              21.0213,
+              21.9346
             ],
             [
-              26.9112,
-              22.8831,
-              23.0654
+              25.1044,
+              25.5209,
+              24.1541
             ],
             [
-              15.2441,
-              14.7913,
-              17.5144
+              15.0618,
+              16.5957,
+              17.2088
             ],
             [
-              18.5867,
-              18.0257,
-              21.6682
+              17.6637,
+              19.5157,
+              21.3258
             ],
             [
-              20.1757,
-              24.9548,
-              21.3551
+              25.5609,
+              23.8006,
+              23.5765
             ],
             [
-              15.7826,
-              15.0706,
-              17.7399
+              15.6175,
+              15.3348,
+              18.3562
             ],
             [
-              17.4422,
-              16.2202,
-              23.1778
+              18.3651,
+              18.9735,
+              21.4192
             ],
             [
-              24.7919,
-              22.1023,
-              21.0561
+              25.2567,
+              23.0805,
+              22.7266
             ],
             [
               0.0,
@@ -15866,64 +15868,64 @@
           ],
           "visits": [
             [
-              39,
-              44,
-              136
+              47,
+              68,
+              84
             ],
             [
-              206,
-              339,
-              1401
+              148,
+              398,
+              947
             ],
             [
-              3249,
-              5859,
-              1173
+              1476,
+              8090,
+              976
             ],
             [
-              140,
-              368,
-              236
+              111,
+              263,
+              216
             ],
             [
-              405,
-              941,
-              3154
+              367,
+              464,
+              2536
             ],
             [
-              3874,
-              3594,
-              812
+              1322,
+              7479,
+              776
             ],
             [
-              175,
-              264,
-              703
+              205,
+              249,
+              569
             ],
             [
-              486,
-              801,
-              4681
+              490,
+              500,
+              3990
             ],
             [
-              5346,
-              2064,
-              852
+              6660,
+              707,
+              689
             ],
             [
-              223,
-              234,
-              620
+              241,
+              220,
+              638
             ],
             [
-              623,
-              673,
-              5194
+              635,
+              622,
+              5626
             ],
             [
-              5892,
-              774,
-              774
+              6010,
+              660,
+              668
             ],
             [
               0,
@@ -15941,163 +15943,131 @@
               0
             ]
           ],
-          "decision_states_matching_optimal": 7,
+          "decision_states_matching_optimal": 11,
           "n_decision_states": 12,
           "mismatches_vs_optimal": [
-            {
-              "knowledge": 0,
-              "energy": 0,
-              "learned": "Review Notes",
-              "optimal": "Watch Videos",
-              "q_star_loss": 0.198,
-              "visits": 219
-            },
-            {
-              "knowledge": 0,
-              "energy": 2,
-              "learned": "Practice Quizzes",
-              "optimal": "Watch Videos",
-              "q_star_loss": 0.645,
-              "visits": 10281
-            },
             {
               "knowledge": 1,
               "energy": 0,
               "learned": "Review Notes",
               "optimal": "Watch Videos",
               "q_star_loss": 0.191,
-              "visits": 744
-            },
-            {
-              "knowledge": 1,
-              "energy": 2,
-              "learned": "Practice Quizzes",
-              "optimal": "Watch Videos",
-              "q_star_loss": 0.575,
-              "visits": 8280
-            },
-            {
-              "knowledge": 2,
-              "energy": 2,
-              "learned": "Watch Videos",
-              "optimal": "Practice Quizzes",
-              "q_star_loss": 0.831,
-              "visits": 8262
+              "visits": 590
             }
           ],
           "near_tie_states_q_star": 3,
           "learning_curve_100": [
-            39.3,
-            38.58,
-            36.59,
-            40.49,
-            42.75,
-            39.21,
-            41.04,
-            40.54,
-            42.7,
-            41.98,
-            43.05,
-            44.15,
-            43.22,
-            44.36,
-            45.0,
-            45.94,
-            45.78,
-            47.24,
-            45.86,
-            47.05,
-            45.8,
-            45.31,
-            43.26,
-            45.47,
-            46.56,
-            47.44,
-            49.39,
-            47.69,
-            46.73,
-            45.54,
-            47.27,
-            48.44,
-            49.09,
-            47.32,
-            47.34,
-            49.0,
-            49.01,
-            47.65,
-            46.78,
-            47.95,
-            47.11,
-            49.18,
-            45.51,
-            46.79,
-            47.71,
-            47.72,
-            47.44,
+            38.59,
+            36.32,
+            34.04,
+            43.28,
+            39.43,
+            38.49,
+            40.58,
+            40.19,
+            43.64,
+            43.98,
+            43.33,
             45.68,
-            46.54,
-            47.06
+            45.27,
+            47.21,
+            42.3,
+            46.64,
+            45.39,
+            46.65,
+            47.36,
+            48.44,
+            45.29,
+            46.91,
+            45.02,
+            46.67,
+            46.82,
+            48.67,
+            48.54,
+            48.49,
+            48.07,
+            47.98,
+            50.06,
+            47.55,
+            49.93,
+            49.13,
+            47.21,
+            47.96,
+            48.54,
+            48.09,
+            48.06,
+            49.55,
+            49.14,
+            47.42,
+            48.61,
+            47.31,
+            49.23,
+            48.33,
+            48.02,
+            47.98,
+            48.85,
+            48.64
           ],
           "checkpoints": [
             {
               "episode": 250,
               "epsilon": 0.8299,
-              "greedy_mean_reward": 48.037,
+              "greedy_mean_reward": 42.93,
               "decision_states_changed": null
             },
             {
               "episode": 500,
               "epsilon": 0.6882,
-              "greedy_mean_reward": 47.3,
+              "greedy_mean_reward": 48.077,
               "decision_states_changed": 4
             },
             {
               "episode": 750,
               "epsilon": 0.5707,
-              "greedy_mean_reward": 48.77,
-              "decision_states_changed": 4
+              "greedy_mean_reward": 47.313,
+              "decision_states_changed": 2
             },
             {
               "episode": 1000,
               "epsilon": 0.4732,
-              "greedy_mean_reward": 42.523,
+              "greedy_mean_reward": 49.217,
               "decision_states_changed": 4
             },
             {
               "episode": 1250,
               "epsilon": 0.3924,
-              "greedy_mean_reward": 48.77,
-              "decision_states_changed": 4
+              "greedy_mean_reward": 48.81,
+              "decision_states_changed": 1
             },
             {
               "episode": 1500,
               "epsilon": 0.3254,
-              "greedy_mean_reward": 43.72,
+              "greedy_mean_reward": 48.71,
               "decision_states_changed": 2
             },
             {
               "episode": 1750,
               "epsilon": 0.2699,
-              "greedy_mean_reward": 48.29,
-              "decision_states_changed": 3
+              "greedy_mean_reward": 48.6,
+              "decision_states_changed": 2
             },
             {
               "episode": 2000,
               "epsilon": 0.2238,
-              "greedy_mean_reward": 48.6,
-              "decision_states_changed": 3
+              "greedy_mean_reward": 49.217,
+              "decision_states_changed": 1
             },
             {
               "episode": 2250,
               "epsilon": 0.1856,
-              "greedy_mean_reward": 48.46,
+              "greedy_mean_reward": 49.217,
               "decision_states_changed": 1
             },
             {
               "episode": 2500,
               "epsilon": 0.1539,
-              "greedy_mean_reward": 41.907,
-              "decision_states_changed": 1
+              "greedy_mean_reward": 48.187,
+              "decision_states_changed": 2
             },
             {
               "episode": 2750,
@@ -16108,59 +16078,288 @@
             {
               "episode": 3000,
               "epsilon": 0.1058,
-              "greedy_mean_reward": 48.29,
+              "greedy_mean_reward": 48.6,
               "decision_states_changed": 1
             },
             {
               "episode": 3250,
               "epsilon": 0.0877,
-              "greedy_mean_reward": 42.913,
+              "greedy_mean_reward": 49.217,
               "decision_states_changed": 1
             },
             {
               "episode": 3500,
               "epsilon": 0.0728,
-              "greedy_mean_reward": 48.6,
-              "decision_states_changed": 3
+              "greedy_mean_reward": 49.217,
+              "decision_states_changed": 0
             },
             {
               "episode": 3750,
               "epsilon": 0.0603,
               "greedy_mean_reward": 49.217,
-              "decision_states_changed": 1
+              "decision_states_changed": 0
             },
             {
               "episode": 4000,
               "epsilon": 0.05,
-              "greedy_mean_reward": 48.29,
-              "decision_states_changed": 2
+              "greedy_mean_reward": 48.6,
+              "decision_states_changed": 1
             },
             {
               "episode": 4250,
-              "epsilon": 0.05,
-              "greedy_mean_reward": 48.187,
-              "decision_states_changed": 1
-            },
-            {
-              "episode": 4500,
-              "epsilon": 0.05,
-              "greedy_mean_reward": 48.29,
-              "decision_states_changed": 1
-            },
-            {
-              "episode": 4750,
               "epsilon": 0.05,
               "greedy_mean_reward": 49.217,
               "decision_states_changed": 1
             },
             {
+              "episode": 4500,
+              "epsilon": 0.05,
+              "greedy_mean_reward": 49.217,
+              "decision_states_changed": 0
+            },
+            {
+              "episode": 4750,
+              "epsilon": 0.05,
+              "greedy_mean_reward": 49.217,
+              "decision_states_changed": 0
+            },
+            {
               "episode": 5000,
               "epsilon": 0.05,
-              "greedy_mean_reward": 47.05,
-              "decision_states_changed": 3
+              "greedy_mean_reward": 49.217,
+              "decision_states_changed": 0
             }
           ],
           "convergence": {
+            "last5_checkpoint_greedy_reward_range": 0.617,
+            "last5_checkpoint_states_changed": [
+              1,
+              1,
+              0,
+              0,
+              0
+            ],
+            "behaviour_reward_last_1000_first_half_vs_second_half": [
+              48.342,
+              48.364
+            ]
+          },
+          "comparison_constant_alpha": {
+            "alpha": 0.1,
+            "decision_states_matching_optimal": 7,
+            "evaluation": {
+              "n_episodes": 1000,
+              "mean_reward": 47.025,
+              "std_reward": 9.9461,
+              "mastery_rate": 0.953,
+              "mean_steps_to_mastery": 10.9391
+            },
+            "optimal_minus_learned": {
+              "mean": 1.944,
+              "se": 0.304,
+              "share_episodes_better": 0.517
+            },
+            "policy": [
+              [
+                2,
+                2,
+                0
+              ],
+              [
+                2,
+                2,
+                0
+              ],
+              [
+                2,
+                2,
+                1
+              ],
+              [
+                2,
+                2,
+                0
+              ],
+              [
+                null,
+                null,
+                null
+              ]
+            ],
+            "learning_curve_100": [
+              39.3,
+              38.58,
+              36.59,
+              40.49,
+              42.75,
+              39.21,
+              41.04,
+              40.54,
+              42.7,
+              41.98,
+              43.05,
+              44.15,
+              43.22,
+              44.36,
+              45.0,
+              45.94,
+              45.78,
+              47.24,
+              45.86,
+              47.05,
+              45.8,
+              45.31,
+              43.26,
+              45.47,
+              46.56,
+              47.44,
+              49.39,
+              47.69,
+              46.73,
+              45.54,
+              47.27,
+              48.44,
+              49.09,
+              47.32,
+              47.34,
+              49.0,
+              49.01,
+              47.65,
+              46.78,
+              47.95,
+              47.11,
+              49.18,
+              45.51,
+              46.79,
+              47.71,
+              47.72,
+              47.44,
+              45.68,
+              46.54,
+              47.06
+            ],
+            "checkpoints": [
+              {
+                "episode": 250,
+                "epsilon": 0.8299,
+                "greedy_mean_reward": 48.037,
+                "decision_states_changed": null
+              },
+              {
+                "episode": 500,
+                "epsilon": 0.6882,
+                "greedy_mean_reward": 47.3,
+                "decision_states_changed": 4
+              },
+              {
+                "episode": 750,
+                "epsilon": 0.5707,
+                "greedy_mean_reward": 48.77,
+                "decision_states_changed": 4
+              },
+              {
+                "episode": 1000,
+                "epsilon": 0.4732,
+                "greedy_mean_reward": 42.523,
+                "decision_states_changed": 4
+              },
+              {
+                "episode": 1250,
+                "epsilon": 0.3924,
+                "greedy_mean_reward": 48.77,
+                "decision_states_changed": 4
+              },
+              {
+                "episode": 1500,
+                "epsilon": 0.3254,
+                "greedy_mean_reward": 43.72,
+                "decision_states_changed": 2
+              },
+              {
+                "episode": 1750,
+                "epsilon": 0.2699,
+                "greedy_mean_reward": 48.29,
+                "decision_states_changed": 3
+              },
+              {
+                "episode": 2000,
+                "epsilon": 0.2238,
+                "greedy_mean_reward": 48.6,
+                "decision_states_changed": 3
+              },
+              {
+                "episode": 2250,
+                "epsilon": 0.1856,
+                "greedy_mean_reward": 48.46,
+                "decision_states_changed": 1
+              },
+              {
+                "episode": 2500,
+                "epsilon": 0.1539,
+                "greedy_mean_reward": 41.907,
+                "decision_states_changed": 1
+              },
+              {
+                "episode": 2750,
+                "epsilon": 0.1276,
+                "greedy_mean_reward": 49.217,
+                "decision_states_changed": 3
+              },
+              {
+                "episode": 3000,
+                "epsilon": 0.1058,
+                "greedy_mean_reward": 48.29,
+                "decision_states_changed": 1
+              },
+              {
+                "episode": 3250,
+                "epsilon": 0.0877,
+                "greedy_mean_reward": 42.913,
+                "decision_states_changed": 1
+              },
+              {
+                "episode": 3500,
+                "epsilon": 0.0728,
+                "greedy_mean_reward": 48.6,
+                "decision_states_changed": 3
+              },
+              {
+                "episode": 3750,
+                "epsilon": 0.0603,
+                "greedy_mean_reward": 49.217,
+                "decision_states_changed": 1
+              },
+              {
+                "episode": 4000,
+                "epsilon": 0.05,
+                "greedy_mean_reward": 48.29,
+                "decision_states_changed": 2
+              },
+              {
+                "episode": 4250,
+                "epsilon": 0.05,
+                "greedy_mean_reward": 48.187,
+                "decision_states_changed": 1
+              },
+              {
+                "episode": 4500,
+                "epsilon": 0.05,
+                "greedy_mean_reward": 48.29,
+                "decision_states_changed": 1
+              },
+              {
+                "episode": 4750,
+                "epsilon": 0.05,
+                "greedy_mean_reward": 49.217,
+                "decision_states_changed": 1
+              },
+              {
+                "episode": 5000,
+                "epsilon": 0.05,
+                "greedy_mean_reward": 47.05,
+                "decision_states_changed": 3
+              }
+            ],
             "last5_checkpoint_greedy_reward_range": 2.167,
             "last5_checkpoint_states_changed": [
               2,
@@ -16168,14 +16367,7 @@
               1,
               1,
               3
-            ],
-            "behaviour_reward_last_1000_first_half_vs_second_half": [
-              47.26,
-              46.888
-            ],
-            "diag_constant_alpha_20000_matching_optimal": 11,
-            "diag_visit_alpha_5000_matching_optimal": 11,
-            "diag_visit_alpha_5000_mean_reward": 48.969
+            ]
           }
         },
         "1": {
@@ -16289,10 +16481,10 @@
           "evaluation": {
             "learned": {
               "n_episodes": 1000,
-              "mean_reward": 43.093,
-              "std_reward": 13.8111,
-              "mastery_rate": 0.898,
-              "mean_steps_to_mastery": 11.9009
+              "mean_reward": 44.39,
+              "std_reward": 12.97,
+              "mastery_rate": 0.906,
+              "mean_steps_to_mastery": 11.6667
             },
             "random": {
               "n_episodes": 1000,
@@ -16348,25 +16540,25 @@
             }
           },
           "learned_minus_best_fixed": {
-            "mean": 16.663,
-            "se": 0.627,
-            "share_episodes_better": 0.784
+            "mean": 17.96,
+            "se": 0.609,
+            "share_episodes_better": 0.863
           },
           "learned_minus_random": {
-            "mean": 19.892,
-            "se": 0.696,
-            "share_episodes_better": 0.827
+            "mean": 21.189,
+            "se": 0.687,
+            "share_episodes_better": 0.869
           },
           "optimal_minus_learned": {
-            "mean": 1.297,
-            "se": 0.378,
-            "share_episodes_better": 0.329
+            "mean": 0.0,
+            "se": 0.0,
+            "share_episodes_better": 0.0
           },
           "policy": [
             [
               1,
-              1,
-              0
+              2,
+              1
             ],
             [
               1,
@@ -16418,64 +16610,64 @@
           ],
           "q_table": [
             [
-              12.5789,
-              19.5339,
-              13.0479
+              14.9485,
+              16.507,
+              15.7351
             ],
             [
-              12.5967,
-              19.2736,
-              16.2041
+              13.8492,
+              17.7577,
+              18.6527
             ],
             [
-              23.8362,
-              20.7928,
-              20.5861
+              22.0251,
+              23.773,
+              21.7566
             ],
             [
-              11.5724,
-              15.9807,
-              12.2605
+              13.8811,
+              15.5421,
+              13.9419
             ],
             [
-              12.845,
-              15.6069,
-              18.082
+              14.3338,
+              16.9441,
+              18.9568
             ],
             [
-              20.6166,
-              21.1934,
-              19.2494
+              21.3416,
+              22.7367,
+              21.6701
             ],
             [
-              10.9204,
-              11.0211,
-              14.3256
+              12.6071,
+              13.6478,
+              14.2508
             ],
             [
-              12.4405,
-              15.0782,
-              16.8347
+              13.124,
+              15.441,
+              19.2724
             ],
             [
-              21.6995,
-              19.8463,
-              19.6935
+              23.6187,
+              21.9403,
+              21.2467
             ],
             [
-              10.9872,
-              11.1918,
-              11.9241
+              14.2645,
+              14.4832,
+              15.4445
             ],
             [
-              13.667,
-              12.8217,
-              20.1583
+              15.1289,
+              16.5172,
+              19.7467
             ],
             [
-              23.3932,
-              19.2331,
-              19.7148
+              24.1439,
+              22.4569,
+              22.057
             ],
             [
               0.0,
@@ -16572,64 +16764,64 @@
           ],
           "visits": [
             [
-              167,
-              725,
-              144
+              109,
+              390,
+              97
             ],
             [
-              297,
-              922,
-              1754
+              237,
+              348,
+              2399
             ],
             [
-              2956,
-              4829,
-              1347
+              1166,
+              7700,
+              844
             ],
             [
-              464,
-              2321,
-              617
+              384,
+              1353,
+              355
             ],
             [
-              643,
-              1609,
-              5083
+              573,
+              667,
+              5674
             ],
             [
-              2098,
-              2935,
-              779
+              1000,
+              5819,
+              633
             ],
             [
-              971,
-              1313,
-              3236
+              640,
+              1102,
+              1993
             ],
             [
-              751,
-              900,
-              7767
+              689,
+              685,
+              7014
             ],
             [
-              3874,
-              999,
-              723
+              4785,
+              531,
+              592
             ],
             [
-              953,
-              873,
-              2339
+              599,
+              615,
+              2076
             ],
             [
-              812,
-              821,
-              7621
+              754,
+              755,
+              8367
             ],
             [
-              3694,
-              523,
-              520
+              4007,
+              378,
+              345
             ],
             [
               0,
@@ -16647,202 +16839,414 @@
               0
             ]
           ],
-          "decision_states_matching_optimal": 10,
+          "decision_states_matching_optimal": 12,
           "n_decision_states": 12,
-          "mismatches_vs_optimal": [
-            {
-              "knowledge": 0,
-              "energy": 1,
-              "learned": "Watch Videos",
-              "optimal": "Review Notes",
-              "q_star_loss": 0.675,
-              "visits": 2973
-            },
-            {
-              "knowledge": 0,
-              "energy": 2,
-              "learned": "Practice Quizzes",
-              "optimal": "Watch Videos",
-              "q_star_loss": 0.719,
-              "visits": 9132
-            }
-          ],
+          "mismatches_vs_optimal": [],
           "near_tie_states_q_star": 1,
           "learning_curve_100": [
-            25.11,
-            21.07,
-            27.63,
-            26.84,
-            28.47,
-            29.29,
-            27.02,
-            29.73,
-            30.02,
-            34.06,
-            33.91,
-            29.21,
-            32.84,
-            36.67,
-            37.25,
-            35.82,
-            32.98,
-            35.14,
-            31.67,
-            34.76,
-            39.12,
-            41.08,
-            39.71,
-            37.48,
-            37.17,
-            41.59,
-            40.88,
+            24.78,
+            22.46,
+            31.4,
+            28.27,
+            29.35,
+            29.83,
+            30.22,
+            32.08,
+            32.55,
+            33.81,
+            33.53,
+            34.25,
+            35.56,
+            38.43,
+            38.39,
+            35.63,
+            38.81,
+            37.65,
+            35.72,
+            41.27,
+            37.26,
             39.61,
-            39.34,
-            37.74,
-            36.34,
-            40.6,
-            37.56,
-            37.87,
-            39.16,
-            35.97,
-            40.44,
-            40.51,
-            39.57,
-            43.99,
-            44.14,
-            43.12,
-            38.04,
-            43.9,
-            41.09,
+            42.91,
+            38.52,
+            40.7,
+            43.16,
+            43.02,
+            43.3,
+            44.7,
+            39.56,
+            41.98,
             40.97,
-            43.61,
-            38.82,
-            40.94,
-            41.6
+            44.69,
+            42.55,
+            41.92,
+            41.6,
+            41.71,
+            39.94,
+            42.45,
+            41.82,
+            44.41,
+            45.73,
+            46.4,
+            42.24,
+            45.02,
+            44.61,
+            43.6,
+            42.58,
+            45.21,
+            42.04
           ],
           "checkpoints": [
             {
               "episode": 250,
               "epsilon": 0.8299,
-              "greedy_mean_reward": 37.653,
+              "greedy_mean_reward": 43.963,
               "decision_states_changed": null
             },
             {
               "episode": 500,
               "epsilon": 0.6882,
-              "greedy_mean_reward": 36.03,
-              "decision_states_changed": 5
+              "greedy_mean_reward": 44.057,
+              "decision_states_changed": 2
             },
             {
               "episode": 750,
               "epsilon": 0.5707,
-              "greedy_mean_reward": 42.203,
-              "decision_states_changed": 4
+              "greedy_mean_reward": 43.37,
+              "decision_states_changed": 2
             },
             {
               "episode": 1000,
               "epsilon": 0.4732,
               "greedy_mean_reward": 43.963,
-              "decision_states_changed": 4
+              "decision_states_changed": 1
             },
             {
               "episode": 1250,
               "epsilon": 0.3924,
-              "greedy_mean_reward": 38.53,
-              "decision_states_changed": 2
+              "greedy_mean_reward": 43.963,
+              "decision_states_changed": 0
             },
             {
               "episode": 1500,
               "epsilon": 0.3254,
-              "greedy_mean_reward": 42.417,
-              "decision_states_changed": 3
+              "greedy_mean_reward": 43.963,
+              "decision_states_changed": 0
             },
             {
               "episode": 1750,
               "epsilon": 0.2699,
-              "greedy_mean_reward": 34.903,
-              "decision_states_changed": 5
+              "greedy_mean_reward": 43.963,
+              "decision_states_changed": 0
             },
             {
               "episode": 2000,
               "epsilon": 0.2238,
-              "greedy_mean_reward": 41.963,
-              "decision_states_changed": 3
+              "greedy_mean_reward": 43.963,
+              "decision_states_changed": 0
             },
             {
               "episode": 2250,
               "epsilon": 0.1856,
-              "greedy_mean_reward": 41.963,
-              "decision_states_changed": 0
+              "greedy_mean_reward": 43.793,
+              "decision_states_changed": 1
             },
             {
               "episode": 2500,
               "epsilon": 0.1539,
-              "greedy_mean_reward": 35.573,
-              "decision_states_changed": 5
+              "greedy_mean_reward": 43.963,
+              "decision_states_changed": 2
             },
             {
               "episode": 2750,
               "epsilon": 0.1276,
-              "greedy_mean_reward": 41.463,
-              "decision_states_changed": 4
+              "greedy_mean_reward": 42.227,
+              "decision_states_changed": 2
             },
             {
               "episode": 3000,
               "epsilon": 0.1058,
-              "greedy_mean_reward": 42.823,
+              "greedy_mean_reward": 43.963,
               "decision_states_changed": 2
             },
             {
               "episode": 3250,
               "epsilon": 0.0877,
-              "greedy_mean_reward": 41.647,
+              "greedy_mean_reward": 43.963,
               "decision_states_changed": 1
             },
             {
               "episode": 3500,
               "epsilon": 0.0728,
-              "greedy_mean_reward": 41.497,
-              "decision_states_changed": 2
+              "greedy_mean_reward": 43.963,
+              "decision_states_changed": 0
             },
             {
               "episode": 3750,
               "epsilon": 0.0603,
-              "greedy_mean_reward": 43.793,
+              "greedy_mean_reward": 41.997,
               "decision_states_changed": 2
             },
             {
               "episode": 4000,
               "epsilon": 0.05,
-              "greedy_mean_reward": 43.793,
-              "decision_states_changed": 0
+              "greedy_mean_reward": 43.963,
+              "decision_states_changed": 2
             },
             {
               "episode": 4250,
               "epsilon": 0.05,
-              "greedy_mean_reward": 37.653,
-              "decision_states_changed": 1
+              "greedy_mean_reward": 43.963,
+              "decision_states_changed": 0
             },
             {
               "episode": 4500,
               "epsilon": 0.05,
-              "greedy_mean_reward": 43.793,
-              "decision_states_changed": 2
+              "greedy_mean_reward": 41.963,
+              "decision_states_changed": 1
             },
             {
               "episode": 4750,
               "epsilon": 0.05,
-              "greedy_mean_reward": 43.793,
-              "decision_states_changed": 0
+              "greedy_mean_reward": 43.963,
+              "decision_states_changed": 1
             },
             {
               "episode": 5000,
               "epsilon": 0.05,
-              "greedy_mean_reward": 42.243,
-              "decision_states_changed": 4
+              "greedy_mean_reward": 43.963,
+              "decision_states_changed": 0
             }
           ],
           "convergence": {
+            "last5_checkpoint_greedy_reward_range": 2.0,
+            "last5_checkpoint_states_changed": [
+              2,
+              0,
+              1,
+              1,
+              0
+            ],
+            "behaviour_reward_last_1000_first_half_vs_second_half": [
+              44.76,
+              43.608
+            ]
+          },
+          "comparison_constant_alpha": {
+            "alpha": 0.1,
+            "decision_states_matching_optimal": 10,
+            "evaluation": {
+              "n_episodes": 1000,
+              "mean_reward": 43.093,
+              "std_reward": 13.8111,
+              "mastery_rate": 0.898,
+              "mean_steps_to_mastery": 11.9009
+            },
+            "optimal_minus_learned": {
+              "mean": 1.297,
+              "se": 0.378,
+              "share_episodes_better": 0.329
+            },
+            "policy": [
+              [
+                1,
+                1,
+                0
+              ],
+              [
+                1,
+                2,
+                1
+              ],
+              [
+                2,
+                2,
+                0
+              ],
+              [
+                2,
+                2,
+                0
+              ],
+              [
+                null,
+                null,
+                null
+              ]
+            ],
+            "learning_curve_100": [
+              25.11,
+              21.07,
+              27.63,
+              26.84,
+              28.47,
+              29.29,
+              27.02,
+              29.73,
+              30.02,
+              34.06,
+              33.91,
+              29.21,
+              32.84,
+              36.67,
+              37.25,
+              35.82,
+              32.98,
+              35.14,
+              31.67,
+              34.76,
+              39.12,
+              41.08,
+              39.71,
+              37.48,
+              37.17,
+              41.59,
+              40.88,
+              39.61,
+              39.34,
+              37.74,
+              36.34,
+              40.6,
+              37.56,
+              37.87,
+              39.16,
+              35.97,
+              40.44,
+              40.51,
+              39.57,
+              43.99,
+              44.14,
+              43.12,
+              38.04,
+              43.9,
+              41.09,
+              40.97,
+              43.61,
+              38.82,
+              40.94,
+              41.6
+            ],
+            "checkpoints": [
+              {
+                "episode": 250,
+                "epsilon": 0.8299,
+                "greedy_mean_reward": 37.653,
+                "decision_states_changed": null
+              },
+              {
+                "episode": 500,
+                "epsilon": 0.6882,
+                "greedy_mean_reward": 36.03,
+                "decision_states_changed": 5
+              },
+              {
+                "episode": 750,
+                "epsilon": 0.5707,
+                "greedy_mean_reward": 42.203,
+                "decision_states_changed": 4
+              },
+              {
+                "episode": 1000,
+                "epsilon": 0.4732,
+                "greedy_mean_reward": 43.963,
+                "decision_states_changed": 4
+              },
+              {
+                "episode": 1250,
+                "epsilon": 0.3924,
+                "greedy_mean_reward": 38.53,
+                "decision_states_changed": 2
+              },
+              {
+                "episode": 1500,
+                "epsilon": 0.3254,
+                "greedy_mean_reward": 42.417,
+                "decision_states_changed": 3
+              },
+              {
+                "episode": 1750,
+                "epsilon": 0.2699,
+                "greedy_mean_reward": 34.903,
+                "decision_states_changed": 5
+              },
+              {
+                "episode": 2000,
+                "epsilon": 0.2238,
+                "greedy_mean_reward": 41.963,
+                "decision_states_changed": 3
+              },
+              {
+                "episode": 2250,
+                "epsilon": 0.1856,
+                "greedy_mean_reward": 41.963,
+                "decision_states_changed": 0
+              },
+              {
+                "episode": 2500,
+                "epsilon": 0.1539,
+                "greedy_mean_reward": 35.573,
+                "decision_states_changed": 5
+              },
+              {
+                "episode": 2750,
+                "epsilon": 0.1276,
+                "greedy_mean_reward": 41.463,
+                "decision_states_changed": 4
+              },
+              {
+                "episode": 3000,
+                "epsilon": 0.1058,
+                "greedy_mean_reward": 42.823,
+                "decision_states_changed": 2
+              },
+              {
+                "episode": 3250,
+                "epsilon": 0.0877,
+                "greedy_mean_reward": 41.647,
+                "decision_states_changed": 1
+              },
+              {
+                "episode": 3500,
+                "epsilon": 0.0728,
+                "greedy_mean_reward": 41.497,
+                "decision_states_changed": 2
+              },
+              {
+                "episode": 3750,
+                "epsilon": 0.0603,
+                "greedy_mean_reward": 43.793,
+                "decision_states_changed": 2
+              },
+              {
+                "episode": 4000,
+                "epsilon": 0.05,
+                "greedy_mean_reward": 43.793,
+                "decision_states_changed": 0
+              },
+              {
+                "episode": 4250,
+                "epsilon": 0.05,
+                "greedy_mean_reward": 37.653,
+                "decision_states_changed": 1
+              },
+              {
+                "episode": 4500,
+                "epsilon": 0.05,
+                "greedy_mean_reward": 43.793,
+                "decision_states_changed": 2
+              },
+              {
+                "episode": 4750,
+                "epsilon": 0.05,
+                "greedy_mean_reward": 43.793,
+                "decision_states_changed": 0
+              },
+              {
+                "episode": 5000,
+                "epsilon": 0.05,
+                "greedy_mean_reward": 42.243,
+                "decision_states_changed": 4
+              }
+            ],
             "last5_checkpoint_greedy_reward_range": 6.14,
             "last5_checkpoint_states_changed": [
               0,
@@ -16850,14 +17254,7 @@
               2,
               0,
               4
-            ],
-            "behaviour_reward_last_1000_first_half_vs_second_half": [
-              42.058,
-              41.188
-            ],
-            "diag_constant_alpha_20000_matching_optimal": 9,
-            "diag_visit_alpha_5000_matching_optimal": 12,
-            "diag_visit_alpha_5000_mean_reward": 44.39
+            ]
           }
         },
         "2": {
@@ -16971,10 +17368,10 @@
           "evaluation": {
             "learned": {
               "n_episodes": 1000,
-              "mean_reward": 15.817,
-              "std_reward": 22.7607,
-              "mastery_rate": 0.345,
-              "mean_steps_to_mastery": 14.5884
+              "mean_reward": 19.671,
+              "std_reward": 22.5742,
+              "mastery_rate": 0.407,
+              "mean_steps_to_mastery": 14.4939
             },
             "random": {
               "n_episodes": 1000,
@@ -17030,30 +17427,30 @@
             }
           },
           "learned_minus_best_fixed": {
-            "mean": 9.9,
-            "se": 0.651,
-            "share_episodes_better": 0.705
+            "mean": 13.754,
+            "se": 0.606,
+            "share_episodes_better": 0.806
           },
           "learned_minus_random": {
-            "mean": 17.129,
-            "se": 0.678,
-            "share_episodes_better": 0.811
+            "mean": 20.983,
+            "se": 0.659,
+            "share_episodes_better": 0.88
           },
           "optimal_minus_learned": {
-            "mean": 3.854,
-            "se": 0.576,
-            "share_episodes_better": 0.383
+            "mean": 0.0,
+            "se": 0.0,
+            "share_episodes_better": 0.0
           },
           "policy": [
             [
-              2,
-              2,
-              0
-            ],
-            [
               1,
               2,
-              0
+              1
+            ],
+            [
+              2,
+              2,
+              1
             ],
             [
               2,
@@ -17100,64 +17497,64 @@
           ],
           "q_table": [
             [
-              1.7692,
-              1.8253,
-              2.4403
+              5.2551,
+              5.9131,
+              5.2732
             ],
             [
-              2.1123,
-              3.0936,
-              5.2667
+              3.1111,
+              5.5896,
+              6.6693
             ],
             [
-              9.3179,
-              3.7486,
-              3.9984
+              8.5628,
+              9.8979,
+              7.8885
             ],
             [
-              3.4551,
-              5.7105,
-              3.5796
+              4.9004,
+              5.0031,
+              5.1791
             ],
             [
-              2.422,
-              4.0256,
-              7.4324
+              2.95,
+              6.8934,
+              8.2413
             ],
             [
-              10.7976,
-              8.813,
-              8.9231
+              9.6239,
+              11.1854,
+              9.1916
             ],
             [
-              3.2579,
-              3.2445,
-              5.6605
+              5.9656,
+              5.9541,
+              6.1606
             ],
             [
-              1.3501,
-              3.7046,
-              9.3269
+              5.1278,
+              7.0141,
+              9.5645
             ],
             [
-              15.8361,
-              7.2253,
-              7.3463
+              12.2732,
+              10.6199,
+              10.4866
             ],
             [
-              6.1753,
-              6.0683,
-              9.7537
+              8.8139,
+              9.5198,
+              10.0122
             ],
             [
-              8.6706,
-              6.8023,
-              15.2315
+              7.8767,
+              11.1588,
+              12.4819
             ],
             [
-              17.1829,
-              12.0456,
-              14.2058
+              15.9962,
+              14.6781,
+              14.996
             ],
             [
               0.0,
@@ -17254,64 +17651,64 @@
           ],
           "visits": [
             [
-              573,
-              1458,
-              837
+              466,
+              1800,
+              419
             ],
             [
-              777,
-              1481,
-              7481
+              729,
+              808,
+              6712
             ],
             [
-              6408,
-              7290,
-              2555
+              3462,
+              11986,
+              1594
             ],
             [
-              804,
-              2506,
-              1331
+              646,
+              2569,
+              1000
             ],
             [
-              955,
-              1724,
-              9049
+              868,
+              969,
+              8055
             ],
             [
-              4326,
-              5126,
-              1421
+              1775,
+              10249,
+              1021
             ],
             [
-              786,
-              1317,
-              1982
+              538,
+              824,
+              1822
             ],
             [
-              851,
-              1031,
-              8417
+              782,
+              831,
+              8707
             ],
             [
-              4450,
-              2924,
-              1250
+              6505,
+              1094,
+              732
             ],
             [
-              413,
-              392,
-              1172
+              316,
+              316,
+              1011
             ],
             [
-              519,
-              516,
-              5158
+              538,
+              457,
+              6114
             ],
             [
-              3264,
-              573,
-              615
+              3966,
+              332,
+              378
             ],
             [
               0,
@@ -17329,183 +17726,167 @@
               0
             ]
           ],
-          "decision_states_matching_optimal": 9,
+          "decision_states_matching_optimal": 11,
           "n_decision_states": 12,
           "mismatches_vs_optimal": [
             {
-              "knowledge": 0,
+              "knowledge": 1,
               "energy": 0,
               "learned": "Review Notes",
               "optimal": "Watch Videos",
-              "q_star_loss": 0.866,
-              "visits": 2868
-            },
-            {
-              "knowledge": 0,
-              "energy": 2,
-              "learned": "Practice Quizzes",
-              "optimal": "Watch Videos",
-              "q_star_loss": 0.413,
-              "visits": 16253
-            },
-            {
-              "knowledge": 1,
-              "energy": 2,
-              "learned": "Practice Quizzes",
-              "optimal": "Watch Videos",
-              "q_star_loss": 0.423,
-              "visits": 10873
+              "q_star_loss": 0.59,
+              "visits": 4215
             }
           ],
           "near_tie_states_q_star": 3,
           "learning_curve_100": [
-            1.54,
-            -1.33,
-            3.97,
-            2.43,
-            1.75,
-            5.28,
-            4.68,
-            5.56,
-            5.08,
-            7.8,
-            7.32,
-            4.74,
-            9.31,
-            10.45,
-            8.44,
-            7.51,
-            13.41,
-            9.23,
-            11.9,
-            13.26,
-            11.41,
-            13.4,
-            13.38,
-            14.88,
-            11.05,
-            11.32,
-            12.39,
-            13.84,
-            17.6,
-            17.27,
-            17.08,
-            14.37,
-            15.75,
-            13.29,
-            21.87,
-            12.08,
-            15.22,
-            14.53,
-            8.61,
-            18.72,
-            19.63,
-            17.15,
-            16.35,
-            16.86,
-            15.18,
-            15.07,
-            11.53,
-            17.71,
-            12.91,
-            12.8
+            1.84,
+            -1.48,
+            5.39,
+            4.49,
+            3.03,
+            5.07,
+            8.37,
+            9.1,
+            7.86,
+            6.21,
+            5.8,
+            10.18,
+            10.32,
+            13.19,
+            9.76,
+            10.56,
+            13.0,
+            17.67,
+            14.55,
+            19.39,
+            17.97,
+            14.9,
+            13.65,
+            16.36,
+            14.23,
+            15.55,
+            18.53,
+            16.56,
+            16.69,
+            17.92,
+            17.53,
+            20.48,
+            17.81,
+            19.55,
+            20.25,
+            19.48,
+            13.63,
+            19.26,
+            15.43,
+            16.04,
+            16.73,
+            16.81,
+            19.31,
+            16.42,
+            19.41,
+            19.64,
+            16.71,
+            18.4,
+            19.28,
+            18.86
           ],
           "checkpoints": [
             {
               "episode": 250,
               "epsilon": 0.8299,
-              "greedy_mean_reward": 9.823,
+              "greedy_mean_reward": 16.967,
               "decision_states_changed": null
             },
             {
               "episode": 500,
               "epsilon": 0.6882,
-              "greedy_mean_reward": 4.913,
+              "greedy_mean_reward": 17.3,
               "decision_states_changed": 4
             },
             {
               "episode": 750,
               "epsilon": 0.5707,
-              "greedy_mean_reward": 11.307,
-              "decision_states_changed": 6
+              "greedy_mean_reward": 14.693,
+              "decision_states_changed": 3
             },
             {
               "episode": 1000,
               "epsilon": 0.4732,
-              "greedy_mean_reward": 20.753,
-              "decision_states_changed": 5
+              "greedy_mean_reward": 19.76,
+              "decision_states_changed": 4
             },
             {
               "episode": 1250,
               "epsilon": 0.3924,
-              "greedy_mean_reward": 12.96,
-              "decision_states_changed": 5
+              "greedy_mean_reward": 17.96,
+              "decision_states_changed": 4
             },
             {
               "episode": 1500,
               "epsilon": 0.3254,
-              "greedy_mean_reward": 13.677,
-              "decision_states_changed": 6
-            },
-            {
-              "episode": 1750,
-              "epsilon": 0.2699,
-              "greedy_mean_reward": 9.45,
-              "decision_states_changed": 6
-            },
-            {
-              "episode": 2000,
-              "epsilon": 0.2238,
               "greedy_mean_reward": 20.753,
               "decision_states_changed": 3
             },
             {
+              "episode": 1750,
+              "epsilon": 0.2699,
+              "greedy_mean_reward": 20.54,
+              "decision_states_changed": 1
+            },
+            {
+              "episode": 2000,
+              "epsilon": 0.2238,
+              "greedy_mean_reward": 20.54,
+              "decision_states_changed": 0
+            },
+            {
               "episode": 2250,
               "epsilon": 0.1856,
-              "greedy_mean_reward": 17.783,
-              "decision_states_changed": 2
+              "greedy_mean_reward": 20.54,
+              "decision_states_changed": 0
             },
             {
               "episode": 2500,
               "epsilon": 0.1539,
-              "greedy_mean_reward": 17.1,
-              "decision_states_changed": 7
+              "greedy_mean_reward": 20.54,
+              "decision_states_changed": 0
             },
             {
               "episode": 2750,
               "epsilon": 0.1276,
-              "greedy_mean_reward": 9.413,
-              "decision_states_changed": 6
+              "greedy_mean_reward": 20.54,
+              "decision_states_changed": 1
             },
             {
               "episode": 3000,
               "epsilon": 0.1058,
-              "greedy_mean_reward": 17.96,
-              "decision_states_changed": 3
+              "greedy_mean_reward": 20.54,
+              "decision_states_changed": 1
             },
             {
               "episode": 3250,
               "epsilon": 0.0877,
               "greedy_mean_reward": 20.753,
-              "decision_states_changed": 3
+              "decision_states_changed": 1
             },
             {
               "episode": 3500,
               "epsilon": 0.0728,
-              "greedy_mean_reward": 18.967,
-              "decision_states_changed": 2
+              "greedy_mean_reward": 20.54,
+              "decision_states_changed": 1
             },
             {
               "episode": 3750,
               "epsilon": 0.0603,
-              "greedy_mean_reward": 16.513,
-              "decision_states_changed": 3
+              "greedy_mean_reward": 19.76,
+              "decision_states_changed": 1
             },
             {
               "episode": 4000,
               "epsilon": 0.05,
-              "greedy_mean_reward": 17.96,
-              "decision_states_changed": 3
+              "greedy_mean_reward": 20.753,
+              "decision_states_changed": 4
             },
             {
               "episode": 4250,
@@ -17516,23 +17897,252 @@
             {
               "episode": 4500,
               "epsilon": 0.05,
-              "greedy_mean_reward": 16.98,
-              "decision_states_changed": 3
+              "greedy_mean_reward": 20.54,
+              "decision_states_changed": 0
             },
             {
               "episode": 4750,
               "epsilon": 0.05,
-              "greedy_mean_reward": 17.96,
-              "decision_states_changed": 2
+              "greedy_mean_reward": 20.54,
+              "decision_states_changed": 0
             },
             {
               "episode": 5000,
               "epsilon": 0.05,
-              "greedy_mean_reward": 17.783,
-              "decision_states_changed": 2
+              "greedy_mean_reward": 20.54,
+              "decision_states_changed": 0
             }
           ],
           "convergence": {
+            "last5_checkpoint_greedy_reward_range": 0.213,
+            "last5_checkpoint_states_changed": [
+              4,
+              2,
+              0,
+              0,
+              0
+            ],
+            "behaviour_reward_last_1000_first_half_vs_second_half": [
+              17.736,
+              18.578
+            ]
+          },
+          "comparison_constant_alpha": {
+            "alpha": 0.1,
+            "decision_states_matching_optimal": 9,
+            "evaluation": {
+              "n_episodes": 1000,
+              "mean_reward": 15.817,
+              "std_reward": 22.7607,
+              "mastery_rate": 0.345,
+              "mean_steps_to_mastery": 14.5884
+            },
+            "optimal_minus_learned": {
+              "mean": 3.854,
+              "se": 0.576,
+              "share_episodes_better": 0.383
+            },
+            "policy": [
+              [
+                2,
+                2,
+                0
+              ],
+              [
+                1,
+                2,
+                0
+              ],
+              [
+                2,
+                2,
+                0
+              ],
+              [
+                2,
+                2,
+                0
+              ],
+              [
+                null,
+                null,
+                null
+              ]
+            ],
+            "learning_curve_100": [
+              1.54,
+              -1.33,
+              3.97,
+              2.43,
+              1.75,
+              5.28,
+              4.68,
+              5.56,
+              5.08,
+              7.8,
+              7.32,
+              4.74,
+              9.31,
+              10.45,
+              8.44,
+              7.51,
+              13.41,
+              9.23,
+              11.9,
+              13.26,
+              11.41,
+              13.4,
+              13.38,
+              14.88,
+              11.05,
+              11.32,
+              12.39,
+              13.84,
+              17.6,
+              17.27,
+              17.08,
+              14.37,
+              15.75,
+              13.29,
+              21.87,
+              12.08,
+              15.22,
+              14.53,
+              8.61,
+              18.72,
+              19.63,
+              17.15,
+              16.35,
+              16.86,
+              15.18,
+              15.07,
+              11.53,
+              17.71,
+              12.91,
+              12.8
+            ],
+            "checkpoints": [
+              {
+                "episode": 250,
+                "epsilon": 0.8299,
+                "greedy_mean_reward": 9.823,
+                "decision_states_changed": null
+              },
+              {
+                "episode": 500,
+                "epsilon": 0.6882,
+                "greedy_mean_reward": 4.913,
+                "decision_states_changed": 4
+              },
+              {
+                "episode": 750,
+                "epsilon": 0.5707,
+                "greedy_mean_reward": 11.307,
+                "decision_states_changed": 6
+              },
+              {
+                "episode": 1000,
+                "epsilon": 0.4732,
+                "greedy_mean_reward": 20.753,
+                "decision_states_changed": 5
+              },
+              {
+                "episode": 1250,
+                "epsilon": 0.3924,
+                "greedy_mean_reward": 12.96,
+                "decision_states_changed": 5
+              },
+              {
+                "episode": 1500,
+                "epsilon": 0.3254,
+                "greedy_mean_reward": 13.677,
+                "decision_states_changed": 6
+              },
+              {
+                "episode": 1750,
+                "epsilon": 0.2699,
+                "greedy_mean_reward": 9.45,
+                "decision_states_changed": 6
+              },
+              {
+                "episode": 2000,
+                "epsilon": 0.2238,
+                "greedy_mean_reward": 20.753,
+                "decision_states_changed": 3
+              },
+              {
+                "episode": 2250,
+                "epsilon": 0.1856,
+                "greedy_mean_reward": 17.783,
+                "decision_states_changed": 2
+              },
+              {
+                "episode": 2500,
+                "epsilon": 0.1539,
+                "greedy_mean_reward": 17.1,
+                "decision_states_changed": 7
+              },
+              {
+                "episode": 2750,
+                "epsilon": 0.1276,
+                "greedy_mean_reward": 9.413,
+                "decision_states_changed": 6
+              },
+              {
+                "episode": 3000,
+                "epsilon": 0.1058,
+                "greedy_mean_reward": 17.96,
+                "decision_states_changed": 3
+              },
+              {
+                "episode": 3250,
+                "epsilon": 0.0877,
+                "greedy_mean_reward": 20.753,
+                "decision_states_changed": 3
+              },
+              {
+                "episode": 3500,
+                "epsilon": 0.0728,
+                "greedy_mean_reward": 18.967,
+                "decision_states_changed": 2
+              },
+              {
+                "episode": 3750,
+                "epsilon": 0.0603,
+                "greedy_mean_reward": 16.513,
+                "decision_states_changed": 3
+              },
+              {
+                "episode": 4000,
+                "epsilon": 0.05,
+                "greedy_mean_reward": 17.96,
+                "decision_states_changed": 3
+              },
+              {
+                "episode": 4250,
+                "epsilon": 0.05,
+                "greedy_mean_reward": 20.54,
+                "decision_states_changed": 2
+              },
+              {
+                "episode": 4500,
+                "epsilon": 0.05,
+                "greedy_mean_reward": 16.98,
+                "decision_states_changed": 3
+              },
+              {
+                "episode": 4750,
+                "epsilon": 0.05,
+                "greedy_mean_reward": 17.96,
+                "decision_states_changed": 2
+              },
+              {
+                "episode": 5000,
+                "epsilon": 0.05,
+                "greedy_mean_reward": 17.783,
+                "decision_states_changed": 2
+              }
+            ],
             "last5_checkpoint_greedy_reward_range": 3.56,
             "last5_checkpoint_states_changed": [
               3,
@@ -17540,14 +18150,7 @@
               3,
               2,
               2
-            ],
-            "behaviour_reward_last_1000_first_half_vs_second_half": [
-              17.034,
-              14.004
-            ],
-            "diag_constant_alpha_20000_matching_optimal": 10,
-            "diag_visit_alpha_5000_matching_optimal": 11,
-            "diag_visit_alpha_5000_mean_reward": 19.671
+            ]
           }
         },
         "3": {
@@ -17661,10 +18264,10 @@
           "evaluation": {
             "learned": {
               "n_episodes": 1000,
-              "mean_reward": 41.887,
-              "std_reward": 15.0076,
-              "mastery_rate": 0.86,
-              "mean_steps_to_mastery": 12.3291
+              "mean_reward": 42.443,
+              "std_reward": 14.694,
+              "mastery_rate": 0.866,
+              "mean_steps_to_mastery": 12.0289
             },
             "random": {
               "n_episodes": 1000,
@@ -17720,25 +18323,25 @@
             }
           },
           "learned_minus_best_fixed": {
-            "mean": 16.525,
-            "se": 0.688,
-            "share_episodes_better": 0.815
+            "mean": 17.081,
+            "se": 0.642,
+            "share_episodes_better": 0.836
           },
           "learned_minus_random": {
-            "mean": 19.354,
-            "se": 0.719,
-            "share_episodes_better": 0.828
+            "mean": 19.91,
+            "se": 0.7,
+            "share_episodes_better": 0.841
           },
           "optimal_minus_learned": {
-            "mean": 1.763,
-            "se": 0.413,
-            "share_episodes_better": 0.361
+            "mean": 1.207,
+            "se": 0.309,
+            "share_episodes_better": 0.231
           },
           "policy": [
             [
-              0,
+              1,
               2,
-              0
+              1
             ],
             [
               1,
@@ -17790,64 +18393,64 @@
           ],
           "q_table": [
             [
-              16.3928,
-              15.6306,
-              14.3807
+              14.3439,
+              16.4841,
+              15.1405
             ],
             [
-              14.2147,
-              14.3573,
-              18.3504
+              12.1204,
+              16.2356,
+              17.788
             ],
             [
-              22.2171,
-              18.0618,
-              18.7998
+              20.6241,
+              22.1319,
+              20.6786
             ],
             [
-              12.0052,
-              14.593,
-              12.7829
+              14.1358,
+              15.3042,
+              14.597
             ],
             [
-              12.8257,
-              15.1988,
-              16.5248
+              13.2913,
+              17.2435,
+              18.4448
             ],
             [
-              22.6278,
-              19.283,
-              19.0791
+              22.2237,
+              21.1409,
+              20.6276
             ],
             [
-              10.8768,
-              10.8604,
-              13.0329
+              12.5012,
+              13.4873,
+              14.3319
             ],
             [
-              11.4909,
-              15.133,
-              18.3368
+              12.8553,
+              16.2315,
+              19.1055
             ],
             [
-              23.3209,
-              19.1447,
-              18.652
+              23.0143,
+              21.4901,
+              21.2377
             ],
             [
-              12.4455,
-              12.4716,
-              18.645
+              14.3296,
+              14.2478,
+              16.2069
             ],
             [
-              12.8698,
-              14.8994,
-              20.5579
+              14.1686,
+              16.6851,
+              19.3269
             ],
             [
-              25.1545,
-              19.5055,
-              19.8087
+              23.1988,
+              22.0578,
+              22.0035
             ],
             [
               0.0,
@@ -17944,64 +18547,64 @@
           ],
           "visits": [
             [
-              171,
-              797,
-              148
+              104,
+              469,
+              130
             ],
             [
-              368,
-              1083,
-              1882
+              275,
+              453,
+              2531
             ],
             [
-              3705,
-              4581,
-              1423
+              1752,
+              7903,
+              964
             ],
             [
-              416,
-              2136,
-              556
+              326,
+              1277,
+              356
             ],
             [
-              606,
-              1590,
-              5241
+              600,
+              656,
+              5689
             ],
             [
-              2476,
-              3425,
-              858
+              2773,
+              4516,
+              629
             ],
             [
-              688,
-              1258,
-              2482
+              592,
+              734,
+              2080
             ],
             [
-              768,
-              992,
-              7442
-            ],
-            [
-              4358,
-              1496,
-              758
-            ],
-            [
+              752,
               799,
-              665,
-              1778
+              7596
             ],
             [
-              776,
-              840,
-              7290
+              5377,
+              551,
+              533
             ],
             [
-              4394,
-              565,
-              588
+              460,
+              497,
+              1601
+            ],
+            [
+              729,
+              733,
+              7762
+            ],
+            [
+              4610,
+              422,
+              382
             ],
             [
               0,
@@ -18019,210 +18622,423 @@
               0
             ]
           ],
-          "decision_states_matching_optimal": 9,
+          "decision_states_matching_optimal": 11,
           "n_decision_states": 12,
           "mismatches_vs_optimal": [
-            {
-              "knowledge": 0,
-              "energy": 0,
-              "learned": "Practice Quizzes",
-              "optimal": "Watch Videos",
-              "q_star_loss": 1.883,
-              "visits": 1116
-            },
-            {
-              "knowledge": 0,
-              "energy": 2,
-              "learned": "Practice Quizzes",
-              "optimal": "Watch Videos",
-              "q_star_loss": 0.662,
-              "visits": 9709
-            },
             {
               "knowledge": 1,
               "energy": 2,
               "learned": "Practice Quizzes",
               "optimal": "Watch Videos",
               "q_star_loss": 0.605,
-              "visits": 6759
+              "visits": 7918
             }
           ],
           "near_tie_states_q_star": 0,
           "learning_curve_100": [
-            25.37,
-            18.86,
-            30.64,
-            30.48,
-            30.22,
-            30.64,
-            28.84,
-            31.11,
-            29.55,
-            32.36,
-            34.83,
-            32.23,
-            33.15,
-            36.83,
-            36.58,
-            31.6,
-            34.88,
-            32.53,
-            35.43,
-            33.28,
-            39.7,
-            41.88,
-            36.79,
-            37.61,
-            35.55,
-            39.34,
-            39.72,
-            37.9,
-            39.6,
-            37.24,
-            40.82,
-            39.23,
-            39.32,
-            39.09,
-            38.52,
-            39.49,
-            39.84,
-            36.59,
-            40.46,
-            41.88,
-            41.84,
+            26.27,
+            18.11,
+            28.15,
+            29.22,
+            27.75,
+            28.88,
+            28.45,
+            28.93,
+            31.84,
+            35.71,
+            34.21,
+            31.54,
+            34.49,
+            36.96,
+            39.06,
+            36.85,
+            38.16,
+            38.55,
+            40.17,
+            39.44,
+            38.43,
+            41.69,
+            41.26,
+            38.95,
+            41.67,
+            41.13,
+            42.67,
+            41.67,
+            40.45,
+            43.92,
             40.0,
-            40.48,
-            44.18,
-            41.84,
-            41.92,
-            41.12,
-            40.52,
-            40.81,
-            40.32
+            42.24,
+            42.46,
+            40.06,
+            40.32,
+            40.63,
+            40.03,
+            43.84,
+            39.0,
+            43.19,
+            41.31,
+            43.42,
+            42.69,
+            42.35,
+            43.45,
+            41.16,
+            45.5,
+            45.0,
+            41.8,
+            41.74
           ],
           "checkpoints": [
             {
               "episode": 250,
               "epsilon": 0.8299,
-              "greedy_mean_reward": 34.597,
+              "greedy_mean_reward": 39.383,
               "decision_states_changed": null
             },
             {
               "episode": 500,
               "epsilon": 0.6882,
-              "greedy_mean_reward": 40.783,
-              "decision_states_changed": 5
+              "greedy_mean_reward": 42.997,
+              "decision_states_changed": 4
             },
             {
               "episode": 750,
               "epsilon": 0.5707,
-              "greedy_mean_reward": 43.287,
-              "decision_states_changed": 5
+              "greedy_mean_reward": 38.287,
+              "decision_states_changed": 2
             },
             {
               "episode": 1000,
               "epsilon": 0.4732,
-              "greedy_mean_reward": 40.313,
-              "decision_states_changed": 5
+              "greedy_mean_reward": 42.237,
+              "decision_states_changed": 3
             },
             {
               "episode": 1250,
               "epsilon": 0.3924,
-              "greedy_mean_reward": 26.513,
-              "decision_states_changed": 5
+              "greedy_mean_reward": 43.63,
+              "decision_states_changed": 1
             },
             {
               "episode": 1500,
               "epsilon": 0.3254,
               "greedy_mean_reward": 42.237,
-              "decision_states_changed": 6
+              "decision_states_changed": 1
             },
             {
               "episode": 1750,
               "epsilon": 0.2699,
-              "greedy_mean_reward": 42.923,
-              "decision_states_changed": 4
+              "greedy_mean_reward": 43.63,
+              "decision_states_changed": 1
             },
             {
               "episode": 2000,
               "epsilon": 0.2238,
-              "greedy_mean_reward": 41.467,
-              "decision_states_changed": 2
+              "greedy_mean_reward": 43.63,
+              "decision_states_changed": 0
             },
             {
               "episode": 2250,
               "epsilon": 0.1856,
-              "greedy_mean_reward": 34.827,
-              "decision_states_changed": 5
+              "greedy_mean_reward": 43.63,
+              "decision_states_changed": 0
             },
             {
               "episode": 2500,
               "epsilon": 0.1539,
-              "greedy_mean_reward": 40.783,
-              "decision_states_changed": 5
+              "greedy_mean_reward": 43.63,
+              "decision_states_changed": 0
             },
             {
               "episode": 2750,
               "epsilon": 0.1276,
-              "greedy_mean_reward": 27.263,
-              "decision_states_changed": 4
+              "greedy_mean_reward": 43.63,
+              "decision_states_changed": 0
             },
             {
               "episode": 3000,
               "epsilon": 0.1058,
-              "greedy_mean_reward": 40.783,
-              "decision_states_changed": 5
+              "greedy_mean_reward": 43.63,
+              "decision_states_changed": 0
             },
             {
               "episode": 3250,
               "epsilon": 0.0877,
-              "greedy_mean_reward": 41.737,
-              "decision_states_changed": 2
+              "greedy_mean_reward": 43.63,
+              "decision_states_changed": 0
             },
             {
               "episode": 3500,
               "epsilon": 0.0728,
-              "greedy_mean_reward": 43.287,
-              "decision_states_changed": 4
+              "greedy_mean_reward": 42.997,
+              "decision_states_changed": 1
             },
             {
               "episode": 3750,
               "epsilon": 0.0603,
-              "greedy_mean_reward": 36.27,
-              "decision_states_changed": 3
+              "greedy_mean_reward": 43.287,
+              "decision_states_changed": 2
             },
             {
               "episode": 4000,
               "epsilon": 0.05,
-              "greedy_mean_reward": 41.737,
-              "decision_states_changed": 2
+              "greedy_mean_reward": 43.287,
+              "decision_states_changed": 0
             },
             {
               "episode": 4250,
               "epsilon": 0.05,
               "greedy_mean_reward": 43.287,
-              "decision_states_changed": 4
+              "decision_states_changed": 0
             },
             {
               "episode": 4500,
               "epsilon": 0.05,
               "greedy_mean_reward": 43.287,
-              "decision_states_changed": 2
+              "decision_states_changed": 0
             },
             {
               "episode": 4750,
               "epsilon": 0.05,
-              "greedy_mean_reward": 41.993,
-              "decision_states_changed": 2
+              "greedy_mean_reward": 43.287,
+              "decision_states_changed": 0
             },
             {
               "episode": 5000,
               "epsilon": 0.05,
-              "greedy_mean_reward": 42.923,
-              "decision_states_changed": 3
+              "greedy_mean_reward": 43.287,
+              "decision_states_changed": 0
             }
           ],
           "convergence": {
+            "last5_checkpoint_greedy_reward_range": 0.0,
+            "last5_checkpoint_states_changed": [
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "behaviour_reward_last_1000_first_half_vs_second_half": [
+              42.644,
+              43.04
+            ]
+          },
+          "comparison_constant_alpha": {
+            "alpha": 0.1,
+            "decision_states_matching_optimal": 9,
+            "evaluation": {
+              "n_episodes": 1000,
+              "mean_reward": 41.887,
+              "std_reward": 15.0076,
+              "mastery_rate": 0.86,
+              "mean_steps_to_mastery": 12.3291
+            },
+            "optimal_minus_learned": {
+              "mean": 1.763,
+              "se": 0.413,
+              "share_episodes_better": 0.361
+            },
+            "policy": [
+              [
+                0,
+                2,
+                0
+              ],
+              [
+                1,
+                2,
+                0
+              ],
+              [
+                2,
+                2,
+                0
+              ],
+              [
+                2,
+                2,
+                0
+              ],
+              [
+                null,
+                null,
+                null
+              ]
+            ],
+            "learning_curve_100": [
+              25.37,
+              18.86,
+              30.64,
+              30.48,
+              30.22,
+              30.64,
+              28.84,
+              31.11,
+              29.55,
+              32.36,
+              34.83,
+              32.23,
+              33.15,
+              36.83,
+              36.58,
+              31.6,
+              34.88,
+              32.53,
+              35.43,
+              33.28,
+              39.7,
+              41.88,
+              36.79,
+              37.61,
+              35.55,
+              39.34,
+              39.72,
+              37.9,
+              39.6,
+              37.24,
+              40.82,
+              39.23,
+              39.32,
+              39.09,
+              38.52,
+              39.49,
+              39.84,
+              36.59,
+              40.46,
+              41.88,
+              41.84,
+              40.0,
+              40.48,
+              44.18,
+              41.84,
+              41.92,
+              41.12,
+              40.52,
+              40.81,
+              40.32
+            ],
+            "checkpoints": [
+              {
+                "episode": 250,
+                "epsilon": 0.8299,
+                "greedy_mean_reward": 34.597,
+                "decision_states_changed": null
+              },
+              {
+                "episode": 500,
+                "epsilon": 0.6882,
+                "greedy_mean_reward": 40.783,
+                "decision_states_changed": 5
+              },
+              {
+                "episode": 750,
+                "epsilon": 0.5707,
+                "greedy_mean_reward": 43.287,
+                "decision_states_changed": 5
+              },
+              {
+                "episode": 1000,
+                "epsilon": 0.4732,
+                "greedy_mean_reward": 40.313,
+                "decision_states_changed": 5
+              },
+              {
+                "episode": 1250,
+                "epsilon": 0.3924,
+                "greedy_mean_reward": 26.513,
+                "decision_states_changed": 5
+              },
+              {
+                "episode": 1500,
+                "epsilon": 0.3254,
+                "greedy_mean_reward": 42.237,
+                "decision_states_changed": 6
+              },
+              {
+                "episode": 1750,
+                "epsilon": 0.2699,
+                "greedy_mean_reward": 42.923,
+                "decision_states_changed": 4
+              },
+              {
+                "episode": 2000,
+                "epsilon": 0.2238,
+                "greedy_mean_reward": 41.467,
+                "decision_states_changed": 2
+              },
+              {
+                "episode": 2250,
+                "epsilon": 0.1856,
+                "greedy_mean_reward": 34.827,
+                "decision_states_changed": 5
+              },
+              {
+                "episode": 2500,
+                "epsilon": 0.1539,
+                "greedy_mean_reward": 40.783,
+                "decision_states_changed": 5
+              },
+              {
+                "episode": 2750,
+                "epsilon": 0.1276,
+                "greedy_mean_reward": 27.263,
+                "decision_states_changed": 4
+              },
+              {
+                "episode": 3000,
+                "epsilon": 0.1058,
+                "greedy_mean_reward": 40.783,
+                "decision_states_changed": 5
+              },
+              {
+                "episode": 3250,
+                "epsilon": 0.0877,
+                "greedy_mean_reward": 41.737,
+                "decision_states_changed": 2
+              },
+              {
+                "episode": 3500,
+                "epsilon": 0.0728,
+                "greedy_mean_reward": 43.287,
+                "decision_states_changed": 4
+              },
+              {
+                "episode": 3750,
+                "epsilon": 0.0603,
+                "greedy_mean_reward": 36.27,
+                "decision_states_changed": 3
+              },
+              {
+                "episode": 4000,
+                "epsilon": 0.05,
+                "greedy_mean_reward": 41.737,
+                "decision_states_changed": 2
+              },
+              {
+                "episode": 4250,
+                "epsilon": 0.05,
+                "greedy_mean_reward": 43.287,
+                "decision_states_changed": 4
+              },
+              {
+                "episode": 4500,
+                "epsilon": 0.05,
+                "greedy_mean_reward": 43.287,
+                "decision_states_changed": 2
+              },
+              {
+                "episode": 4750,
+                "epsilon": 0.05,
+                "greedy_mean_reward": 41.993,
+                "decision_states_changed": 2
+              },
+              {
+                "episode": 5000,
+                "epsilon": 0.05,
+                "greedy_mean_reward": 42.923,
+                "decision_states_changed": 3
+              }
+            ],
             "last5_checkpoint_greedy_reward_range": 1.55,
             "last5_checkpoint_states_changed": [
               2,
@@ -18230,14 +19046,7 @@
               2,
               2,
               3
-            ],
-            "behaviour_reward_last_1000_first_half_vs_second_half": [
-              41.668,
-              40.938
-            ],
-            "diag_constant_alpha_20000_matching_optimal": 10,
-            "diag_visit_alpha_5000_matching_optimal": 11,
-            "diag_visit_alpha_5000_mean_reward": 42.443
+            ]
           }
         },
         "4": {
@@ -18436,7 +19245,7 @@
               1
             ],
             [
-              1,
+              2,
               2,
               0
             ],
@@ -18480,64 +19289,64 @@
           ],
           "q_table": [
             [
-              10.6746,
-              16.5469,
-              21.3662
+              20.4575,
+              20.2908,
+              21.3323
             ],
             [
-              20.7337,
-              23.7234,
-              26.9534
+              21.5976,
+              25.0811,
+              27.1937
             ],
             [
-              29.4215,
-              31.9973,
-              28.9792
+              30.9583,
+              31.9743,
+              30.4508
             ],
             [
-              19.038,
-              24.1663,
-              20.3761
+              19.5175,
+              22.3637,
+              20.8154
             ],
             [
-              20.3458,
-              22.3839,
-              26.1848
+              21.0871,
+              24.5127,
+              25.5074
             ],
             [
-              28.1793,
-              33.8729,
-              27.75
+              28.9946,
+              30.3645,
+              28.4594
             ],
             [
-              17.1515,
-              21.6601,
-              17.7096
+              18.0459,
+              17.9863,
+              19.5968
             ],
             [
-              17.0608,
-              20.8804,
-              23.365
+              18.5979,
+              21.735,
+              23.4967
             ],
             [
-              27.1796,
-              25.9981,
-              25.7187
+              28.3212,
+              27.3185,
+              26.4109
             ],
             [
-              14.9818,
-              14.8383,
-              17.4103
+              18.5004,
+              17.9148,
+              19.8099
             ],
             [
-              19.2484,
-              19.4166,
-              19.9919
+              19.1753,
+              20.4393,
+              22.3938
             ],
             [
-              25.4504,
-              24.0056,
-              24.3124
+              27.1448,
+              23.4047,
+              24.7293
             ],
             [
               0.0,
@@ -18634,64 +19443,64 @@
           ],
           "visits": [
             [
-              14,
-              22,
-              99
+              29,
+              29,
+              74
             ],
             [
-              102,
-              370,
-              827
+              107,
+              198,
+              808
             ],
             [
-              3175,
-              3732,
-              910
+              1299,
+              6098,
+              694
             ],
             [
-              102,
-              282,
-              319
+              117,
+              393,
+              139
             ],
             [
-              366,
-              1129,
-              3339
+              369,
+              506,
+              2822
             ],
             [
-              2292,
-              2918,
-              609
+              992,
+              5273,
+              556
             ],
             [
-              240,
-              361,
-              839
+              275,
+              352,
+              843
             ],
             [
-              507,
-              690,
-              4484
+              481,
+              469,
+              3771
             ],
             [
-              4129,
-              996,
-              510
+              4902,
+              493,
+              493
             ],
             [
-              487,
-              427,
-              1193
+              312,
+              305,
+              891
             ],
             [
-              659,
-              748,
-              5580
+              641,
+              613,
+              5694
             ],
             [
-              4228,
-              480,
-              444
+              4261,
+              443,
+              432
             ],
             [
               0,
@@ -18709,7 +19518,7 @@
               0
             ]
           ],
-          "decision_states_matching_optimal": 10,
+          "decision_states_matching_optimal": 11,
           "n_decision_states": 12,
           "mismatches_vs_optimal": [
             {
@@ -18718,193 +19527,414 @@
               "learned": "Review Notes",
               "optimal": "Watch Videos",
               "q_star_loss": 1.142,
-              "visits": 135
-            },
-            {
-              "knowledge": 2,
-              "energy": 0,
-              "learned": "Watch Videos",
-              "optimal": "Review Notes",
-              "q_star_loss": 0.748,
-              "visits": 1440
+              "visits": 132
             }
           ],
           "near_tie_states_q_star": 0,
           "learning_curve_100": [
-            39.74,
-            40.32,
-            40.23,
-            44.82,
-            43.69,
-            45.73,
-            46.62,
-            46.97,
-            42.02,
-            45.97,
-            46.93,
-            46.2,
-            44.76,
-            47.94,
-            47.38,
-            48.49,
-            47.15,
-            47.48,
-            48.39,
-            48.17,
-            50.18,
-            49.34,
-            48.61,
-            48.99,
-            49.4,
-            48.77,
-            48.93,
-            46.08,
-            50.77,
-            50.69,
-            50.68,
-            49.73,
-            50.35,
-            50.24,
-            50.2,
+            39.48,
+            40.01,
+            41.05,
+            44.41,
+            43.94,
+            44.14,
+            44.35,
+            47.46,
+            44.06,
+            47.97,
+            45.67,
+            47.87,
+            47.77,
+            47.55,
+            47.2,
+            49.12,
+            48.46,
+            48.14,
+            49.11,
+            49.06,
+            50.19,
+            50.71,
+            50.17,
             50.0,
-            50.72,
-            49.33,
-            50.2,
-            50.24,
-            50.23,
-            51.18,
-            51.29,
-            50.66,
-            49.49,
-            49.84,
-            49.78,
-            50.6,
-            50.38,
-            50.36
+            49.62,
+            49.24,
+            49.23,
+            49.72,
+            50.62,
+            50.89,
+            50.74,
+            51.57,
+            51.09,
+            50.9,
+            50.41,
+            51.01,
+            51.41,
+            50.44,
+            50.8,
+            50.99,
+            51.64,
+            51.35,
+            50.82,
+            51.33,
+            51.8,
+            51.24,
+            51.74,
+            51.44,
+            51.7,
+            50.78
           ],
           "checkpoints": [
             {
               "episode": 250,
               "epsilon": 0.8299,
-              "greedy_mean_reward": 50.533,
+              "greedy_mean_reward": 48.277,
               "decision_states_changed": null
             },
             {
               "episode": 500,
               "epsilon": 0.6882,
-              "greedy_mean_reward": 51.01,
-              "decision_states_changed": 5
+              "greedy_mean_reward": 49.21,
+              "decision_states_changed": 4
             },
             {
               "episode": 750,
               "epsilon": 0.5707,
-              "greedy_mean_reward": 47.84,
-              "decision_states_changed": 2
+              "greedy_mean_reward": 51.423,
+              "decision_states_changed": 5
             },
             {
               "episode": 1000,
               "epsilon": 0.4732,
-              "greedy_mean_reward": 46.213,
-              "decision_states_changed": 3
+              "greedy_mean_reward": 50.827,
+              "decision_states_changed": 4
             },
             {
               "episode": 1250,
               "epsilon": 0.3924,
-              "greedy_mean_reward": 51.023,
+              "greedy_mean_reward": 51.423,
               "decision_states_changed": 2
             },
             {
               "episode": 1500,
               "epsilon": 0.3254,
-              "greedy_mean_reward": 47.79,
-              "decision_states_changed": 3
+              "greedy_mean_reward": 50.877,
+              "decision_states_changed": 2
             },
             {
               "episode": 1750,
               "epsilon": 0.2699,
-              "greedy_mean_reward": 51.01,
-              "decision_states_changed": 4
+              "greedy_mean_reward": 51.423,
+              "decision_states_changed": 2
             },
             {
               "episode": 2000,
               "epsilon": 0.2238,
-              "greedy_mean_reward": 50.593,
-              "decision_states_changed": 2
+              "greedy_mean_reward": 51.423,
+              "decision_states_changed": 0
             },
             {
               "episode": 2250,
               "epsilon": 0.1856,
-              "greedy_mean_reward": 47.743,
-              "decision_states_changed": 3
+              "greedy_mean_reward": 51.423,
+              "decision_states_changed": 0
             },
             {
               "episode": 2500,
               "epsilon": 0.1539,
-              "greedy_mean_reward": 50.207,
-              "decision_states_changed": 4
+              "greedy_mean_reward": 51.423,
+              "decision_states_changed": 0
             },
             {
               "episode": 2750,
               "epsilon": 0.1276,
-              "greedy_mean_reward": 47.463,
-              "decision_states_changed": 4
+              "greedy_mean_reward": 51.043,
+              "decision_states_changed": 1
             },
             {
               "episode": 3000,
               "epsilon": 0.1058,
-              "greedy_mean_reward": 51.297,
-              "decision_states_changed": 5
+              "greedy_mean_reward": 51.423,
+              "decision_states_changed": 1
             },
             {
               "episode": 3250,
               "epsilon": 0.0877,
-              "greedy_mean_reward": 50.857,
-              "decision_states_changed": 1
+              "greedy_mean_reward": 51.423,
+              "decision_states_changed": 0
             },
             {
               "episode": 3500,
               "epsilon": 0.0728,
-              "greedy_mean_reward": 49.29,
-              "decision_states_changed": 3
+              "greedy_mean_reward": 51.423,
+              "decision_states_changed": 0
             },
             {
               "episode": 3750,
               "epsilon": 0.0603,
-              "greedy_mean_reward": 51.043,
-              "decision_states_changed": 3
+              "greedy_mean_reward": 51.423,
+              "decision_states_changed": 0
             },
             {
               "episode": 4000,
               "epsilon": 0.05,
-              "greedy_mean_reward": 50.593,
-              "decision_states_changed": 4
+              "greedy_mean_reward": 51.423,
+              "decision_states_changed": 0
             },
             {
               "episode": 4250,
               "epsilon": 0.05,
-              "greedy_mean_reward": 51.297,
-              "decision_states_changed": 3
+              "greedy_mean_reward": 51.423,
+              "decision_states_changed": 0
             },
             {
               "episode": 4500,
               "epsilon": 0.05,
-              "greedy_mean_reward": 50.533,
-              "decision_states_changed": 2
+              "greedy_mean_reward": 51.423,
+              "decision_states_changed": 0
             },
             {
               "episode": 4750,
               "epsilon": 0.05,
               "greedy_mean_reward": 51.423,
-              "decision_states_changed": 4
+              "decision_states_changed": 0
             },
             {
               "episode": 5000,
               "epsilon": 0.05,
               "greedy_mean_reward": 51.423,
-              "decision_states_changed": 1
+              "decision_states_changed": 0
             }
           ],
           "convergence": {
+            "last5_checkpoint_greedy_reward_range": 0.0,
+            "last5_checkpoint_states_changed": [
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "behaviour_reward_last_1000_first_half_vs_second_half": [
+              51.388,
+              51.38
+            ]
+          },
+          "comparison_constant_alpha": {
+            "alpha": 0.1,
+            "decision_states_matching_optimal": 10,
+            "evaluation": {
+              "n_episodes": 1000,
+              "mean_reward": 51.599,
+              "std_reward": 3.4208,
+              "mastery_rate": 0.999,
+              "mean_steps_to_mastery": 8.3594
+            },
+            "optimal_minus_learned": {
+              "mean": 0.0,
+              "se": 0.0,
+              "share_episodes_better": 0.0
+            },
+            "policy": [
+              [
+                2,
+                2,
+                1
+              ],
+              [
+                1,
+                2,
+                1
+              ],
+              [
+                1,
+                2,
+                0
+              ],
+              [
+                2,
+                2,
+                0
+              ],
+              [
+                null,
+                null,
+                null
+              ]
+            ],
+            "learning_curve_100": [
+              39.74,
+              40.32,
+              40.23,
+              44.82,
+              43.69,
+              45.73,
+              46.62,
+              46.97,
+              42.02,
+              45.97,
+              46.93,
+              46.2,
+              44.76,
+              47.94,
+              47.38,
+              48.49,
+              47.15,
+              47.48,
+              48.39,
+              48.17,
+              50.18,
+              49.34,
+              48.61,
+              48.99,
+              49.4,
+              48.77,
+              48.93,
+              46.08,
+              50.77,
+              50.69,
+              50.68,
+              49.73,
+              50.35,
+              50.24,
+              50.2,
+              50.0,
+              50.72,
+              49.33,
+              50.2,
+              50.24,
+              50.23,
+              51.18,
+              51.29,
+              50.66,
+              49.49,
+              49.84,
+              49.78,
+              50.6,
+              50.38,
+              50.36
+            ],
+            "checkpoints": [
+              {
+                "episode": 250,
+                "epsilon": 0.8299,
+                "greedy_mean_reward": 50.533,
+                "decision_states_changed": null
+              },
+              {
+                "episode": 500,
+                "epsilon": 0.6882,
+                "greedy_mean_reward": 51.01,
+                "decision_states_changed": 5
+              },
+              {
+                "episode": 750,
+                "epsilon": 0.5707,
+                "greedy_mean_reward": 47.84,
+                "decision_states_changed": 2
+              },
+              {
+                "episode": 1000,
+                "epsilon": 0.4732,
+                "greedy_mean_reward": 46.213,
+                "decision_states_changed": 3
+              },
+              {
+                "episode": 1250,
+                "epsilon": 0.3924,
+                "greedy_mean_reward": 51.023,
+                "decision_states_changed": 2
+              },
+              {
+                "episode": 1500,
+                "epsilon": 0.3254,
+                "greedy_mean_reward": 47.79,
+                "decision_states_changed": 3
+              },
+              {
+                "episode": 1750,
+                "epsilon": 0.2699,
+                "greedy_mean_reward": 51.01,
+                "decision_states_changed": 4
+              },
+              {
+                "episode": 2000,
+                "epsilon": 0.2238,
+                "greedy_mean_reward": 50.593,
+                "decision_states_changed": 2
+              },
+              {
+                "episode": 2250,
+                "epsilon": 0.1856,
+                "greedy_mean_reward": 47.743,
+                "decision_states_changed": 3
+              },
+              {
+                "episode": 2500,
+                "epsilon": 0.1539,
+                "greedy_mean_reward": 50.207,
+                "decision_states_changed": 4
+              },
+              {
+                "episode": 2750,
+                "epsilon": 0.1276,
+                "greedy_mean_reward": 47.463,
+                "decision_states_changed": 4
+              },
+              {
+                "episode": 3000,
+                "epsilon": 0.1058,
+                "greedy_mean_reward": 51.297,
+                "decision_states_changed": 5
+              },
+              {
+                "episode": 3250,
+                "epsilon": 0.0877,
+                "greedy_mean_reward": 50.857,
+                "decision_states_changed": 1
+              },
+              {
+                "episode": 3500,
+                "epsilon": 0.0728,
+                "greedy_mean_reward": 49.29,
+                "decision_states_changed": 3
+              },
+              {
+                "episode": 3750,
+                "epsilon": 0.0603,
+                "greedy_mean_reward": 51.043,
+                "decision_states_changed": 3
+              },
+              {
+                "episode": 4000,
+                "epsilon": 0.05,
+                "greedy_mean_reward": 50.593,
+                "decision_states_changed": 4
+              },
+              {
+                "episode": 4250,
+                "epsilon": 0.05,
+                "greedy_mean_reward": 51.297,
+                "decision_states_changed": 3
+              },
+              {
+                "episode": 4500,
+                "epsilon": 0.05,
+                "greedy_mean_reward": 50.533,
+                "decision_states_changed": 2
+              },
+              {
+                "episode": 4750,
+                "epsilon": 0.05,
+                "greedy_mean_reward": 51.423,
+                "decision_states_changed": 4
+              },
+              {
+                "episode": 5000,
+                "epsilon": 0.05,
+                "greedy_mean_reward": 51.423,
+                "decision_states_changed": 1
+              }
+            ],
             "last5_checkpoint_greedy_reward_range": 0.89,
             "last5_checkpoint_states_changed": [
               4,
@@ -18912,14 +19942,7 @@
               2,
               4,
               1
-            ],
-            "behaviour_reward_last_1000_first_half_vs_second_half": [
-              50.57,
-              50.192
-            ],
-            "diag_constant_alpha_20000_matching_optimal": 10,
-            "diag_visit_alpha_5000_matching_optimal": 11,
-            "diag_visit_alpha_5000_mean_reward": 51.599
+            ]
           }
         }
       },
@@ -19035,10 +20058,10 @@
           "evaluation": {
             "learned": {
               "n_episodes": 1000,
-              "mean_reward": 21.575,
-              "std_reward": 22.6829,
-              "mastery_rate": 0.447,
-              "mean_steps_to_mastery": 14.3736
+              "mean_reward": 25.496,
+              "std_reward": 22.1723,
+              "mastery_rate": 0.524,
+              "mean_steps_to_mastery": 14.2252
             },
             "random": {
               "n_episodes": 1000,
@@ -19094,30 +20117,30 @@
             }
           },
           "learned_minus_best_fixed": {
-            "mean": 11.509,
-            "se": 0.677,
-            "share_episodes_better": 0.738
+            "mean": 15.43,
+            "se": 0.629,
+            "share_episodes_better": 0.826
           },
           "learned_minus_random": {
-            "mean": 17.12,
-            "se": 0.732,
-            "share_episodes_better": 0.805
+            "mean": 21.041,
+            "se": 0.7,
+            "share_episodes_better": 0.861
           },
           "optimal_minus_learned": {
-            "mean": 3.921,
-            "se": 0.584,
-            "share_episodes_better": 0.387
+            "mean": 0.0,
+            "se": 0.0,
+            "share_episodes_better": 0.0
           },
           "policy": [
             [
               1,
               2,
-              0
+              1
             ],
             [
               1,
               2,
-              0
+              1
             ],
             [
               2,
@@ -19164,64 +20187,64 @@
           ],
           "q_table": [
             [
-              4.8105,
-              5.8731,
-              5.812
+              7.059,
+              7.9736,
+              7.2438
             ],
             [
-              4.3794,
-              4.9539,
-              9.4331
+              5.5258,
+              8.2759,
+              8.6698
             ],
             [
-              12.7272,
-              7.5381,
-              7.5784
+              10.5389,
+              11.4537,
+              10.4391
             ],
             [
-              5.0429,
-              8.3616,
-              5.0459
+              7.3876,
+              9.1458,
+              7.5993
             ],
             [
-              4.9159,
-              5.7643,
-              8.7754
+              6.5066,
+              8.4341,
+              9.3094
             ],
             [
-              10.8782,
-              7.7615,
-              7.8615
+              11.5716,
+              13.2287,
+              11.5532
             ],
             [
-              6.0609,
-              6.9262,
-              9.0394
+              7.29,
+              7.9,
+              9.1529
             ],
             [
-              6.2499,
-              7.9008,
-              10.3777
+              8.3961,
+              10.1941,
+              11.5211
             ],
             [
-              14.8911,
-              9.5792,
-              9.753
+              14.3447,
+              13.166,
+              13.6655
             ],
             [
-              9.2122,
-              8.4985,
-              9.6675
+              10.446,
+              10.2172,
+              11.6306
             ],
             [
-              8.9419,
-              9.5522,
-              15.9364
+              11.7342,
+              11.7281,
+              14.9105
             ],
             [
-              18.3225,
-              13.6439,
-              13.9795
+              19.1077,
+              16.3979,
+              17.5865
             ],
             [
               0.0,
@@ -19318,64 +20341,64 @@
           ],
           "visits": [
             [
-              344,
-              1096,
-              596
+              258,
+              1004,
+              369
             ],
             [
-              634,
-              1055,
-              5576
+              543,
+              658,
+              5131
             ],
             [
-              4385,
-              8786,
-              2094
+              1780,
+              13158,
+              1534
             ],
             [
-              810,
-              1771,
-              1429
+              545,
+              1980,
+              720
             ],
             [
-              921,
-              1493,
-              8286
+              814,
+              849,
+              7827
             ],
             [
-              4071,
-              5651,
-              1525
+              3359,
+              7737,
+              1005
             ],
             [
-              684,
-              989,
-              1912
+              564,
+              697,
+              1889
             ],
             [
-              816,
-              1163,
-              8358
+              861,
+              898,
+              8978
             ],
             [
-              5042,
-              2443,
-              1633
+              6516,
+              1099,
+              728
             ],
             [
-              438,
-              403,
-              1180
+              379,
+              360,
+              1174
             ],
             [
               603,
-              732,
-              5910
+              564,
+              6884
             ],
             [
-              3717,
-              655,
-              716
+              4380,
+              414,
+              484
             ],
             [
               0,
@@ -19393,202 +20416,414 @@
               0
             ]
           ],
-          "decision_states_matching_optimal": 10,
+          "decision_states_matching_optimal": 12,
           "n_decision_states": 12,
-          "mismatches_vs_optimal": [
-            {
-              "knowledge": 0,
-              "energy": 2,
-              "learned": "Practice Quizzes",
-              "optimal": "Watch Videos",
-              "q_star_loss": 0.461,
-              "visits": 15265
-            },
-            {
-              "knowledge": 1,
-              "energy": 2,
-              "learned": "Practice Quizzes",
-              "optimal": "Watch Videos",
-              "q_star_loss": 0.461,
-              "visits": 11247
-            }
-          ],
+          "mismatches_vs_optimal": [],
           "near_tie_states_q_star": 2,
           "learning_curve_100": [
-            9.63,
-            3.4,
-            10.27,
-            5.47,
-            11.9,
-            9.25,
-            7.87,
-            11.96,
-            9.65,
-            12.95,
-            14.29,
-            12.33,
-            13.27,
-            16.28,
-            15.21,
-            16.58,
-            15.62,
-            18.69,
-            17.91,
-            17.97,
-            23.78,
-            18.63,
-            17.28,
-            20.13,
-            18.74,
-            18.36,
-            24.73,
-            17.47,
-            17.97,
-            18.83,
-            21.02,
-            23.37,
-            23.83,
-            19.32,
-            23.83,
-            27.6,
-            23.15,
-            18.79,
-            24.82,
-            22.79,
-            17.98,
-            20.74,
-            21.28,
-            21.88,
-            21.69,
-            24.49,
-            20.48,
-            22.9,
-            18.32,
-            19.68
+            8.94,
+            3.14,
+            9.98,
+            8.61,
+            13.01,
+            8.99,
+            10.99,
+            11.49,
+            11.02,
+            13.07,
+            14.7,
+            12.94,
+            16.5,
+            16.86,
+            15.26,
+            16.23,
+            16.42,
+            22.24,
+            18.8,
+            21.49,
+            23.56,
+            21.76,
+            19.76,
+            21.18,
+            25.92,
+            23.51,
+            22.02,
+            24.72,
+            21.91,
+            26.42,
+            22.81,
+            24.69,
+            25.44,
+            26.17,
+            28.68,
+            23.49,
+            29.77,
+            24.02,
+            22.0,
+            27.26,
+            17.03,
+            24.02,
+            27.19,
+            23.46,
+            23.5,
+            24.19,
+            24.02,
+            24.35,
+            21.9,
+            24.89
           ],
           "checkpoints": [
             {
               "episode": 250,
               "epsilon": 0.8299,
-              "greedy_mean_reward": 20.767,
+              "greedy_mean_reward": 24.123,
               "decision_states_changed": null
             },
             {
               "episode": 500,
               "epsilon": 0.6882,
-              "greedy_mean_reward": 17.45,
+              "greedy_mean_reward": 23.027,
               "decision_states_changed": 4
             },
             {
               "episode": 750,
               "epsilon": 0.5707,
-              "greedy_mean_reward": 15.143,
-              "decision_states_changed": 5
+              "greedy_mean_reward": 24.483,
+              "decision_states_changed": 1
             },
             {
               "episode": 1000,
               "epsilon": 0.4732,
-              "greedy_mean_reward": 18.26,
-              "decision_states_changed": 3
+              "greedy_mean_reward": 24.483,
+              "decision_states_changed": 0
             },
             {
               "episode": 1250,
               "epsilon": 0.3924,
-              "greedy_mean_reward": 19.633,
-              "decision_states_changed": 3
+              "greedy_mean_reward": 24.483,
+              "decision_states_changed": 0
             },
             {
               "episode": 1500,
               "epsilon": 0.3254,
-              "greedy_mean_reward": 24.483,
-              "decision_states_changed": 4
+              "greedy_mean_reward": 24.123,
+              "decision_states_changed": 1
             },
             {
               "episode": 1750,
               "epsilon": 0.2699,
-              "greedy_mean_reward": 18.877,
-              "decision_states_changed": 3
+              "greedy_mean_reward": 24.483,
+              "decision_states_changed": 1
             },
             {
               "episode": 2000,
               "epsilon": 0.2238,
               "greedy_mean_reward": 24.483,
-              "decision_states_changed": 4
+              "decision_states_changed": 0
             },
             {
               "episode": 2250,
               "epsilon": 0.1856,
-              "greedy_mean_reward": 18.733,
-              "decision_states_changed": 3
+              "greedy_mean_reward": 24.483,
+              "decision_states_changed": 0
             },
             {
               "episode": 2500,
               "epsilon": 0.1539,
-              "greedy_mean_reward": 15.06,
-              "decision_states_changed": 4
+              "greedy_mean_reward": 24.483,
+              "decision_states_changed": 0
             },
             {
               "episode": 2750,
               "epsilon": 0.1276,
-              "greedy_mean_reward": 23.913,
-              "decision_states_changed": 4
+              "greedy_mean_reward": 24.483,
+              "decision_states_changed": 0
             },
             {
               "episode": 3000,
               "epsilon": 0.1058,
-              "greedy_mean_reward": 17.553,
-              "decision_states_changed": 4
+              "greedy_mean_reward": 24.483,
+              "decision_states_changed": 0
             },
             {
               "episode": 3250,
               "epsilon": 0.0877,
-              "greedy_mean_reward": 24.287,
-              "decision_states_changed": 4
+              "greedy_mean_reward": 24.483,
+              "decision_states_changed": 1
             },
             {
               "episode": 3500,
               "epsilon": 0.0728,
               "greedy_mean_reward": 24.483,
-              "decision_states_changed": 3
+              "decision_states_changed": 0
             },
             {
               "episode": 3750,
               "epsilon": 0.0603,
-              "greedy_mean_reward": 23.227,
-              "decision_states_changed": 4
+              "greedy_mean_reward": 23.913,
+              "decision_states_changed": 1
             },
             {
               "episode": 4000,
               "epsilon": 0.05,
-              "greedy_mean_reward": 24.483,
-              "decision_states_changed": 2
+              "greedy_mean_reward": 24.123,
+              "decision_states_changed": 3
             },
             {
               "episode": 4250,
               "epsilon": 0.05,
               "greedy_mean_reward": 24.123,
-              "decision_states_changed": 1
+              "decision_states_changed": 2
             },
             {
               "episode": 4500,
               "epsilon": 0.05,
-              "greedy_mean_reward": 24.037,
-              "decision_states_changed": 1
+              "greedy_mean_reward": 24.123,
+              "decision_states_changed": 0
             },
             {
               "episode": 4750,
               "epsilon": 0.05,
-              "greedy_mean_reward": 17.743,
+              "greedy_mean_reward": 24.483,
               "decision_states_changed": 1
             },
             {
               "episode": 5000,
               "epsilon": 0.05,
-              "greedy_mean_reward": 24.037,
-              "decision_states_changed": 3
+              "greedy_mean_reward": 24.483,
+              "decision_states_changed": 0
             }
           ],
           "convergence": {
+            "last5_checkpoint_greedy_reward_range": 0.36,
+            "last5_checkpoint_states_changed": [
+              3,
+              2,
+              0,
+              1,
+              0
+            ],
+            "behaviour_reward_last_1000_first_half_vs_second_half": [
+              23.04,
+              23.87
+            ]
+          },
+          "comparison_constant_alpha": {
+            "alpha": 0.1,
+            "decision_states_matching_optimal": 10,
+            "evaluation": {
+              "n_episodes": 1000,
+              "mean_reward": 21.575,
+              "std_reward": 22.6829,
+              "mastery_rate": 0.447,
+              "mean_steps_to_mastery": 14.3736
+            },
+            "optimal_minus_learned": {
+              "mean": 3.921,
+              "se": 0.584,
+              "share_episodes_better": 0.387
+            },
+            "policy": [
+              [
+                1,
+                2,
+                0
+              ],
+              [
+                1,
+                2,
+                0
+              ],
+              [
+                2,
+                2,
+                0
+              ],
+              [
+                2,
+                2,
+                0
+              ],
+              [
+                null,
+                null,
+                null
+              ]
+            ],
+            "learning_curve_100": [
+              9.63,
+              3.4,
+              10.27,
+              5.47,
+              11.9,
+              9.25,
+              7.87,
+              11.96,
+              9.65,
+              12.95,
+              14.29,
+              12.33,
+              13.27,
+              16.28,
+              15.21,
+              16.58,
+              15.62,
+              18.69,
+              17.91,
+              17.97,
+              23.78,
+              18.63,
+              17.28,
+              20.13,
+              18.74,
+              18.36,
+              24.73,
+              17.47,
+              17.97,
+              18.83,
+              21.02,
+              23.37,
+              23.83,
+              19.32,
+              23.83,
+              27.6,
+              23.15,
+              18.79,
+              24.82,
+              22.79,
+              17.98,
+              20.74,
+              21.28,
+              21.88,
+              21.69,
+              24.49,
+              20.48,
+              22.9,
+              18.32,
+              19.68
+            ],
+            "checkpoints": [
+              {
+                "episode": 250,
+                "epsilon": 0.8299,
+                "greedy_mean_reward": 20.767,
+                "decision_states_changed": null
+              },
+              {
+                "episode": 500,
+                "epsilon": 0.6882,
+                "greedy_mean_reward": 17.45,
+                "decision_states_changed": 4
+              },
+              {
+                "episode": 750,
+                "epsilon": 0.5707,
+                "greedy_mean_reward": 15.143,
+                "decision_states_changed": 5
+              },
+              {
+                "episode": 1000,
+                "epsilon": 0.4732,
+                "greedy_mean_reward": 18.26,
+                "decision_states_changed": 3
+              },
+              {
+                "episode": 1250,
+                "epsilon": 0.3924,
+                "greedy_mean_reward": 19.633,
+                "decision_states_changed": 3
+              },
+              {
+                "episode": 1500,
+                "epsilon": 0.3254,
+                "greedy_mean_reward": 24.483,
+                "decision_states_changed": 4
+              },
+              {
+                "episode": 1750,
+                "epsilon": 0.2699,
+                "greedy_mean_reward": 18.877,
+                "decision_states_changed": 3
+              },
+              {
+                "episode": 2000,
+                "epsilon": 0.2238,
+                "greedy_mean_reward": 24.483,
+                "decision_states_changed": 4
+              },
+              {
+                "episode": 2250,
+                "epsilon": 0.1856,
+                "greedy_mean_reward": 18.733,
+                "decision_states_changed": 3
+              },
+              {
+                "episode": 2500,
+                "epsilon": 0.1539,
+                "greedy_mean_reward": 15.06,
+                "decision_states_changed": 4
+              },
+              {
+                "episode": 2750,
+                "epsilon": 0.1276,
+                "greedy_mean_reward": 23.913,
+                "decision_states_changed": 4
+              },
+              {
+                "episode": 3000,
+                "epsilon": 0.1058,
+                "greedy_mean_reward": 17.553,
+                "decision_states_changed": 4
+              },
+              {
+                "episode": 3250,
+                "epsilon": 0.0877,
+                "greedy_mean_reward": 24.287,
+                "decision_states_changed": 4
+              },
+              {
+                "episode": 3500,
+                "epsilon": 0.0728,
+                "greedy_mean_reward": 24.483,
+                "decision_states_changed": 3
+              },
+              {
+                "episode": 3750,
+                "epsilon": 0.0603,
+                "greedy_mean_reward": 23.227,
+                "decision_states_changed": 4
+              },
+              {
+                "episode": 4000,
+                "epsilon": 0.05,
+                "greedy_mean_reward": 24.483,
+                "decision_states_changed": 2
+              },
+              {
+                "episode": 4250,
+                "epsilon": 0.05,
+                "greedy_mean_reward": 24.123,
+                "decision_states_changed": 1
+              },
+              {
+                "episode": 4500,
+                "epsilon": 0.05,
+                "greedy_mean_reward": 24.037,
+                "decision_states_changed": 1
+              },
+              {
+                "episode": 4750,
+                "epsilon": 0.05,
+                "greedy_mean_reward": 17.743,
+                "decision_states_changed": 1
+              },
+              {
+                "episode": 5000,
+                "epsilon": 0.05,
+                "greedy_mean_reward": 24.037,
+                "decision_states_changed": 3
+              }
+            ],
             "last5_checkpoint_greedy_reward_range": 6.74,
             "last5_checkpoint_states_changed": [
               2,
@@ -19596,14 +20831,7 @@
               1,
               1,
               3
-            ],
-            "behaviour_reward_last_1000_first_half_vs_second_half": [
-              20.714,
-              21.174
-            ],
-            "diag_constant_alpha_20000_matching_optimal": 10,
-            "diag_visit_alpha_5000_matching_optimal": 12,
-            "diag_visit_alpha_5000_mean_reward": 25.496
+            ]
           }
         },
         "1": {
@@ -19717,10 +20945,10 @@
           "evaluation": {
             "learned": {
               "n_episodes": 1000,
-              "mean_reward": 44.033,
-              "std_reward": 13.7254,
-              "mastery_rate": 0.912,
-              "mean_steps_to_mastery": 11.5428
+              "mean_reward": 45.006,
+              "std_reward": 12.3449,
+              "mastery_rate": 0.917,
+              "mean_steps_to_mastery": 11.5093
             },
             "random": {
               "n_episodes": 1000,
@@ -19776,28 +21004,28 @@
             }
           },
           "learned_minus_best_fixed": {
-            "mean": 16.645,
-            "se": 0.605,
-            "share_episodes_better": 0.821
+            "mean": 17.618,
+            "se": 0.607,
+            "share_episodes_better": 0.86
           },
           "learned_minus_random": {
-            "mean": 19.785,
-            "se": 0.694,
-            "share_episodes_better": 0.846
+            "mean": 20.758,
+            "se": 0.696,
+            "share_episodes_better": 0.865
           },
           "optimal_minus_learned": {
-            "mean": 0.973,
-            "se": 0.28,
-            "share_episodes_better": 0.125
+            "mean": 0.0,
+            "se": 0.0,
+            "share_episodes_better": 0.0
           },
           "policy": [
             [
               1,
-              1,
+              2,
               1
             ],
             [
-              2,
+              1,
               2,
               1
             ],
@@ -19846,64 +21074,64 @@
           ],
           "q_table": [
             [
-              15.1006,
-              17.2455,
-              15.2989
+              15.6747,
+              18.1129,
+              15.9714
             ],
             [
-              13.6821,
-              19.2911,
-              15.0348
+              14.1276,
+              18.2141,
+              19.1632
             ],
             [
-              20.3934,
-              22.8354,
-              20.0762
+              21.7554,
+              24.1752,
+              22.2563
             ],
             [
-              11.5905,
-              11.5377,
-              13.1158
+              14.6582,
+              16.1845,
+              14.9759
             ],
             [
-              12.0758,
-              15.036,
-              19.3247
+              13.4284,
+              17.359,
+              19.289
             ],
             [
-              19.9495,
-              21.8461,
-              19.8728
+              21.7993,
+              24.2741,
+              22.1371
             ],
             [
-              11.4589,
-              10.6288,
-              14.3353
+              13.0039,
+              13.6969,
+              14.9808
             ],
             [
-              12.3203,
-              15.8772,
-              19.374
+              13.2647,
+              16.1405,
+              18.9652
             ],
             [
-              24.8241,
-              20.3996,
-              20.471
+              23.5669,
+              22.3955,
+              21.6763
             ],
             [
-              12.3022,
-              12.1595,
-              13.363
+              14.5783,
+              14.9253,
+              16.0411
             ],
             [
-              15.8383,
-              16.584,
-              21.987
+              16.2713,
+              15.8596,
+              19.5062
             ],
             [
-              23.7646,
-              20.5246,
-              19.3119
+              24.8855,
+              22.54,
+              22.5886
             ],
             [
               0.0,
@@ -20000,64 +21228,64 @@
           ],
           "visits": [
             [
-              146,
-              702,
-              155
+              110,
+              385,
+              101
             ],
             [
-              286,
-              986,
-              1811
+              288,
+              324,
+              2424
             ],
             [
-              3280,
-              4473,
-              1163
+              1290,
+              7505,
+              843
             ],
             [
-              449,
-              1834,
-              800
+              316,
+              1442,
+              345
             ],
             [
-              647,
-              1270,
-              6237
+              594,
+              620,
+              5587
             ],
             [
-              2629,
-              2584,
-              641
+              716,
+              6289,
+              516
             ],
             [
-              882,
-              1445,
-              2444
+              560,
+              659,
+              2045
             ],
             [
-              662,
-              796,
-              7495
+              663,
+              701,
+              6830
             ],
             [
-              3838,
-              995,
-              756
+              5047,
+              504,
+              449
             ],
             [
-              743,
-              789,
-              2187
+              616,
+              564,
+              1893
             ],
             [
-              774,
-              833,
-              7767
+              742,
+              797,
+              8264
             ],
             [
-              3875,
-              446,
-              610
+              4131,
+              386,
+              358
             ],
             [
               0,
@@ -20075,202 +21303,414 @@
               0
             ]
           ],
-          "decision_states_matching_optimal": 10,
+          "decision_states_matching_optimal": 12,
           "n_decision_states": 12,
-          "mismatches_vs_optimal": [
-            {
-              "knowledge": 0,
-              "energy": 1,
-              "learned": "Watch Videos",
-              "optimal": "Review Notes",
-              "q_star_loss": 0.675,
-              "visits": 3083
-            },
-            {
-              "knowledge": 1,
-              "energy": 0,
-              "learned": "Review Notes",
-              "optimal": "Watch Videos",
-              "q_star_loss": 1.066,
-              "visits": 3083
-            }
-          ],
+          "mismatches_vs_optimal": [],
           "near_tie_states_q_star": 1,
           "learning_curve_100": [
-            24.58,
-            23.0,
-            32.68,
-            32.02,
-            29.01,
-            28.99,
-            28.56,
-            30.26,
-            28.83,
-            33.48,
-            36.28,
-            32.63,
-            34.49,
-            36.17,
-            37.07,
-            38.36,
-            38.55,
-            32.61,
-            30.85,
-            37.29,
-            37.28,
-            39.7,
-            41.11,
-            36.46,
-            40.69,
-            38.33,
-            42.4,
-            41.75,
-            38.09,
-            40.72,
-            41.13,
-            42.35,
-            42.87,
-            40.08,
-            41.73,
+            25.43,
+            23.24,
+            29.39,
+            32.62,
+            31.24,
+            29.32,
+            28.93,
+            32.26,
+            34.31,
+            33.04,
+            33.74,
+            38.15,
+            34.02,
+            38.49,
+            40.24,
+            38.54,
+            40.78,
+            38.5,
+            40.27,
+            39.28,
+            39.82,
+            41.63,
+            43.44,
+            40.74,
+            42.96,
+            43.03,
+            42.73,
+            44.49,
+            42.47,
+            39.4,
             41.78,
-            41.53,
-            40.11,
-            38.73,
-            42.49,
-            43.66,
-            44.5,
-            40.01,
-            39.67,
-            44.87,
-            38.68,
-            42.41,
-            42.26,
-            42.36,
-            39.14
+            41.01,
+            42.77,
+            43.54,
+            42.88,
+            42.83,
+            40.37,
+            43.03,
+            44.81,
+            42.06,
+            44.21,
+            45.01,
+            44.77,
+            44.59,
+            43.3,
+            46.46,
+            45.01,
+            43.57,
+            46.95,
+            44.56
           ],
           "checkpoints": [
             {
               "episode": 250,
               "epsilon": 0.8299,
-              "greedy_mean_reward": 44.653,
+              "greedy_mean_reward": 37.933,
               "decision_states_changed": null
             },
             {
               "episode": 500,
               "epsilon": 0.6882,
-              "greedy_mean_reward": 35.46,
-              "decision_states_changed": 5
+              "greedy_mean_reward": 39.657,
+              "decision_states_changed": 4
             },
             {
               "episode": 750,
               "epsilon": 0.5707,
-              "greedy_mean_reward": 35.59,
-              "decision_states_changed": 7
+              "greedy_mean_reward": 43.34,
+              "decision_states_changed": 4
             },
             {
               "episode": 1000,
               "epsilon": 0.4732,
-              "greedy_mean_reward": 40.657,
-              "decision_states_changed": 6
+              "greedy_mean_reward": 44.127,
+              "decision_states_changed": 3
             },
             {
               "episode": 1250,
               "epsilon": 0.3924,
               "greedy_mean_reward": 44.693,
-              "decision_states_changed": 3
+              "decision_states_changed": 1
             },
             {
               "episode": 1500,
               "epsilon": 0.3254,
-              "greedy_mean_reward": 42.947,
-              "decision_states_changed": 3
+              "greedy_mean_reward": 44.693,
+              "decision_states_changed": 0
             },
             {
               "episode": 1750,
               "epsilon": 0.2699,
-              "greedy_mean_reward": 44.253,
-              "decision_states_changed": 2
+              "greedy_mean_reward": 44.693,
+              "decision_states_changed": 0
             },
             {
               "episode": 2000,
               "epsilon": 0.2238,
-              "greedy_mean_reward": 42.517,
-              "decision_states_changed": 4
+              "greedy_mean_reward": 44.693,
+              "decision_states_changed": 0
             },
             {
               "episode": 2250,
               "epsilon": 0.1856,
-              "greedy_mean_reward": 42.687,
-              "decision_states_changed": 5
+              "greedy_mean_reward": 44.693,
+              "decision_states_changed": 0
             },
             {
               "episode": 2500,
               "epsilon": 0.1539,
-              "greedy_mean_reward": 42.947,
-              "decision_states_changed": 3
+              "greedy_mean_reward": 44.693,
+              "decision_states_changed": 0
             },
             {
               "episode": 2750,
               "epsilon": 0.1276,
-              "greedy_mean_reward": 44.127,
-              "decision_states_changed": 2
+              "greedy_mean_reward": 44.693,
+              "decision_states_changed": 0
             },
             {
               "episode": 3000,
               "epsilon": 0.1058,
               "greedy_mean_reward": 44.653,
-              "decision_states_changed": 2
+              "decision_states_changed": 1
             },
             {
               "episode": 3250,
               "epsilon": 0.0877,
-              "greedy_mean_reward": 44.693,
-              "decision_states_changed": 1
+              "greedy_mean_reward": 44.127,
+              "decision_states_changed": 2
             },
             {
               "episode": 3500,
               "epsilon": 0.0728,
-              "greedy_mean_reward": 44.653,
+              "greedy_mean_reward": 44.693,
               "decision_states_changed": 1
             },
             {
               "episode": 3750,
               "epsilon": 0.0603,
-              "greedy_mean_reward": 42.17,
-              "decision_states_changed": 3
+              "greedy_mean_reward": 44.693,
+              "decision_states_changed": 0
             },
             {
               "episode": 4000,
               "epsilon": 0.05,
-              "greedy_mean_reward": 44.447,
-              "decision_states_changed": 3
+              "greedy_mean_reward": 44.693,
+              "decision_states_changed": 0
             },
             {
               "episode": 4250,
               "epsilon": 0.05,
-              "greedy_mean_reward": 44.253,
-              "decision_states_changed": 2
+              "greedy_mean_reward": 44.693,
+              "decision_states_changed": 0
             },
             {
               "episode": 4500,
               "epsilon": 0.05,
-              "greedy_mean_reward": 44.253,
-              "decision_states_changed": 2
+              "greedy_mean_reward": 44.693,
+              "decision_states_changed": 0
             },
             {
               "episode": 4750,
               "epsilon": 0.05,
-              "greedy_mean_reward": 43.77,
-              "decision_states_changed": 2
+              "greedy_mean_reward": 44.693,
+              "decision_states_changed": 0
             },
             {
               "episode": 5000,
               "epsilon": 0.05,
-              "greedy_mean_reward": 43.193,
-              "decision_states_changed": 2
+              "greedy_mean_reward": 44.693,
+              "decision_states_changed": 0
             }
           ],
           "convergence": {
+            "last5_checkpoint_greedy_reward_range": 0.0,
+            "last5_checkpoint_states_changed": [
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "behaviour_reward_last_1000_first_half_vs_second_half": [
+              44.376,
+              45.31
+            ]
+          },
+          "comparison_constant_alpha": {
+            "alpha": 0.1,
+            "decision_states_matching_optimal": 10,
+            "evaluation": {
+              "n_episodes": 1000,
+              "mean_reward": 44.033,
+              "std_reward": 13.7254,
+              "mastery_rate": 0.912,
+              "mean_steps_to_mastery": 11.5428
+            },
+            "optimal_minus_learned": {
+              "mean": 0.973,
+              "se": 0.28,
+              "share_episodes_better": 0.125
+            },
+            "policy": [
+              [
+                1,
+                1,
+                1
+              ],
+              [
+                2,
+                2,
+                1
+              ],
+              [
+                2,
+                2,
+                0
+              ],
+              [
+                2,
+                2,
+                0
+              ],
+              [
+                null,
+                null,
+                null
+              ]
+            ],
+            "learning_curve_100": [
+              24.58,
+              23.0,
+              32.68,
+              32.02,
+              29.01,
+              28.99,
+              28.56,
+              30.26,
+              28.83,
+              33.48,
+              36.28,
+              32.63,
+              34.49,
+              36.17,
+              37.07,
+              38.36,
+              38.55,
+              32.61,
+              30.85,
+              37.29,
+              37.28,
+              39.7,
+              41.11,
+              36.46,
+              40.69,
+              38.33,
+              42.4,
+              41.75,
+              38.09,
+              40.72,
+              41.13,
+              42.35,
+              42.87,
+              40.08,
+              41.73,
+              41.78,
+              41.53,
+              40.11,
+              38.73,
+              42.49,
+              43.66,
+              44.5,
+              40.01,
+              39.67,
+              44.87,
+              38.68,
+              42.41,
+              42.26,
+              42.36,
+              39.14
+            ],
+            "checkpoints": [
+              {
+                "episode": 250,
+                "epsilon": 0.8299,
+                "greedy_mean_reward": 44.653,
+                "decision_states_changed": null
+              },
+              {
+                "episode": 500,
+                "epsilon": 0.6882,
+                "greedy_mean_reward": 35.46,
+                "decision_states_changed": 5
+              },
+              {
+                "episode": 750,
+                "epsilon": 0.5707,
+                "greedy_mean_reward": 35.59,
+                "decision_states_changed": 7
+              },
+              {
+                "episode": 1000,
+                "epsilon": 0.4732,
+                "greedy_mean_reward": 40.657,
+                "decision_states_changed": 6
+              },
+              {
+                "episode": 1250,
+                "epsilon": 0.3924,
+                "greedy_mean_reward": 44.693,
+                "decision_states_changed": 3
+              },
+              {
+                "episode": 1500,
+                "epsilon": 0.3254,
+                "greedy_mean_reward": 42.947,
+                "decision_states_changed": 3
+              },
+              {
+                "episode": 1750,
+                "epsilon": 0.2699,
+                "greedy_mean_reward": 44.253,
+                "decision_states_changed": 2
+              },
+              {
+                "episode": 2000,
+                "epsilon": 0.2238,
+                "greedy_mean_reward": 42.517,
+                "decision_states_changed": 4
+              },
+              {
+                "episode": 2250,
+                "epsilon": 0.1856,
+                "greedy_mean_reward": 42.687,
+                "decision_states_changed": 5
+              },
+              {
+                "episode": 2500,
+                "epsilon": 0.1539,
+                "greedy_mean_reward": 42.947,
+                "decision_states_changed": 3
+              },
+              {
+                "episode": 2750,
+                "epsilon": 0.1276,
+                "greedy_mean_reward": 44.127,
+                "decision_states_changed": 2
+              },
+              {
+                "episode": 3000,
+                "epsilon": 0.1058,
+                "greedy_mean_reward": 44.653,
+                "decision_states_changed": 2
+              },
+              {
+                "episode": 3250,
+                "epsilon": 0.0877,
+                "greedy_mean_reward": 44.693,
+                "decision_states_changed": 1
+              },
+              {
+                "episode": 3500,
+                "epsilon": 0.0728,
+                "greedy_mean_reward": 44.653,
+                "decision_states_changed": 1
+              },
+              {
+                "episode": 3750,
+                "epsilon": 0.0603,
+                "greedy_mean_reward": 42.17,
+                "decision_states_changed": 3
+              },
+              {
+                "episode": 4000,
+                "epsilon": 0.05,
+                "greedy_mean_reward": 44.447,
+                "decision_states_changed": 3
+              },
+              {
+                "episode": 4250,
+                "epsilon": 0.05,
+                "greedy_mean_reward": 44.253,
+                "decision_states_changed": 2
+              },
+              {
+                "episode": 4500,
+                "epsilon": 0.05,
+                "greedy_mean_reward": 44.253,
+                "decision_states_changed": 2
+              },
+              {
+                "episode": 4750,
+                "epsilon": 0.05,
+                "greedy_mean_reward": 43.77,
+                "decision_states_changed": 2
+              },
+              {
+                "episode": 5000,
+                "epsilon": 0.05,
+                "greedy_mean_reward": 43.193,
+                "decision_states_changed": 2
+              }
+            ],
             "last5_checkpoint_greedy_reward_range": 1.254,
             "last5_checkpoint_states_changed": [
               3,
@@ -20278,14 +21718,7 @@
               2,
               2,
               2
-            ],
-            "behaviour_reward_last_1000_first_half_vs_second_half": [
-              42.542,
-              40.97
-            ],
-            "diag_constant_alpha_20000_matching_optimal": 11,
-            "diag_visit_alpha_5000_matching_optimal": 12,
-            "diag_visit_alpha_5000_mean_reward": 45.006
+            ]
           }
         },
         "2": {
@@ -20399,10 +21832,10 @@
           "evaluation": {
             "learned": {
               "n_episodes": 1000,
-              "mean_reward": 49.0,
-              "std_reward": 6.8798,
-              "mastery_rate": 0.981,
-              "mean_steps_to_mastery": 10.1937
+              "mean_reward": 49.789,
+              "std_reward": 6.373,
+              "mastery_rate": 0.982,
+              "mean_steps_to_mastery": 9.4817
             },
             "random": {
               "n_episodes": 1000,
@@ -20458,30 +21891,30 @@
             }
           },
           "learned_minus_best_fixed": {
-            "mean": 12.332,
-            "se": 0.564,
-            "share_episodes_better": 0.686
+            "mean": 13.121,
+            "se": 0.548,
+            "share_episodes_better": 0.744
           },
           "learned_minus_random": {
-            "mean": 13.972,
-            "se": 0.606,
-            "share_episodes_better": 0.777
+            "mean": 14.761,
+            "se": 0.609,
+            "share_episodes_better": 0.811
           },
           "optimal_minus_learned": {
-            "mean": 0.789,
-            "se": 0.204,
-            "share_episodes_better": 0.402
+            "mean": 0.0,
+            "se": 0.0,
+            "share_episodes_better": 0.0
           },
           "policy": [
             [
               2,
               2,
-              0
+              1
             ],
             [
               2,
               2,
-              0
+              1
             ],
             [
               2,
@@ -20528,64 +21961,64 @@
           ],
           "q_table": [
             [
-              14.9751,
-              15.6846,
-              19.2794
+              18.0068,
+              18.5026,
+              18.728
             ],
             [
-              17.8457,
-              20.3655,
-              23.903
+              20.9576,
+              23.4493,
+              23.7881
             ],
             [
-              27.479,
-              25.3919,
-              25.2613
+              28.0278,
+              28.933,
+              26.6118
             ],
             [
-              16.9443,
-              16.5845,
-              19.1776
+              17.9776,
+              19.0141,
+              19.5535
             ],
             [
-              20.2489,
-              19.3959,
-              22.4314
+              19.2306,
+              22.7005,
+              23.2577
             ],
             [
-              27.2165,
-              22.5581,
-              22.8869
+              26.5223,
+              27.5596,
+              25.4497
             ],
             [
-              15.6805,
-              16.403,
-              18.8614
+              15.8523,
+              17.4639,
+              17.8364
             ],
             [
-              14.9122,
-              19.9772,
-              22.1788
+              17.3353,
+              20.4265,
+              22.4848
             ],
             [
-              26.2058,
-              23.0013,
-              23.2468
+              26.0309,
+              24.8047,
+              24.1309
             ],
             [
-              13.83,
-              13.998,
-              17.8499
+              16.6075,
+              15.3921,
+              16.6797
             ],
             [
-              15.7044,
-              18.7441,
-              21.8526
+              19.1228,
+              18.7368,
+              21.6532
             ],
             [
-              25.6627,
-              22.602,
-              22.4188
+              25.3113,
+              23.3954,
+              23.1313
             ],
             [
               0.0,
@@ -20682,64 +22115,64 @@
           ],
           "visits": [
             [
-              29,
-              23,
-              139
+              27,
+              41,
+              60
             ],
             [
-              185,
-              361,
-              1376
+              126,
+              180,
+              1050
             ],
             [
-              3363,
-              4889,
-              1059
+              1025,
+              7913,
+              882
             ],
             [
-              155,
-              426,
-              275
+              124,
+              354,
+              168
             ],
             [
+              352,
               428,
-              977,
-              3395
+              2613
             ],
             [
-              2982,
-              3667,
-              747
+              954,
+              7066,
+              744
             ],
             [
-              268,
-              357,
-              1002
+              241,
+              290,
+              629
             ],
             [
-              534,
-              838,
-              4754
+              481,
+              512,
+              3911
             ],
             [
-              4797,
-              1604,
-              774
+              5973,
+              686,
+              625
             ],
             [
-              346,
-              375,
-              835
+              334,
+              331,
+              859
             ],
             [
-              702,
-              790,
-              5548
+              638,
+              612,
+              6002
             ],
             [
-              5173,
-              677,
-              665
+              5307,
+              552,
+              567
             ],
             [
               0,
@@ -20757,7 +22190,7 @@
               0
             ]
           ],
-          "decision_states_matching_optimal": 8,
+          "decision_states_matching_optimal": 10,
           "n_decision_states": 12,
           "mismatches_vs_optimal": [
             {
@@ -20766,15 +22199,7 @@
               "learned": "Review Notes",
               "optimal": "Watch Videos",
               "q_star_loss": 0.679,
-              "visits": 191
-            },
-            {
-              "knowledge": 0,
-              "energy": 2,
-              "learned": "Practice Quizzes",
-              "optimal": "Watch Videos",
-              "q_star_loss": 0.686,
-              "visits": 9311
+              "visits": 128
             },
             {
               "knowledge": 1,
@@ -20782,69 +22207,61 @@
               "learned": "Review Notes",
               "optimal": "Watch Videos",
               "q_star_loss": 0.471,
-              "visits": 856
-            },
-            {
-              "knowledge": 1,
-              "energy": 2,
-              "learned": "Practice Quizzes",
-              "optimal": "Watch Videos",
-              "q_star_loss": 0.602,
-              "visits": 7396
+              "visits": 646
             }
           ],
           "near_tie_states_q_star": 1,
           "learning_curve_100": [
-            38.97,
-            38.74,
-            36.3,
-            41.17,
-            41.1,
-            39.37,
-            41.3,
-            40.31,
-            42.77,
-            43.11,
-            41.48,
-            43.53,
-            43.36,
-            45.77,
-            43.68,
-            44.79,
-            46.93,
-            47.39,
-            44.7,
-            45.43,
-            45.07,
-            47.27,
-            45.9,
-            47.99,
-            47.47,
-            48.25,
-            47.87,
-            48.59,
-            48.19,
-            46.51,
-            49.12,
-            46.53,
-            48.08,
-            50.55,
-            48.94,
-            47.97,
-            47.15,
-            49.42,
-            49.91,
-            47.43,
-            49.45,
-            44.72,
+            38.77,
+            38.59,
+            36.0,
+            42.02,
+            42.01,
+            40.4,
+            41.31,
+            42.33,
+            45.32,
+            44.07,
+            43.75,
+            42.15,
+            46.0,
+            47.13,
+            46.94,
+            46.3,
+            47.24,
+            48.21,
+            49.04,
+            48.39,
+            48.42,
+            48.13,
+            47.64,
+            46.82,
+            47.68,
+            48.11,
+            49.68,
+            49.68,
+            49.32,
+            48.61,
+            49.01,
+            50.34,
             48.4,
-            48.28,
-            48.84,
-            48.29,
-            47.51,
-            49.07,
-            48.74,
-            47.54
+            49.03,
+            50.7,
+            47.84,
+            48.1,
+            49.37,
+            50.51,
+            49.72,
+            49.06,
+            49.19,
+            49.2,
+            49.87,
+            49.69,
+            49.3,
+            49.05,
+            49.66,
+            50.19,
+            48.54
           ],
           "checkpoints": [
             {
@@ -20856,119 +22273,348 @@
             {
               "episode": 500,
               "epsilon": 0.6882,
-              "greedy_mean_reward": 49.463,
+              "greedy_mean_reward": 45.623,
               "decision_states_changed": 4
             },
             {
               "episode": 750,
               "epsilon": 0.5707,
-              "greedy_mean_reward": 49.807,
+              "greedy_mean_reward": 49.343,
               "decision_states_changed": 3
             },
             {
               "episode": 1000,
               "epsilon": 0.4732,
-              "greedy_mean_reward": 41.007,
-              "decision_states_changed": 6
+              "greedy_mean_reward": 49.807,
+              "decision_states_changed": 2
             },
             {
               "episode": 1250,
               "epsilon": 0.3924,
-              "greedy_mean_reward": 49.463,
-              "decision_states_changed": 6
+              "greedy_mean_reward": 49.807,
+              "decision_states_changed": 0
             },
             {
               "episode": 1500,
               "epsilon": 0.3254,
-              "greedy_mean_reward": 44.97,
-              "decision_states_changed": 4
+              "greedy_mean_reward": 49.807,
+              "decision_states_changed": 0
             },
             {
               "episode": 1750,
               "epsilon": 0.2699,
-              "greedy_mean_reward": 48.84,
-              "decision_states_changed": 2
+              "greedy_mean_reward": 49.807,
+              "decision_states_changed": 0
             },
             {
               "episode": 2000,
               "epsilon": 0.2238,
-              "greedy_mean_reward": 48.84,
-              "decision_states_changed": 1
+              "greedy_mean_reward": 49.807,
+              "decision_states_changed": 2
             },
             {
               "episode": 2250,
               "epsilon": 0.1856,
-              "greedy_mean_reward": 49.387,
-              "decision_states_changed": 3
+              "greedy_mean_reward": 49.807,
+              "decision_states_changed": 1
             },
             {
               "episode": 2500,
               "epsilon": 0.1539,
-              "greedy_mean_reward": 49.387,
+              "greedy_mean_reward": 49.807,
               "decision_states_changed": 1
             },
             {
               "episode": 2750,
               "epsilon": 0.1276,
               "greedy_mean_reward": 49.807,
-              "decision_states_changed": 2
+              "decision_states_changed": 1
             },
             {
               "episode": 3000,
               "epsilon": 0.1058,
-              "greedy_mean_reward": 49.387,
-              "decision_states_changed": 1
+              "greedy_mean_reward": 49.807,
+              "decision_states_changed": 0
             },
             {
               "episode": 3250,
               "epsilon": 0.0877,
-              "greedy_mean_reward": 49.113,
+              "greedy_mean_reward": 49.807,
               "decision_states_changed": 1
             },
             {
               "episode": 3500,
               "epsilon": 0.0728,
-              "greedy_mean_reward": 49.463,
-              "decision_states_changed": 1
+              "greedy_mean_reward": 49.807,
+              "decision_states_changed": 2
             },
             {
               "episode": 3750,
               "epsilon": 0.0603,
-              "greedy_mean_reward": 49.23,
-              "decision_states_changed": 2
+              "greedy_mean_reward": 49.807,
+              "decision_states_changed": 1
             },
             {
               "episode": 4000,
               "epsilon": 0.05,
-              "greedy_mean_reward": 45.18,
-              "decision_states_changed": 4
+              "greedy_mean_reward": 49.807,
+              "decision_states_changed": 1
             },
             {
               "episode": 4250,
               "epsilon": 0.05,
-              "greedy_mean_reward": 49.113,
-              "decision_states_changed": 2
+              "greedy_mean_reward": 49.807,
+              "decision_states_changed": 0
             },
             {
               "episode": 4500,
               "epsilon": 0.05,
-              "greedy_mean_reward": 48.203,
-              "decision_states_changed": 3
+              "greedy_mean_reward": 49.807,
+              "decision_states_changed": 1
             },
             {
               "episode": 4750,
               "epsilon": 0.05,
-              "greedy_mean_reward": 49.387,
-              "decision_states_changed": 2
+              "greedy_mean_reward": 49.807,
+              "decision_states_changed": 1
             },
             {
               "episode": 5000,
               "epsilon": 0.05,
-              "greedy_mean_reward": 49.113,
+              "greedy_mean_reward": 49.807,
               "decision_states_changed": 1
             }
           ],
           "convergence": {
+            "last5_checkpoint_greedy_reward_range": 0.0,
+            "last5_checkpoint_states_changed": [
+              1,
+              0,
+              1,
+              1,
+              1
+            ],
+            "behaviour_reward_last_1000_first_half_vs_second_half": [
+              49.402,
+              49.348
+            ]
+          },
+          "comparison_constant_alpha": {
+            "alpha": 0.1,
+            "decision_states_matching_optimal": 8,
+            "evaluation": {
+              "n_episodes": 1000,
+              "mean_reward": 49.0,
+              "std_reward": 6.8798,
+              "mastery_rate": 0.981,
+              "mean_steps_to_mastery": 10.1937
+            },
+            "optimal_minus_learned": {
+              "mean": 0.789,
+              "se": 0.204,
+              "share_episodes_better": 0.402
+            },
+            "policy": [
+              [
+                2,
+                2,
+                0
+              ],
+              [
+                2,
+                2,
+                0
+              ],
+              [
+                2,
+                2,
+                0
+              ],
+              [
+                2,
+                2,
+                0
+              ],
+              [
+                null,
+                null,
+                null
+              ]
+            ],
+            "learning_curve_100": [
+              38.97,
+              38.74,
+              36.3,
+              41.17,
+              41.1,
+              39.37,
+              41.3,
+              40.31,
+              42.77,
+              43.11,
+              41.48,
+              43.53,
+              43.36,
+              45.77,
+              43.68,
+              44.79,
+              46.93,
+              47.39,
+              44.7,
+              45.43,
+              45.07,
+              47.27,
+              45.9,
+              47.99,
+              47.47,
+              48.25,
+              47.87,
+              48.59,
+              48.19,
+              46.51,
+              49.12,
+              46.53,
+              48.08,
+              50.55,
+              48.94,
+              47.97,
+              47.15,
+              49.42,
+              49.91,
+              47.43,
+              49.45,
+              44.72,
+              48.4,
+              48.28,
+              48.84,
+              48.29,
+              47.51,
+              49.07,
+              48.74,
+              47.54
+            ],
+            "checkpoints": [
+              {
+                "episode": 250,
+                "epsilon": 0.8299,
+                "greedy_mean_reward": 49.387,
+                "decision_states_changed": null
+              },
+              {
+                "episode": 500,
+                "epsilon": 0.6882,
+                "greedy_mean_reward": 49.463,
+                "decision_states_changed": 4
+              },
+              {
+                "episode": 750,
+                "epsilon": 0.5707,
+                "greedy_mean_reward": 49.807,
+                "decision_states_changed": 3
+              },
+              {
+                "episode": 1000,
+                "epsilon": 0.4732,
+                "greedy_mean_reward": 41.007,
+                "decision_states_changed": 6
+              },
+              {
+                "episode": 1250,
+                "epsilon": 0.3924,
+                "greedy_mean_reward": 49.463,
+                "decision_states_changed": 6
+              },
+              {
+                "episode": 1500,
+                "epsilon": 0.3254,
+                "greedy_mean_reward": 44.97,
+                "decision_states_changed": 4
+              },
+              {
+                "episode": 1750,
+                "epsilon": 0.2699,
+                "greedy_mean_reward": 48.84,
+                "decision_states_changed": 2
+              },
+              {
+                "episode": 2000,
+                "epsilon": 0.2238,
+                "greedy_mean_reward": 48.84,
+                "decision_states_changed": 1
+              },
+              {
+                "episode": 2250,
+                "epsilon": 0.1856,
+                "greedy_mean_reward": 49.387,
+                "decision_states_changed": 3
+              },
+              {
+                "episode": 2500,
+                "epsilon": 0.1539,
+                "greedy_mean_reward": 49.387,
+                "decision_states_changed": 1
+              },
+              {
+                "episode": 2750,
+                "epsilon": 0.1276,
+                "greedy_mean_reward": 49.807,
+                "decision_states_changed": 2
+              },
+              {
+                "episode": 3000,
+                "epsilon": 0.1058,
+                "greedy_mean_reward": 49.387,
+                "decision_states_changed": 1
+              },
+              {
+                "episode": 3250,
+                "epsilon": 0.0877,
+                "greedy_mean_reward": 49.113,
+                "decision_states_changed": 1
+              },
+              {
+                "episode": 3500,
+                "epsilon": 0.0728,
+                "greedy_mean_reward": 49.463,
+                "decision_states_changed": 1
+              },
+              {
+                "episode": 3750,
+                "epsilon": 0.0603,
+                "greedy_mean_reward": 49.23,
+                "decision_states_changed": 2
+              },
+              {
+                "episode": 4000,
+                "epsilon": 0.05,
+                "greedy_mean_reward": 45.18,
+                "decision_states_changed": 4
+              },
+              {
+                "episode": 4250,
+                "epsilon": 0.05,
+                "greedy_mean_reward": 49.113,
+                "decision_states_changed": 2
+              },
+              {
+                "episode": 4500,
+                "epsilon": 0.05,
+                "greedy_mean_reward": 48.203,
+                "decision_states_changed": 3
+              },
+              {
+                "episode": 4750,
+                "epsilon": 0.05,
+                "greedy_mean_reward": 49.387,
+                "decision_states_changed": 2
+              },
+              {
+                "episode": 5000,
+                "epsilon": 0.05,
+                "greedy_mean_reward": 49.113,
+                "decision_states_changed": 1
+              }
+            ],
             "last5_checkpoint_greedy_reward_range": 4.207,
             "last5_checkpoint_states_changed": [
               4,
@@ -20976,84 +22622,43 @@
               3,
               2,
               1
-            ],
-            "behaviour_reward_last_1000_first_half_vs_second_half": [
-              47.938,
-              48.23
-            ],
-            "diag_constant_alpha_20000_matching_optimal": 11,
-            "diag_visit_alpha_5000_matching_optimal": 10,
-            "diag_visit_alpha_5000_mean_reward": 49.789
+            ]
           }
         }
       }
     },
     "policy_differences": {
-      "n_distinct_learned_policies": 8,
+      "n_distinct_learned_policies": 5,
       "n_distinct_optimal_policies": 1,
       "states_where_policies_differ": [
         {
           "knowledge": 0,
           "energy": 0,
           "learned": {
-            "mat/0": "Review Notes",
-            "mat/1": "Watch Videos",
-            "mat/2": "Review Notes",
-            "mat/3": "Practice Quizzes",
-            "mat/4": "Review Notes",
-            "por/0": "Watch Videos",
-            "por/1": "Watch Videos",
-            "por/2": "Review Notes"
-          },
-          "optimal_actions": [
-            "Watch Videos"
-          ]
-        },
-        {
-          "knowledge": 0,
-          "energy": 1,
-          "learned": {
-            "mat/0": "Review Notes",
-            "mat/1": "Watch Videos",
-            "mat/2": "Review Notes",
-            "mat/3": "Review Notes",
-            "mat/4": "Review Notes",
-            "por/0": "Review Notes",
-            "por/1": "Watch Videos",
-            "por/2": "Review Notes"
-          },
-          "optimal_actions": [
-            "Review Notes"
-          ]
-        },
-        {
-          "knowledge": 0,
-          "energy": 2,
-          "learned": {
-            "mat/0": "Practice Quizzes",
-            "mat/1": "Practice Quizzes",
-            "mat/2": "Practice Quizzes",
-            "mat/3": "Practice Quizzes",
-            "mat/4": "Watch Videos",
-            "por/0": "Practice Quizzes",
-            "por/1": "Watch Videos",
-            "por/2": "Practice Quizzes"
-          },
-          "optimal_actions": [
-            "Watch Videos"
-          ]
-        },
-        {
-          "knowledge": 1,
-          "energy": 0,
-          "learned": {
-            "mat/0": "Review Notes",
+            "mat/0": "Watch Videos",
             "mat/1": "Watch Videos",
             "mat/2": "Watch Videos",
             "mat/3": "Watch Videos",
+            "mat/4": "Review Notes",
+            "por/0": "Watch Videos",
+            "por/1": "Watch Videos",
+            "por/2": "Review Notes"
+          },
+          "optimal_actions": [
+            "Watch Videos"
+          ]
+        },
+        {
+          "knowledge": 1,
+          "energy": 0,
+          "learned": {
+            "mat/0": "Review Notes",
+            "mat/1": "Watch Videos",
+            "mat/2": "Review Notes",
+            "mat/3": "Watch Videos",
             "mat/4": "Watch Videos",
             "por/0": "Watch Videos",
-            "por/1": "Review Notes",
+            "por/1": "Watch Videos",
             "por/2": "Review Notes"
           },
           "optimal_actions": [
@@ -21064,51 +22669,17 @@
           "knowledge": 1,
           "energy": 2,
           "learned": {
-            "mat/0": "Practice Quizzes",
+            "mat/0": "Watch Videos",
             "mat/1": "Watch Videos",
-            "mat/2": "Practice Quizzes",
+            "mat/2": "Watch Videos",
             "mat/3": "Practice Quizzes",
             "mat/4": "Watch Videos",
-            "por/0": "Practice Quizzes",
+            "por/0": "Watch Videos",
             "por/1": "Watch Videos",
-            "por/2": "Practice Quizzes"
+            "por/2": "Watch Videos"
           },
           "optimal_actions": [
             "Watch Videos"
-          ]
-        },
-        {
-          "knowledge": 2,
-          "energy": 0,
-          "learned": {
-            "mat/0": "Review Notes",
-            "mat/1": "Review Notes",
-            "mat/2": "Review Notes",
-            "mat/3": "Review Notes",
-            "mat/4": "Watch Videos",
-            "por/0": "Review Notes",
-            "por/1": "Review Notes",
-            "por/2": "Review Notes"
-          },
-          "optimal_actions": [
-            "Review Notes"
-          ]
-        },
-        {
-          "knowledge": 2,
-          "energy": 2,
-          "learned": {
-            "mat/0": "Watch Videos",
-            "mat/1": "Practice Quizzes",
-            "mat/2": "Practice Quizzes",
-            "mat/3": "Practice Quizzes",
-            "mat/4": "Practice Quizzes",
-            "por/0": "Practice Quizzes",
-            "por/1": "Practice Quizzes",
-            "por/2": "Practice Quizzes"
-          },
-          "optimal_actions": [
-            "Practice Quizzes"
           ]
         }
       ]
@@ -21116,7 +22687,8 @@
     "figures": [
       "reports/figures/17_rl_learning_curves.png",
       "reports/figures/18_rl_policy_heatmaps.png",
-      "reports/figures/19_rl_policy_comparison.png"
+      "reports/figures/19_rl_policy_comparison.png",
+      "reports/figures/20_rl_alpha_comparison.png"
     ]
   }
 }

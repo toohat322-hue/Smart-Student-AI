@@ -1,4 +1,4 @@
-"""Tabular Q-learning study planner (spec §8.2) + evaluation helpers.
+"""Tabular Q-learning study planner (spec §8.2, decaying learning rate since Phase 6b) + evaluation helpers.
 
 One Q-table (15 states x 3 actions) per (subject, cluster) environment. The environments are
 SIMULATIONS whose parameters come from the K-Means cluster centroids (src/rl_env.py); the
@@ -34,14 +34,16 @@ def epsilon_schedule(episode: int, n_episodes: int = C.RL_EPISODES) -> float:
 
 
 class QLearningAgent:
-    """Tabular Q-learning. alpha_power=None -> constant alpha (spec, used for the saved tables).
+    """Tabular Q-learning.
 
-    alpha_power=x -> per-(state, action) learning rate max(0.01, 1 / visits**x); used only as a
-    convergence diagnostic (DECISIONS.md D14), never for the saved Q-tables.
+    alpha_power=x (default RL_ALPHA_POWER = 0.6) -> per-(state, action) learning rate
+    max(RL_ALPHA_MIN, 1 / visits**x); used for the saved Q-tables (DECISIONS.md D16).
+    alpha_power=None -> constant alpha = 0.1 (the spec's setting), kept as a comparison.
     """
 
     def __init__(self, n_states: int = N_STATES, n_actions: int = N_ACTIONS, alpha: float = C.RL_ALPHA,
-                 gamma: float = C.RL_GAMMA, seed: int = C.RANDOM_STATE, alpha_power: float | None = None):
+                 gamma: float = C.RL_GAMMA, seed: int = C.RANDOM_STATE,
+                 alpha_power: float | None = C.RL_ALPHA_POWER):
         self.q = np.zeros((n_states, n_actions))
         self.visits = np.zeros((n_states, n_actions), dtype=int)
         self.alpha, self.gamma = alpha, gamma
@@ -58,7 +60,7 @@ class QLearningAgent:
         # Mastery is a true terminal state. Hitting the 20-step limit is a time-out (truncation),
         # so the target still bootstraps from the next state.
         self.visits[s, a] += 1
-        alpha = self.alpha if self.alpha_power is None else max(0.01, 1.0 / self.visits[s, a] ** self.alpha_power)
+        alpha = self.alpha if self.alpha_power is None else max(C.RL_ALPHA_MIN, 1.0 / self.visits[s, a] ** self.alpha_power)
         target = r if terminal else r + self.gamma * self.q[s_next].max()
         self.q[s, a] += alpha * (target - self.q[s, a])
 
@@ -67,7 +69,8 @@ class QLearningAgent:
 
 
 def train(params: EnvParams, n_episodes: int = C.RL_EPISODES, seed: int = C.RANDOM_STATE,
-          checkpoints: bool = True, alpha_power: float | None = None) -> tuple[QLearningAgent, dict[str, Any]]:
+          checkpoints: bool = True,
+          alpha_power: float | None = C.RL_ALPHA_POWER) -> tuple[QLearningAgent, dict[str, Any]]:
     """Q-learning on one environment. Deterministic for a given seed."""
     env = StudyEnv(params)
     agent = QLearningAgent(seed=seed, alpha_power=alpha_power)

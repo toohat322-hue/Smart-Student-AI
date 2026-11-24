@@ -62,7 +62,9 @@ RL_DRAIN_COEF = {"goout": 0.08, "freetime": 0.04, "health": -0.08}  # added to d
 RL_SKIP_COEF = {"absences": 0.05}                              # added to skip probability
 
 # Q-learning (spec §8.2)
-RL_ALPHA = 0.1
+RL_ALPHA = 0.1                   # constant learning rate (spec); kept as a comparison only
+RL_ALPHA_POWER = 0.6             # default (Phase 6b): per-(state, action) alpha = max(0.01, 1 / visits**0.6)
+RL_ALPHA_MIN = 0.01
 RL_GAMMA = 0.9
 RL_EPS_START = 1.0
 RL_EPS_END = 0.05

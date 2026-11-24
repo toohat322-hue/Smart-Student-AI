@@ -172,6 +172,7 @@ only; the agent never sees the model. The learned policy is 0.0–3.9 reward bel
 gaps are in the two "High past failures" environments (Mathematics 3.85, Portuguese 3.92).
 
 ### D14. Training does not fully converge with constant α = 0.1. The fix is a decaying learning rate, not more episodes
+*(Superseded by D16 in Phase 6b: the decaying learning rate is now the default.)*
 The ε-greedy training reward levels off, but the greedy policy keeps changing. In the last 5 checkpoints
 (every 250 episodes), 0–4 of the 12 decision states change their best action, and greedy reward swings by
 up to 6.7. Learned policies agree with the exact optimum in 7–10 of 12 states. More episodes do not fix this:
@@ -192,3 +193,43 @@ policies, but every difference is Q-learning noise in near-tie states (D14), not
 must not present per-cluster strategies as different advice. It shows the same strategy, plus each
 cluster's expected outcome (mastery rate, steps). Making policies differ would mean changing the simulator's
 assumptions just to get that result, so we did not.
+
+---
+
+## Phase 6b — Decaying learning rate
+
+### D16. Default learning rate: α = max(0.01, 1/visits^0.6) per (state, action)
+All 8 Q-tables were retrained with it (same seed 42, same 5,000 episodes, same ε schedule). The spec's
+constant α = 0.1 is still trained and stored as `comparison_constant_alpha` in `metrics.json["rl"]`, and
+`reports/figures/20_rl_alpha_comparison.png` shows the two side by side. Results (decaying vs constant):
+
+| Measure | Decaying α (saved) | Constant α = 0.1 |
+|---|---|---|
+| Decision states with the optimal action (of 12) | 10–12 | 7–10 |
+| Reward gap to the exact optimum | 0.00 in 7 of 8 environments; 1.21 in Mathematics 3 | 0.00–3.92 |
+| Greedy-reward range over the last 5 checkpoints | 0.0–2.0 | 0.9–6.7 |
+
+The remaining disagreements are six cases across the 8 environments. Five are low-energy states at
+knowledge 0–1, which the agent rarely visits (128–4,215 visits, against about 8,000–10,000 for common
+states); each costs at most 1.14 in Q-value. The sixth is knowledge 1 / high energy in Mathematics 3,
+costing 0.61. The learned policy now beats the best fixed action by
++11.3 to +18.0 reward (standard error about 0.6).
+
+### D17. The best action depends on the student's current state, not their cluster
+The exact optimal policy is the same in all 8 environments (D15). The decaying-α policies now come close to
+it, so of their 5 distinct versions most differences sit in those rarely visited low-energy states. We
+accept this rather than reshape the simulator:
+- **The current state decides the action:** knowledge 0–1 → videos when energy is low or high, review notes
+  when it is mid; knowledge 2–3 → review notes when energy is low or mid, quizzes when it is high.
+- **The cluster changes the expected outcome:** mean reward 19.7 (Mathematics "High past failures") to
+  51.6 (Mathematics "High study time"), mastery rate 41% to 100%, and 8.4 to 14.5 steps to mastery.
+
+The app presents it this way: one strategy based on where the student is now, plus what students in their
+cluster can expect.
+
+---
+
+## Future work
+- **Cluster-specific action effectiveness.** For example, if videos helped weaker students more, the
+  clusters would get different policies. Modelling that needs data on which study activities students
+  used and how they progressed afterwards, which we do not have.

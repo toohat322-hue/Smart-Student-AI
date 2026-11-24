@@ -1,10 +1,11 @@
 """Phase 6 — Reinforcement-learning study planner runner (spec §8).
 
 One SIMULATED environment per K-Means cluster (5 Mathematics + 3 Portuguese). For each:
-Q-learning (alpha 0.1, gamma 0.9, eps 1.0 -> 0.05, 5,000 episodes, seed 42); evaluation of the
+Q-learning (alpha = 1/visits^0.6, gamma 0.9, eps 1.0 -> 0.05, 5,000 episodes, seed 42), plus the
+spec's constant alpha = 0.1 as a stored comparison; evaluation of the
 learned policy vs random / always-quizzes / best single fixed action on 1,000 fixed test seeds;
 exact optimal policy by value iteration (analysis reference); convergence diagnostics.
-Saves models/q_tables.joblib, reports/metrics.json["rl"] and figures 17–19.
+Saves models/q_tables.joblib, reports/metrics.json["rl"] and figures 17–20.
 
 Usage:
     python scripts/train_rl.py
@@ -39,8 +40,6 @@ SUBJECT_NAMES = {"mat": "Mathematics", "por": "Portuguese"}
 ACTION_COLORS = ["#2a78d6", "#1baf7a", "#eda100"]  # quizzes, videos, review notes (fixed order)
 C_GRAY, C_TEXT2, C_ORANGE = "#8a8984", "#52514e", "#eb6834"
 NEAR_TIE = 0.5          # Q* gap below this = the two best actions are almost equally good
-DIAG_EPISODES_CONST = 20_000
-DIAG_ALPHA_POWER = 0.6
 
 plt.rcParams.update({
     "figure.dpi": 110, "savefig.dpi": 150, "savefig.bbox": "tight", "font.size": 10,
@@ -93,7 +92,8 @@ def run() -> tuple[dict, dict]:
             "base_restore": C.RL_BASE_RESTORE, "base_skip": C.RL_BASE_SKIP, "prob_clip": list(C.RL_PROB_CLIP),
             "gain_coef": C.RL_GAIN_COEF, "gain_mult_clip": list(C.RL_GAIN_MULT_CLIP),
             "drain_coef": C.RL_DRAIN_COEF, "skip_coef": C.RL_SKIP_COEF,
-            "alpha": C.RL_ALPHA, "gamma": C.RL_GAMMA, "eps_start": C.RL_EPS_START, "eps_end": C.RL_EPS_END,
+            "alpha_schedule": f"max({C.RL_ALPHA_MIN}, 1 / visits**{C.RL_ALPHA_POWER}) per (state, action)",
+            "alpha_power": C.RL_ALPHA_POWER, "comparison_constant_alpha": C.RL_ALPHA, "gamma": C.RL_GAMMA, "eps_start": C.RL_EPS_START, "eps_end": C.RL_EPS_END,
             "eps_decay_fraction": C.RL_EPS_DECAY_FRACTION, "episodes": C.RL_EPISODES, "seed": C.RANDOM_STATE,
             "eval_episodes": C.RL_EVAL_EPISODES, "eval_seeds": [C.RL_EVAL_SEED_OFFSET,
                                                                   C.RL_EVAL_SEED_OFFSET + C.RL_EVAL_EPISODES - 1],
@@ -131,9 +131,9 @@ def run() -> tuple[dict, dict]:
                         "visits": int(agent.visits[st].sum()),
                     })
 
-            # Convergence diagnostics (not saved as models).
-            ag_long, _ = train(p, n_episodes=DIAG_EPISODES_CONST, checkpoints=False)
-            ag_visit, _ = train(p, checkpoints=False, alpha_power=DIAG_ALPHA_POWER)
+            # Comparison: the spec's constant alpha = 0.1, same seed / episodes / evaluation (not saved).
+            ag_const, hist_const = train(p, alpha_power=None)
+            ev_const = evaluate_policy(p, greedy(ag_const.q))
             cps = hist["checkpoints"]
             last5 = cps[-5:]
             res["environments"][s][str(c)] = {
@@ -164,11 +164,21 @@ def run() -> tuple[dict, dict]:
                     "behaviour_reward_last_1000_first_half_vs_second_half": [
                         round(float(np.mean(hist["episode_rewards"][-1000:-500])), 3),
                         round(float(np.mean(hist["episode_rewards"][-500:])), 3)],
-                    "diag_constant_alpha_20000_matching_optimal":
-                        int((ag_long.greedy_policy()[DECISION_STATES] == pi_star[DECISION_STATES]).sum()),
-                    "diag_visit_alpha_5000_matching_optimal":
-                        int((ag_visit.greedy_policy()[DECISION_STATES] == pi_star[DECISION_STATES]).sum()),
-                    "diag_visit_alpha_5000_mean_reward": round(evaluate_policy(p, greedy(ag_visit.q))["mean_reward"], 3),
+                },
+                "comparison_constant_alpha": {
+                    "alpha": C.RL_ALPHA,
+                    "decision_states_matching_optimal":
+                        int((ag_const.greedy_policy()[DECISION_STATES] == pi_star[DECISION_STATES]).sum()),
+                    "evaluation": summary(ev_const),
+                    "optimal_minus_learned": paired(evals["optimal_reference"], ev_const),
+                    "policy": policy_grid(ag_const.greedy_policy()),
+                    "learning_curve_100": hist_const["learning_curve_100"],
+                    "checkpoints": hist_const["checkpoints"],
+                    "last5_checkpoint_greedy_reward_range": round(
+                        max(x["greedy_mean_reward"] for x in hist_const["checkpoints"][-5:])
+                        - min(x["greedy_mean_reward"] for x in hist_const["checkpoints"][-5:]), 3),
+                    "last5_checkpoint_states_changed": [x["decision_states_changed"]
+                                                        for x in hist_const["checkpoints"][-5:]],
                 },
             }
             print(f"  {s}/{c}: {time.time() - t0:.0f}s", flush=True)
@@ -298,6 +308,48 @@ def fig_comparison(res: dict) -> str:
     return save(fig, "19_rl_policy_comparison.png")
 
 
+def fig_alpha_comparison(res: dict) -> str:
+    """Decaying alpha (saved) vs the spec's constant alpha = 0.1."""
+    keys = env_keys(res)
+    labels = [f"{s} {c}" for s, c in keys]
+    x = np.arange(len(keys))
+    w = 0.38
+    fig, axes = plt.subplots(1, 3, figsize=(16, 4.6))
+    series = (("decaying α = 1/visits^0.6 (saved)", "#2a78d6", lambda e: e),
+              ("constant α = 0.1 (spec)", C_GRAY, lambda e: e["comparison_constant_alpha"]))
+    for i, (name, col, get) in enumerate(series):
+        match = [get(res["environments"][s][c])["decision_states_matching_optimal"] for s, c in keys]
+        gap = [get(res["environments"][s][c])["optimal_minus_learned"]["mean"] for s, c in keys]
+        xs = x + (i - 0.5) * (w + 0.02)
+        axes[0].bar(xs, match, width=w, color=col, label=name)
+        axes[1].bar(xs, gap, width=w, color=col, label=name)
+        # mean gap of the greedy policy to the optimum, across the 8 environments, per checkpoint
+        cps = [get(res["environments"][s][c])["checkpoints"] for s, c in keys]
+        opt = [res["environments"][s][c]["evaluation"]["optimal_reference"]["mean_reward"] for s, c in keys]
+        eps_axis = [cp["episode"] for cp in cps[0]]
+        mean_gap = [np.mean([o - cp[j]["greedy_mean_reward"] for o, cp in zip(opt, cps)]) for j in range(len(eps_axis))]
+        axes[2].plot(eps_axis, mean_gap, color=col, marker="o", markersize=3, linewidth=1.8, label=name)
+    axes[0].set_ylim(0, 13)
+    axes[0].axhline(12, color=C_TEXT2, linestyle=":", linewidth=1)
+    axes[0].set_ylabel("Decision states with the optimal action (of 12)")
+    axes[1].set_ylabel("Reward gap to the exact optimum (1,000 test episodes)")
+    axes[2].set_ylabel("Mean reward gap to optimum (greedy policy)")
+    axes[2].set_xlabel("Training episode")
+    axes[2].axhline(0, color=C_TEXT2, linewidth=0.8)
+    for ax in axes[:2]:
+        ax.set_xticks(x, labels=labels, fontsize=8.5)
+        ax.grid(axis="x", visible=False)
+    axes[0].set_title("Agreement with the exact optimal policy")
+    axes[1].set_title("How much reward the learned policy leaves")
+    axes[2].set_title("Convergence, averaged over the 8 environments")
+    handles, lbls = axes[2].get_legend_handles_labels()
+    fig.legend(handles, lbls, loc="upper center", ncol=2, bbox_to_anchor=(0.5, 1.0))
+    fig.suptitle("Learning-rate comparison: decaying vs constant α (same seed, 5,000 episodes)", fontweight="bold",
+                 y=1.07)
+    fig.tight_layout()
+    return save(fig, "20_rl_alpha_comparison.png")
+
+
 # --------------------------------------------------------------------------- summary
 def print_summary(res: dict) -> None:
     print("\nENVIRONMENT PARAMETERS")
@@ -323,9 +375,11 @@ def print_summary(res: dict) -> None:
               + ("; ".join(f"k{m['knowledge']}e{m['energy']} {m['learned']} vs {m['optimal']} (loss {m['q_star_loss']}, "
                            f"visits {m['visits']})" for m in e["mismatches_vs_optimal"]) or "none"))
         print(f"     convergence: last 5 checkpoints greedy range {cv['last5_checkpoint_greedy_reward_range']}, states "
-              f"changed {cv['last5_checkpoint_states_changed']}; const-alpha 20k matches "
-              f"{cv['diag_constant_alpha_20000_matching_optimal']}/12; visit-alpha 5k matches "
-              f"{cv['diag_visit_alpha_5000_matching_optimal']}/12")
+              f"changed {cv['last5_checkpoint_states_changed']}")
+        ca = e["comparison_constant_alpha"]
+        print(f"     constant alpha 0.1: {ca['evaluation']['mean_reward']:.1f} reward, matches optimum "
+              f"{ca['decision_states_matching_optimal']}/12, gap {ca['optimal_minus_learned']['mean']:+.2f}, "
+              f"last-5 range {ca['last5_checkpoint_greedy_reward_range']}")
     pdiff = res["policy_differences"]
     print(f"\nDistinct learned policies: {pdiff['n_distinct_learned_policies']} of 8;"
           f" distinct OPTIMAL policies: {pdiff['n_distinct_optimal_policies']}")
@@ -340,7 +394,7 @@ def main() -> int:
     t0 = time.time()
     res, q_tables = run()
     joblib.dump(q_tables, Q_TABLES_PATH)
-    res["figures"] = [fig_learning(res), fig_policies(res), fig_comparison(res)]
+    res["figures"] = [fig_learning(res), fig_policies(res), fig_comparison(res), fig_alpha_comparison(res)]
     update_metrics("rl", res)
     print_summary(res)
     print(f"\nSaved {Q_TABLES_PATH.name} ({len(q_tables)} Q-tables), metrics.json['rl'], "

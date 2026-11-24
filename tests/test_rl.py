@@ -206,3 +206,27 @@ def test_centroids_cover_all_features():
     for s in ("mat", "por"):
         for z in cluster_centroids(s).values():
             assert set(z) == set(CENTROID_FEATURES)
+
+
+def test_saved_tables_use_decaying_alpha_and_constant_alpha_is_kept_for_comparison():
+    rl = load_metrics()["rl"]
+    assert rl["config"]["alpha_power"] == C.RL_ALPHA_POWER == 0.6
+    assert rl["config"]["comparison_constant_alpha"] == C.RL_ALPHA == 0.1
+    for s, c in ENVS:
+        e = rl["environments"][s][str(c)]
+        cmp_ = e["comparison_constant_alpha"]
+        assert 0 <= cmp_["decision_states_matching_optimal"] <= 12
+        assert len(cmp_["learning_curve_100"]) == C.RL_EPISODES // 100
+        assert cmp_["evaluation"]["n_episodes"] == C.RL_EVAL_EPISODES
+        assert "optimal_minus_learned" in cmp_ and "optimal_minus_learned" in e
+
+
+@pytest.mark.parametrize("subject,cluster", [("mat", 0), ("por", 2)])
+def test_constant_alpha_comparison_is_reproducible(subject, cluster):
+    p = env_params(subject, cluster)
+    const, _ = train(p, checkpoints=False, alpha_power=None)
+    pi_star = optimal_q(p).argmax(1)
+    matching = int((const.greedy_policy()[DECISION_STATES] == pi_star[DECISION_STATES]).sum())
+    stored = load_metrics()["rl"]["environments"][subject][str(cluster)]["comparison_constant_alpha"]
+    assert matching == stored["decision_states_matching_optimal"]
+    assert not np.allclose(const.q, load_q_tables()[(subject, cluster)])  # saved tables are the decaying-alpha ones
