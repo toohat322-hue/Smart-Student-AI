@@ -6,6 +6,37 @@ study planner (reinforcement learning) on the UCI Student Performance dataset.
 > The full README (screenshots, deployed link, citation, limitations) is written in Phase 9.
 > Design decisions that differ from `PROJECT_SPEC.md` are logged in [DECISIONS.md](DECISIONS.md).
 
+## How to run the app
+
+```bash
+python -m venv .venv
+.venv\Scriptsctivate            # Windows  (macOS/Linux: source .venv/bin/activate)
+pip install -r requirements.txt
+streamlit run app.py               # opens http://localhost:8501
+```
+
+The trained models and `reports/metrics.json` are committed, so the app runs without training. If a model file
+is missing, the page says so and points to `python scripts/train_all.py`.
+
+| Page | What it shows |
+|---|---|
+| Home | What the system does, key numbers, a "Start with a student" button |
+| Performance Prediction | Student form (Early or Mid-term), At-Risk screening result with probability gauge, top 3 factors |
+| Student Clustering | The student's cluster, silhouette by k, PCA map with the student marked, cluster profiles |
+| Study Planner | The learned study strategy, the cluster's expected outcome, strategy comparison, animated simulated session |
+| Model Evaluation | 20-split headline metrics, the saved model's split, fairness by sex, data issues and fixes, RL learning rates |
+| About Project | Data, license and citation, methods, limitations, future work |
+
+**One student flows through the app.** Enter a student once on the Prediction page, or load one of three *real,
+anonymised records from the held-out test set* (clear pass, clear At Risk, dropout with final grade 0). The
+Clustering and Study Planner pages then use the same student. To open any page with an example already loaded,
+add `?example=pass`, `?example=at_risk` or `?example=dropout` to the URL (optionally with `&subject=mat`), for
+example `http://localhost:8501/prediction?example=dropout`.
+
+Screenshots are in [reports/screenshots/](reports/screenshots/). They are regenerated with
+`scripts/take_screenshots.py`, an optional tool that needs `pip install playwright` and Google Chrome; it is
+not part of `requirements.txt`.
+
 ## How to retrain
 
 Everything in `models/` and `reports/` is produced by one script, with fixed seeds (42). The

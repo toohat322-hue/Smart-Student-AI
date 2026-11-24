@@ -260,6 +260,48 @@ centroid values.
 
 ---
 
+## Phase 8 — Dashboard
+
+### D20. Navigation with `st.navigation` and short URLs
+`app.py` is still the entry point, but it defines the pages with `st.navigation`, so the first page is
+titled "Home" instead of "app". The pages live in `pages/` as in spec §4, with short URL paths
+(`/prediction`, `/clustering`, `/planner`, `/evaluation`, `/about`). Each page file also runs on its own,
+which is how `tests/test_app_smoke.py` tests it.
+
+### D21. One shared student, with real examples, loadable from the URL
+The subject, the scenario and the student are kept in plain `st.session_state` keys, not widget keys, because
+Streamlit can reset widget state on page switches. The three example students are real records from the
+**seed-42 test split**, chosen by a rule from the Early model's pass probability (not picked by hand):
+- clear pass: the passing student with the highest pass probability;
+- clear At Risk: the failing student (G3 > 0) with the lowest;
+- dropout: the G3 = 0 student with the lowest.
+
+The app labels them as anonymised UCI records and shows their real final grade, noting that the model does
+not use it. `?example=…` in the URL loads one on any page, which helps for live demos and for the
+screenshot script.
+
+### D22. What the app shows as headline numbers
+- **Home and Prediction pages:** the Early model's At-Risk recall, precision and false-alert rate are the
+  20-split means at the final threshold. The false-alert rate is the mean number of false alerts divided by
+  the number of passing students in a test set.
+- **Model Evaluation:** the 20-split tables come first; the seed-42 numbers sit in an expander and a second
+  tab labelled "Saved model (seed 42)".
+- **Study Planner:** it shows the student's cluster's learned strategy, says that the exact optimum is the
+  same for every cluster, and presents clusters as different *expected outcomes* (D17), not different advice.
+
+Numbers in the page text are read from `metrics.json` or computed live. That includes the 382 students who
+appear in both files, recomputed with the UCI merge script's 13 join attributes, and the "counted about 4
+times" figure in the fairness caveat (number of splits × test share).
+
+### D23. Screenshots without new dependencies
+`scripts/take_screenshots.py` drives the installed Google Chrome through Playwright, installed in a separate
+virtual environment, so `requirements.txt` is unchanged. Streamlit scrolls inside its own container, so the
+script waits until the app has been idle for 2 s, then grows the browser window to the content height before
+capturing. It saves 6 desktop shots (1440 px wide) and 2 phone shots (390 px wide) of the Prediction and
+Planner pages, all with the "Clear At Risk" example loaded.
+
+---
+
 ## Future work
 - **Cluster-specific action effectiveness.** For example, if videos helped weaker students more, the
   clusters would get different policies. Modelling that needs data on which study activities students
