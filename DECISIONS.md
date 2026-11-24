@@ -131,3 +131,64 @@ in "High past failures", which is 3.2× over-represented relative to its size (8
 majority. In Portuguese, the 15 are split 3 / 5 / 7, almost proportional to cluster size. Their recorded
 0 absences (D2) is only one of six features, so it does not decide their cluster. No change to spec §14 is
 needed, and the students stay in.
+
+---
+
+## Phase 6 — Reinforcement learning (simulation)
+
+### D12. One environment per cluster, derived from the centroid (replaces spec §8's 3 fixed profiles)
+There are 8 environments: 5 for Mathematics and 3 for Portuguese. **All parameters are simulation
+assumptions, not learned from data**; the UCI files have no action or reward sequences. The base dynamics
+for an average student (z = 0) were set once, from the action descriptions in §8.1, before any RL result
+was seen, and they were not changed afterwards:
+- **Gain** P(knowledge +1) for low / mid / high energy: quizzes 0.10 / 0.35 / 0.60, videos 0.20 / 0.30 /
+  0.35, review notes 0.10 / 0.15 / 0.20. Videos get +0.15 at knowledge ≤ 1 and −0.10 at knowledge ≥ 3.
+- **Energy**: quizzes lose 1 energy level with P = 0.70 and videos with P = 0.25; review notes restore 1
+  level with P = 0.50. A session is skipped (does not count) with P = 0.10.
+
+Each cluster's standardized centroid z (log1p(absences) → StandardScaler space, read from the saved K-Means
+model) shifts these through linear formulas, with every coefficient in `src/config.py`:
+- gain multiplier = clip(1 + 0.15·z_studytime − 0.15·z_failures, 0.5, 1.5): studying more helps, past
+  failures hurt;
+- drain shift = 0.08·z_goout + 0.04·z_freetime − 0.08·z_health, added to the quiz and video drain and
+  subtracted from the review restore: a busy social life and poor health tire students faster;
+- P(skip) = 0.10 + 0.05·z_absences: absent students miss sessions.
+
+All probabilities are clipped to 0.05–0.95. Resulting gain multipliers run from 0.50 (Mathematics "High past
+failures") to 1.29 (Mathematics "High study time"); P(quiz drain) from 0.57 to 0.79; P(skip) from 0.08 to
+0.13. Other implementation details:
+- "−5 if energy hits 0" is applied when energy *drops* to 0, not on every step spent at 0.
+- Mastery (knowledge 4) is terminal. The 20-step limit is treated as a time-out, so the Q-update still uses
+  the next state's value there, because the state has no clock.
+- Every step draws the same 3 random numbers whatever the action, so all policies are compared on the same
+  1,000 test seeds (100000–100999).
+
+### D13. The learned policy beats the best fixed action in every environment, not just random
+The best single fixed action is "Watch Videos" in all 8 environments. On the same 1,000 test seeds, the
+learned policy scores **+9.9 to +16.7 reward** above it (standard error about 0.6), and +12.3 to +19.9 above
+random. Mastery rates: learned 34–100% vs best fixed 18–84%. To check how good the learned policy is, the
+exact optimal policy was computed by value iteration on the known simulator. This is an analysis reference
+only; the agent never sees the model. The learned policy is 0.0–3.9 reward below the optimum. The largest
+gaps are in the two "High past failures" environments (Mathematics 3.85, Portuguese 3.92).
+
+### D14. Training does not fully converge with constant α = 0.1. The fix is a decaying learning rate, not more episodes
+The ε-greedy training reward levels off, but the greedy policy keeps changing. In the last 5 checkpoints
+(every 250 episodes), 0–4 of the 12 decision states change their best action, and greedy reward swings by
+up to 6.7. Learned policies agree with the exact optimum in 7–10 of 12 states. More episodes do not fix this:
+with constant α = 0.1, agreement at 5k / 20k / 50k episodes was 7–10 / 9–11 / 7–11 of 12. A per-state
+learning rate α = 1/visits^0.6 reaches 10–12 of 12 states at 5,000 episodes, with a mean reward gap to the
+optimum of 0.15 (vs 1.8 for constant α). The saved Q-tables keep the spec's α = 0.1; switching is a
+one-line change (`alpha_power` in `src/rl_agent.py`) if wanted. The states that disagree are near-ties:
+losing at most 1.9 Q-value units, and mostly under 0.9.
+
+### D15. The clusters do not get genuinely different policies
+**The exact optimal policy is identical in all 8 environments**:
+- knowledge 0–1: videos at low and high energy, review notes at mid energy;
+- knowledge 2–3: review notes at low and mid energy, quizzes at high energy.
+
+The cluster parameters change how well a student does (optimal mean reward ranges from 19.7 to 51.6, and
+mastery from 41% to 100%), but not which action is best. The 8 learned Q-tables do give 8 slightly different
+policies, but every difference is Q-learning noise in near-tie states (D14), not a cluster effect. The app
+must not present per-cluster strategies as different advice. It shows the same strategy, plus each
+cluster's expected outcome (mastery rate, steps). Making policies differ would mean changing the simulator's
+assumptions just to get that result, so we did not.
