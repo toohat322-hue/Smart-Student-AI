@@ -13,6 +13,7 @@ from src.unsupervised import (
     choose_k,
     cluster_names,
     evaluate_k,
+    fit_pipeline,
     load_kmeans,
     log1p_absences,
     model_path,
@@ -84,6 +85,17 @@ def test_deterministic_with_fixed_seed(subject, data, meta):
     assert np.allclose(a[-1].cluster_centers_, b[-1].cluster_centers_)
     assert np.array_equal(a.predict(X), load_kmeans(subject).predict(X))  # saved model reproducible
     assert evaluate_k(X) == meta["subjects"][subject]["k_selection"]["log1p"]
+
+
+
+@pytest.mark.parametrize("subject", SUBJ)
+def test_centroids_bit_identical_across_fits(subject, data, meta):
+    """Single-threaded fit => centroids identical to the last bit (they feed the RL environments)."""
+    X = data[subject][CLUSTER_FEATURES]
+    k = meta["subjects"][subject]["k"]
+    fits = [fit_pipeline(k, X)[-1].cluster_centers_ for _ in range(3)]
+    assert all(np.array_equal(f, fits[0]) for f in fits)
+    assert np.array_equal(fits[0], load_kmeans(subject)[-1].cluster_centers_)
 
 
 def test_choose_k_rule():

@@ -72,6 +72,7 @@ def run() -> dict:
             "monotonic_decreasing_features": MONOTONIC_DECREASING,
             "default_threshold": DEFAULT_THRESHOLD,
             "threshold_rule": THRESHOLD_RULE,
+            "threshold_floor": THRESHOLD_FLOOR,
             "saved_model": "FixedThresholdClassifier(Pipeline(preprocessor, RandomForest with monotonic_cst))",
             "features": {s: feature_columns(s) for s in SCENARIOS},
         },

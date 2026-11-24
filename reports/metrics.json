@@ -343,6 +343,7 @@
       ],
       "default_threshold": 0.5,
       "threshold_rule": "cut-off = max(0.5, smallest cut-off with out-of-fold At-Risk recall >= 70% on the training set (5-fold, best RF params)); Likely to Pass iff P(pass) >= cut-off",
+      "threshold_floor": 0.5,
       "saved_model": "FixedThresholdClassifier(Pipeline(preprocessor, RandomForest with monotonic_cst))",
       "features": {
         "early": [
@@ -409,8 +410,7 @@
           "G1",
           "G2"
         ]
-      },
-      "threshold_floor": 0.5
+      }
     },
     "subjects": {
       "mat": {

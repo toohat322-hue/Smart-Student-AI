@@ -16,6 +16,7 @@ from sklearn.decomposition import PCA
 from sklearn.metrics import silhouette_score
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import FunctionTransformer, StandardScaler
+from threadpoolctl import threadpool_limits
 
 from src.config import CLUSTER_FEATURES, K_RANGE, MODELS_DIR, RANDOM_STATE, SUBJECTS
 from src.data import TARGET_COL
@@ -49,6 +50,14 @@ def build_pipeline(k: int, log_absences: bool = True) -> Pipeline:
     return Pipeline(steps)
 
 
+def fit_pipeline(k: int, X: pd.DataFrame, log_absences: bool = True) -> Pipeline:
+    """Fit single-threaded: multi-threaded K-Means sums in a varying order, so centroids differ in
+    the last bits (~1e-16) between runs. Labels do not change, but the RL environments are built
+    from the centroids, so we keep them bit-identical (DECISIONS.md D18)."""
+    with threadpool_limits(limits=1):
+        return build_pipeline(k, log_absences).fit(X)
+
+
 def transformed(pipe: Pipeline, X: pd.DataFrame) -> np.ndarray:
     """Data in the space K-Means sees (after log1p + scaling)."""
     return pipe[:-1].transform(X)
@@ -58,7 +67,7 @@ def transformed(pipe: Pipeline, X: pd.DataFrame) -> np.ndarray:
 def evaluate_k(X: pd.DataFrame, log_absences: bool = True) -> list[dict[str, Any]]:
     rows = []
     for k in K_RANGE:
-        pipe = build_pipeline(k, log_absences).fit(X)
+        pipe = fit_pipeline(k, X, log_absences)
         Z = transformed(pipe, X)
         labels = pipe[-1].labels_
         rows.append({

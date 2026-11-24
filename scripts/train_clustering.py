@@ -27,7 +27,7 @@ from src.config import CLUSTER_FEATURES, FIGURES_DIR, K_RANGE, MODELS_DIR, RANDO
 from src.metrics_io import update_metrics  # noqa: E402
 from src.supervised import prepare_subject  # noqa: E402
 from src.unsupervised import (  # noqa: E402
-    FEATURE_LABELS, K_TOLERANCE, NAME_MAX_TRAITS, NAME_MIN_Z, PREFERRED_K, build_pipeline, choose_k,
+    FEATURE_LABELS, K_TOLERANCE, NAME_MAX_TRAITS, NAME_MIN_Z, PREFERRED_K, choose_k, fit_pipeline,
     evaluate_k, g3_zero_concentration, model_path, pca_2d, profile_clusters, transformed,
 )
 
@@ -70,7 +70,7 @@ def run() -> dict:
         X = df[CLUSTER_FEATURES]
         rows_log, rows_raw = evaluate_k(X, log_absences=True), evaluate_k(X, log_absences=False)
         choice = choose_k(rows_log)
-        pipe = build_pipeline(choice["k"]).fit(X)
+        pipe = fit_pipeline(choice["k"], X)
         joblib.dump(pipe, model_path(s))
         labels = pipe[-1].labels_
         res["subjects"][s] = {

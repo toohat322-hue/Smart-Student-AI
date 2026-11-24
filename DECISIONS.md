@@ -229,6 +229,37 @@ cluster can expect.
 
 ---
 
+## Phase 7 — End-to-end training
+
+### D18. One script regenerates everything; the 20-split evaluation is optional
+`python scripts/train_all.py` runs data → EDA → supervised → clustering → RL. Each step is a separate
+process, and the script stops at the first failure. It takes about 7–10 minutes on a 4-core laptop
+(supervised 350–490 s, RL about 55 s, the rest under 20 s). The 20-split evaluation (~30 min) runs only
+with `--full`; otherwise `metrics.json["supervised_repeated_splits"]` is left untouched. The
+`apply_threshold_floor.py` migration from Phase 4c is no longer needed, because training applies the floor
+itself.
+
+### D19. Reproducibility: two consecutive runs are identical to the byte
+`scripts/fingerprint.py` hashes every section of `metrics.json` and the predictions of every saved model on
+the full datasets (classifier probabilities and labels, K-Means labels and centroids, Q-tables), plus the
+file bytes. The first check found two problems, both now fixed:
+- **K-Means centroids varied in the last bits** (differences of about 1e-16) from one fit to the next,
+  because multi-threaded K-Means adds numbers in a varying order. Cluster assignments never changed, but
+  the RL environments are built from the centroids. K-Means now fits single-threaded
+  (`threadpool_limits(1)`; threadpoolctl is already a scikit-learn dependency, so nothing new is added to
+  `requirements.txt`). Centroids are now identical to the bit, and a test checks this.
+- **A config key was missing from training.** The Phase 4c migration had recorded
+  `supervised.config.threshold_floor`, and `train_supervised.py` did not write it. It does now. Apart from
+  that key, a full retrain reproduced every supervised number written by the migration, which confirms the
+  migration was exact.
+
+After the fixes, two consecutive runs produced the same `metrics.json`, the same predictions from all 7
+model files, and byte-identical model and figure files. Compared with the previously committed state,
+classifier and Q-table predictions are identical, and the K-Means models differ only in those last-bit
+centroid values.
+
+---
+
 ## Future work
 - **Cluster-specific action effectiveness.** For example, if videos helped weaker students more, the
   clusters would get different policies. Modelling that needs data on which study activities students
