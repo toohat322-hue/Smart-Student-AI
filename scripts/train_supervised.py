@@ -31,6 +31,7 @@ from src.metrics_io import update_metrics  # noqa: E402
 from src.preprocessing import MONOTONIC_DECREASING, SCENARIOS, feature_columns  # noqa: E402
 from src.supervised import (  # noqa: E402
     CV_FOLDS, DEFAULT_THRESHOLD, PERM_REPEATS, RF_PARAM_GRID, SCORING, TARGET_AT_RISK_RECALL, TEST_SIZE,
+    THRESHOLD_FLOOR,
     absences_partial_dependence, evaluate, fairness_check, model_path, permutation_top,
     prepare_subject, split_indices, train_reference, train_scenario,
 )
@@ -40,6 +41,9 @@ SUBJECT_NAMES = {"mat": "Mathematics", "por": "Portuguese"}
 SCENARIO_NAMES = {"early": "Early", "midterm": "Mid-term"}
 C_BLUE, C_ORANGE, C_AQUA, C_GRAY = "#2a78d6", "#eb6834", "#1baf7a", "#8a8984"
 C_TEXT2 = "#52514e"
+THRESHOLD_RULE = (f"cut-off = max({THRESHOLD_FLOOR}, smallest cut-off with out-of-fold At-Risk recall >= "
+                  f"{TARGET_AT_RISK_RECALL:.0%} on the training set (5-fold, best RF params)); "
+                  "Likely to Pass iff P(pass) >= cut-off")
 PD_GAP = 0.02  # PD(0) lower than PD(1–5) by more than this => "0 absences = higher risk"
 
 plt.rcParams.update({
@@ -67,8 +71,7 @@ def run() -> dict:
             "label_names": {"0": "At Risk", "1": "Likely to Pass"}, "headline_metric": "at_risk_recall",
             "monotonic_decreasing_features": MONOTONIC_DECREASING,
             "default_threshold": DEFAULT_THRESHOLD,
-            "threshold_rule": (f"smallest cut-off with out-of-fold At-Risk recall >= {TARGET_AT_RISK_RECALL:.0%} "
-                               "on the training set (5-fold, best RF params); Likely to Pass iff P(pass) >= cut-off"),
+            "threshold_rule": THRESHOLD_RULE,
             "saved_model": "FixedThresholdClassifier(Pipeline(preprocessor, RandomForest with monotonic_cst))",
             "features": {s: feature_columns(s) for s in SCENARIOS},
         },
@@ -163,7 +166,7 @@ def fig_confusion(res: dict) -> str:
         ax.grid(False)
         ax.set_title(f"{SUBJECT_NAMES[s]} — {SCENARIO_NAMES[sc]} (cut-off {t['threshold']:.3f})\n"
                      f"At-Risk recall {t['at_risk_recall']:.0%}, false alerts {t['false_alerts']}")
-    fig.suptitle("Random Forest confusion matrices at the tuned alert cut-off (held-out test set)",
+    fig.suptitle("Random Forest confusion matrices at the final alert cut-off (held-out test set)",
                  fontweight="bold")
     fig.tight_layout()
     return save(fig, "07_confusion_matrices.png")
@@ -201,7 +204,7 @@ def fig_importance(res: dict) -> str:
         ax.set_title(f"{SUBJECT_NAMES[s]} — {SCENARIO_NAMES[sc]}")
         ax.set_xlabel("Drop in test macro-F1 when shuffled")
         ax.grid(axis="y", visible=False)
-    fig.suptitle(f"Random Forest permutation importance, top 10 (test set, tuned cut-off, {PERM_REPEATS} "
+    fig.suptitle(f"Random Forest permutation importance, top 10 (test set, final cut-off, {PERM_REPEATS} "
                  "repeats, ± std)", fontweight="bold")
     fig.tight_layout()
     return save(fig, "09_feature_importance.png")
@@ -227,7 +230,7 @@ def fig_early_vs_midterm(res: dict) -> str:
         ax.grid(axis="x", visible=False)
         ax.legend(loc="upper left", ncol=2, fontsize=9)
     axes[0].set_ylabel("Score (test set)")
-    fig.suptitle("Random Forest at tuned cut-off: Early (no grades) vs Mid-term (with G1, G2)", fontweight="bold")
+    fig.suptitle("Random Forest at final cut-off: Early (no grades) vs Mid-term (with G1, G2)", fontweight="bold")
     fig.tight_layout()
     return save(fig, "10_early_vs_midterm.png")
 
@@ -263,7 +266,7 @@ def fig_threshold_effect(res: dict) -> str:
     for ax, key, ylabel in ((axes[0], "at_risk_recall", "At-Risk recall"),
                             (axes[1], "false_alert_rate", "False-alert rate (share of passing students)")):
         for i, (mode, name, color) in enumerate((("test_default", "cut-off 0.5", C_GRAY),
-                                                 ("test_tuned", "tuned cut-off", C_BLUE))):
+                                                 ("test_tuned", "final cut-off", C_BLUE))):
             vals = [res["subjects"][s][sc]["models"]["rf"][mode][key] for s in SUBJECT_ORDER for sc in SCENARIOS]
             xs = x + (i - 0.5) * (w + 0.02)
             ax.bar(xs, vals, width=w, color=color, label=name)
@@ -275,7 +278,7 @@ def fig_threshold_effect(res: dict) -> str:
         ax.grid(axis="x", visible=False)
         ax.legend(loc="upper left", ncol=2)
     axes[0].axhline(TARGET_AT_RISK_RECALL, color=C_TEXT2, linestyle=":", linewidth=1)
-    fig.suptitle("Effect of the tuned alert cut-off on the test set (monotonic RF)", fontweight="bold")
+    fig.suptitle("Effect of the final alert cut-off on the test set (monotonic RF)", fontweight="bold")
     fig.tight_layout()
     return save(fig, "12_threshold_effect.png")
 
@@ -305,7 +308,7 @@ def print_summary(res: dict) -> None:
             print(row("RF old (unconstrained) @0.5", m["rf_unconstrained"]["test_default"]))
             print(row("RF old (unconstrained) @tuned", m["rf_unconstrained"]["test_tuned"]))
             print(row("RF monotonic @0.5", m["rf"]["test_default"]))
-            print(row("RF monotonic @tuned  [SAVED]", m["rf"]["test_tuned"]))
+            print(row("RF monotonic @final  [SAVED]", m["rf"]["test_tuned"]))
             sens = e["sensitivity_excl_g3_zero"]
             print(row("RF monotonic @tuned, test w/o G3=0", sens["rf_main_on_test_excl_g3_zero"]["test_tuned"]))
             print(row("RF w/o G3=0 @tuned, test w/o G3=0", sens["rf_excl_g3_zero"]["test_tuned"]))
@@ -318,7 +321,7 @@ def print_summary(res: dict) -> None:
                 t = m["threshold_tuning"]
                 print(f"  {s}/{sc:8s} {key:17s} cut-off {t['threshold']:.3f}  OOF AR-recall "
                       f"{t['oof_at_risk_recall_at_default']:.2f} -> {t['oof_at_risk_recall']:.2f}  "
-                      f"OOF AR-prec {t['oof_at_risk_precision']:.2f}  CV F1 {m['cv']['mean']:.3f}±{m['cv']['std']:.3f}  "
+                      f"(raw cut-off {t['threshold_raw']:.3f})  CV F1 {m['cv']['mean']:.3f}±{m['cv']['std']:.3f}  "
                       f"{m['best_params']}")
 
     print("\nTop 5 permutation importance (saved model):")

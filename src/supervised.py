@@ -63,6 +63,7 @@ RF_PARAM_GRID = {
 }
 DEFAULT_THRESHOLD = 0.5
 TARGET_AT_RISK_RECALL = 0.70
+THRESHOLD_FLOOR = 0.5  # the alert cut-off never goes below the default (would lower At-Risk recall)
 THRESHOLD_GRID = np.round(np.arange(0.01, 1.0, 0.005), 3)
 PERM_REPEATS = 20
 TOP_N_IMPORTANCE = 10
@@ -126,9 +127,12 @@ def labels_at(p_pass: np.ndarray, threshold: float) -> np.ndarray:
 
 def tune_threshold(estimator: Pipeline, X_train: pd.DataFrame, y_train: pd.Series,
                    target_recall: float = TARGET_AT_RISK_RECALL, n_jobs: int = -1) -> dict[str, Any]:
-    """Smallest cut-off whose out-of-fold At-Risk recall on the TRAINING set is >= target.
+    """Alert cut-off from out-of-fold predictions on the TRAINING set (test set never used).
 
-    The smallest such cut-off raises the fewest false alerts. The test set is never used.
+    threshold_raw = smallest cut-off whose OOF At-Risk recall is >= target (fewest false alerts).
+    threshold     = max(THRESHOLD_FLOOR, threshold_raw): when recall at 0.5 already exceeds the
+                    target, the raw rule would pick a cut-off below 0.5 and lower recall, so the
+                    floor keeps the default instead.
     """
     oof = cross_val_predict(clone(estimator), X_train, y_train, cv=cv_splitter(),
                             method="predict_proba", n_jobs=n_jobs)[:, PASS]
@@ -139,13 +143,18 @@ def tune_threshold(estimator: Pipeline, X_train: pd.DataFrame, y_train: pd.Serie
         rec = float((pred[is_risk] == AT_RISK).mean())
         if rec >= target_recall:
             break
-    pred = labels_at(oof, t)
+    raw = float(t)
+    final = max(THRESHOLD_FLOOR, raw)
+    pred_raw = labels_at(oof, raw)
     return {
-        "threshold": float(t),
+        "threshold": final,
+        "threshold_raw": raw,
+        "threshold_floor": THRESHOLD_FLOOR,
         "target_at_risk_recall": target_recall,
-        "oof_at_risk_recall": round(rec, 4),
-        "oof_at_risk_precision": round(precision_score(y, pred, pos_label=AT_RISK, zero_division=0), 4),
-        "oof_f1_macro": round(f1_score(y, pred, average="macro"), 4),
+        "oof_at_risk_recall": round(float((labels_at(oof, final)[is_risk] == AT_RISK).mean()), 4),
+        "oof_at_risk_recall_raw": round(rec, 4),
+        "oof_at_risk_precision_raw": round(precision_score(y, pred_raw, pos_label=AT_RISK, zero_division=0), 4),
+        "oof_f1_macro_raw": round(f1_score(y, pred_raw, average="macro"), 4),
         "oof_at_risk_recall_at_default": round(float((labels_at(oof, DEFAULT_THRESHOLD)[is_risk] == AT_RISK).mean()), 4),
     }
 
@@ -328,8 +337,11 @@ def run_split(subject: str, scenario: str, seed: int) -> dict[str, Any]:
     """
     df = prepare_subject(subject)
     train_idx, test_idx = split_indices(df, seed=seed)
-    _, m = train_scenario(df, train_idx, test_idx, scenario, with_unconstrained=False, n_jobs=1,
-                          include_curves=False)
+    models, m = train_scenario(df, train_idx, test_idx, scenario, with_unconstrained=False, n_jobs=1,
+                               include_curves=False)
+    rf = models["rf"]
+    X_te, y_te = df[feature_columns(scenario)].iloc[test_idx], df[TARGET_COL].iloc[test_idx]
+    fair = fairness_check(rf, X_te, y_te, df["sex"].iloc[test_idx], rf.threshold)
 
     def pick(t: dict) -> dict:
         return {k: t[k] for k in REPEATED_KEYS}
@@ -342,6 +354,8 @@ def run_split(subject: str, scenario: str, seed: int) -> dict[str, Any]:
         "rf_tuned": pick(m["rf"]["test_tuned"]),
         "rf_cv_f1_macro": m["rf"]["cv"]["mean"],
         "rf_threshold": m["rf"]["threshold_tuning"]["threshold"],
+        "rf_threshold_raw": m["rf"]["threshold_tuning"]["threshold_raw"],
+        "fairness_final": {g: {"n_at_risk": fair[g]["n_at_risk"], "n_caught": fair[g]["n_caught"]} for g in ("F", "M")},
         "n_test_at_risk": m["rf"]["test_default"]["n_at_risk"],
     }
 

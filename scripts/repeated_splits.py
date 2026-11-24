@@ -35,7 +35,7 @@ SEEDS = list(range(20))
 SUBJECT_ORDER = ["mat", "por"]
 SUBJECT_NAMES = {"mat": "Mathematics", "por": "Portuguese"}
 SCENARIO_NAMES = {"early": "Early", "midterm": "Mid-term"}
-MODEL_KEYS = ("dummy", "logreg", "rf_default", "rf_tuned", "rf_tuned_floor05")
+MODEL_KEYS = ("dummy", "logreg", "rf_default", "rf_tuned")  # rf_tuned = final cut-off (with 0.5 floor)
 C_BLUE, C_GRAY, C_ORANGE, C_TEXT2 = "#2a78d6", "#8a8984", "#eb6834", "#52514e"
 
 
@@ -56,6 +56,16 @@ def summarise(rows: list[dict], seed42: dict | None) -> dict:
     thr = np.array([r["rf_threshold"] for r in rows])
     out["rf_threshold"] = {"mean": round(thr.mean(), 4), "std": round(thr.std(ddof=1), 4),
                            "min": round(thr.min(), 4), "max": round(thr.max(), 4)}
+    raw = np.array([r["rf_threshold_raw"] for r in rows])
+    out["rf_threshold_raw"] = {"mean": round(raw.mean(), 4), "std": round(raw.std(ddof=1), 4),
+                               "share_floored": round(float((raw < 0.5).mean()), 4)}
+    # Fairness: pool caught / At-Risk counts over all test sets (not an average of percentages).
+    out["fairness_pooled_final"] = {}
+    for g in ("F", "M"):
+        caught = int(sum(r["fairness_final"][g]["n_caught"] for r in rows))
+        total = int(sum(r["fairness_final"][g]["n_at_risk"] for r in rows))
+        out["fairness_pooled_final"][g] = {"n_caught": caught, "n_at_risk": total,
+                                           "at_risk_recall": round(caught / total, 4) if total else None}
     out["per_seed"] = [{k: v for k, v in r.items() if k not in ("subject", "scenario")} for r in rows]
     if seed42 is not None:
         f1_42 = seed42["test_default"]["f1_macro"]
@@ -80,7 +90,7 @@ def fig_repeated(summary: dict) -> str:
         for i, (s, sc) in enumerate((s, sc) for s in SUBJECT_ORDER for sc in SCENARIOS):
             e = summary["subjects"][s][sc]
             for mk, dx, color, name in (("rf_default", -0.15, C_GRAY, "RF @0.5"),
-                                        ("rf_tuned", 0.15, C_BLUE, "RF @tuned cut-off")):
+                                        ("rf_tuned", 0.15, C_BLUE, "RF @final cut-off")):
                 vals = [r[mk][metric] for r in e["per_seed"]]
                 jitter = np.linspace(-0.05, 0.05, len(vals))
                 ax.scatter(i + dx + jitter, vals, s=14, color=color, alpha=0.55, edgecolors="none",
@@ -112,13 +122,13 @@ def main() -> int:
     jobs = [(s, sc, seed) for s in SUBJECT_ORDER for sc in SCENARIOS for seed in SEEDS]
     print(f"Running {len(jobs)} splits in parallel ...", flush=True)
     rows = Parallel(n_jobs=-1, verbose=5)(delayed(run_split)(s, sc, seed) for s, sc, seed in jobs)
-    for r in rows:  # alternative rule: tuned cut-off, but never below 0.5 (derived, no refit needed)
-        r["rf_tuned_floor05"] = r["rf_tuned"] if r["rf_threshold"] >= 0.5 else r["rf_default"]
 
     sup = load_metrics().get("supervised", {}).get("subjects", {})
     summary: dict = {
         "config": {"seeds": SEEDS, "procedure": "same as saved models: stratified 80/20 split (seed varies), "
-                   "GridSearchCV monotonic RF, OOF cut-off at >= 70% At-Risk recall, single test evaluation"},
+                   "GridSearchCV monotonic RF, cut-off = max(0.5, OOF cut-off at >= 70% At-Risk recall), "
+                   "single test evaluation",
+                   "fairness": "At-Risk recall by sex at the final cut-off, caught/total counts pooled over all splits"},
         "subjects": {},
     }
     for s in SUBJECT_ORDER:
@@ -143,11 +153,15 @@ def main() -> int:
             for mk in MODEL_KEYS:
                 print(f"  {mk:11s} " + "  ".join(
                     f"{k} {e[mk][k]['mean']:.3f}±{e[mk][k]['std']:.3f}" for k in REPEATED_KEYS))
+            fp = e["fairness_pooled_final"]
+            print(f"  pooled fairness @final: F {fp['F']['at_risk_recall']:.3f} ({fp['F']['n_caught']}/{fp['F']['n_at_risk']})"
+                  f"   M {fp['M']['at_risk_recall']:.3f} ({fp['M']['n_caught']}/{fp['M']['n_at_risk']})"
+                  f"   floored in {e['rf_threshold_raw']['share_floored']:.0%} of splits")
             if "seed42" in e:
                 z = e["seed42"]
                 print(f"  seed 42 (saved): RF@0.5 macro-F1 {z['rf_default_f1_macro']:.3f} (z = {z['rf_default_f1_macro_z']:+.2f}, "
                       f"{z['share_of_seeds_with_lower_f1_macro']:.0%} of seeds lower), AR-recall "
-                      f"{z['rf_default_at_risk_recall']:.3f};  RF@tuned macro-F1 {z['rf_tuned_f1_macro']:.3f}, "
+                      f"{z['rf_default_at_risk_recall']:.3f};  RF@final macro-F1 {z['rf_tuned_f1_macro']:.3f}, "
                       f"AR-recall {z['rf_tuned_at_risk_recall']:.3f}")
     print(f"\nSaved metrics.json['supervised_repeated_splits'], {summary['figure']}  ({time.time() - t0:.0f}s)")
     return 0

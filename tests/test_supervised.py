@@ -32,6 +32,7 @@ from src.supervised import (
     prepare_subject,
     proba_pass,
     split_indices,
+    THRESHOLD_FLOOR,
     tune_threshold,
 )
 
@@ -236,9 +237,19 @@ def test_saved_model_carries_tuned_threshold(subject, scenario):
     model = load_model(subject, scenario)
     assert isinstance(model, FixedThresholdClassifier)
     meta = load_metrics()["supervised"]["subjects"][subject][scenario]
-    assert 0 < model.threshold < 1
-    assert model.threshold == meta["threshold"] == meta["models"]["rf"]["threshold_tuning"]["threshold"]
-    assert meta["models"]["rf"]["threshold_tuning"]["oof_at_risk_recall"] >= 0.70
+    tt = meta["models"]["rf"]["threshold_tuning"]
+    assert 0.5 <= model.threshold < 1
+    assert model.threshold == meta["threshold"] == tt["threshold"] == max(THRESHOLD_FLOOR, tt["threshold_raw"])
+    assert tt["oof_at_risk_recall"] >= 0.70 and tt["oof_at_risk_recall_raw"] >= 0.70
+
+
+def test_threshold_floor_never_lowers_recall_below_default():
+    """The final cut-off is never below 0.5, so it can only add alerts compared with the default."""
+    meta = load_metrics()["supervised"]["subjects"]
+    for subject, scenario in CASES:
+        m = meta[subject][scenario]["models"]["rf"]
+        assert m["threshold_tuning"]["threshold"] >= THRESHOLD_FLOOR == 0.5
+        assert m["test_tuned"]["at_risk_recall"] >= m["test_default"]["at_risk_recall"]
 
 
 @pytest.mark.parametrize("subject,scenario", CASES)
@@ -265,9 +276,12 @@ def test_tune_threshold_picks_smallest_cutoff_reaching_target(data):
     def recall(t):
         return (labels_at(oof, t)[risk] == AT_RISK).mean()
 
-    assert recall(res["threshold"]) >= 0.7
+    raw = res["threshold_raw"]
+    assert recall(raw) >= 0.7
+    assert abs(recall(raw) - res["oof_at_risk_recall_raw"]) < 1e-4
+    assert recall(round(raw - 0.005, 3)) < 0.7  # one grid step lower misses the target
+    assert res["threshold"] == max(THRESHOLD_FLOOR, raw)
     assert abs(recall(res["threshold"]) - res["oof_at_risk_recall"]) < 1e-4
-    assert recall(round(res["threshold"] - 0.005, 3)) < 0.7  # one grid step lower misses the target
 
 
 def test_evaluate_false_alerts_match_confusion_matrix(data):
@@ -296,3 +310,11 @@ def test_repeated_split_results_present(subject, scenario):
     for mk in ("dummy", "logreg", "rf_default", "rf_tuned"):
         for k in ("f1_macro", "at_risk_recall"):
             assert 0 <= rep[mk][k]["mean"] <= 1 and rep[mk][k]["std"] >= 0
+    assert all(r["rf_threshold"] >= THRESHOLD_FLOOR for r in rep["per_seed"])
+    # pooled fairness = summed counts over the 20 test sets, not averaged percentages
+    for g in ("F", "M"):
+        pooled = rep["fairness_pooled_final"][g]
+        caught = sum(r["fairness_final"][g]["n_caught"] for r in rep["per_seed"])
+        total = sum(r["fairness_final"][g]["n_at_risk"] for r in rep["per_seed"])
+        assert (pooled["n_caught"], pooled["n_at_risk"]) == (caught, total)
+        assert pooled["at_risk_recall"] == round(caught / total, 4)

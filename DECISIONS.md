@@ -1,0 +1,97 @@
+# Decision log
+
+Every decision that differs from, or adds to, `PROJECT_SPEC.md`. Newest phase last.
+All numbers come from `reports/metrics.json` at the time of the decision.
+
+---
+
+## Phase 2 — Data
+
+### D1. `failures` is 0–3, not 0–4
+Spec §2.3 copies the UCI text ("n if 1 ≤ n < 3, else 4"), but both CSVs only contain 0, 1, 2, 3, where
+3 means "3 or more". Input validation (`FEATURE_SPEC` in `src/data.py`) therefore accepts 0–3. Allowing 4
+would let the app send a value the models have never seen.
+
+---
+
+## Phase 3 — EDA
+
+### D2. G3 = 0 students: kept, labelled At Risk, treated as "did not sit the final exam"
+There are 38 such students in Mathematics (9.6% of all, 29% of At Risk) and 15 in Portuguese (2.3%, 15%).
+They look like dropouts, not like the weakest students:
+- **Every one of them has 0 absences** (100% in both subjects; 13–22% among other At-Risk students),
+  which points to absences no longer being recorded rather than perfect attendance.
+- **The drop is all-or-nothing.** No Mathematics student has a G3 between 1 and 3, yet 11 students with
+  G2 ≥ 8 end on 0. Everyone with G2 = 0 also has G3 = 0 (13 in Mathematics, 7 in Portuguese).
+- **They started out weak**: mean G1 is about 7, and they have more past failures (53–60% vs 35–47%).
+
+We keep them labelled At Risk, because dropping out is exactly what an early-warning tool should catch.
+The side effect is that `absences = 0` became a false risk signal (see D3). Removing them was tested as a
+sensitivity check in Phase 4 and rejected: Mathematics Early At-Risk recall fell from 0.42 to 0.32.
+
+---
+
+## Phase 4 — Supervised
+
+### D3. Monotonic constraint on `absences`
+The unconstrained Mathematics Early RF learned "0 absences = higher risk": mean predicted P(pass) was 0.517
+at 0 absences vs 0.564 at 1–5 (partial dependence). That is an artefact of D2. All 4 RFs now use
+`monotonic_cst = -1` on absences, so P(pass) can only stay the same or fall as absences rise. The
+constrained Mathematics Early curve is 0.597 / 0.594 / 0.564 / 0.466 for 0 / 1–5 / 6–10 / >10. To make the
+column index fixed before fitting, the preprocessor puts numeric columns first and takes its one-hot
+categories from the data dictionary (absences = output column 12 in every model). The cost is small: test
+macro-F1 −0.009 (Mathematics Early), −0.012 (Mathematics Mid-term), 0 for Portuguese. A test checks that
+P(pass) is non-increasing for every test student as absences goes from 0 to 93.
+
+### D4. Alert cut-off: tuned on training data, with a floor at 0.5
+At the default 0.5 cut-off the Early models caught too few At-Risk students (seed-42 test: Mathematics 0.38,
+Portuguese 0.35). The rule is:
+- `threshold_raw` = the smallest cut-off whose **out-of-fold** At-Risk recall on the **training set** is
+  ≥ 70% (5-fold CV with the best RF parameters). The test set is never used.
+- `threshold = max(0.5, threshold_raw)`.
+
+The floor was added in Phase 4c. Without it, models whose recall at 0.5 was already above 70% got a cut-off
+below 0.5, which lowered recall. Over 20 splits, Mid-term recall fell from 0.93 to 0.69 (Mathematics) and
+from 0.81 to 0.70 (Portuguese). Final cut-offs: Mathematics Early 0.575; Mathematics Mid-term, Portuguese
+Early and Portuguese Mid-term 0.5 (raw 0.295 / 0.475 / 0.38). The cut-off lives inside the saved model
+(`FixedThresholdClassifier`), so `predict()` always uses it. Applying the floor did not retrain anything:
+predictions from the saved forests are identical before and after.
+
+### D5. Repeated splits are the headline numbers
+The single seed-42 split is unusually hard for Portuguese Early. Its test macro-F1 is 0.543, while the mean
+over 20 other splits (seeds 0–19, same full procedure) is 0.697 ± 0.042. Seed 42 is 3.7 SD below that mean
+and lower than all 20 splits. Its ROC-AUC is 0.65 vs a typical 0.85 ± 0.03. The cross-validation score is
+genuine (GridSearchCV `mean_test_score` 0.773; training score 0.848), and the CV − test gap averages
++0.005 ± 0.049 across splits, so nothing is leaking. The app and slides show **mean ± std over the 20
+splits** as the main result, and the seed-42 numbers only as "the split of the saved model".
+
+Final-cut-off results over 20 splits (mean ± std):
+| Model | Cut-off | Macro F1 | At-Risk recall | At-Risk precision | False alerts per test set |
+|---|---|---|---|---|---|
+| Mathematics Early | 0.583 ± 0.029 | 0.562 ± 0.042 | 0.696 ± 0.088 | 0.410 ± 0.035 | 26.2 of 53 |
+| Mathematics Mid-term | 0.5 (floored in all 20) | 0.905 ± 0.031 | 0.929 ± 0.038 | 0.833 ± 0.058 | 5.0 of 53 |
+| Portuguese Early | 0.539 ± 0.028 | 0.690 ± 0.033 | 0.698 ± 0.107 | 0.405 ± 0.043 | 20.7 of 110 |
+| Portuguese Mid-term | 0.5 (floored in all 20) | 0.860 ± 0.030 | 0.805 ± 0.076 | 0.735 ± 0.067 | 6.0 of 110 |
+
+### D6. Fairness is reported with pooled counts
+`sex` is not a model feature, but At-Risk recall is reported per sex. Single-split groups are tiny (e.g. 17
+girls and 9 boys At Risk in the Mathematics test set), so we pool caught / total counts over the 20 test
+sets instead of averaging percentages (final cut-off):
+| Model | Girls (F) | Boys (M) | Gap (F − M) |
+|---|---|---|---|
+| Mathematics Early | 0.647 (202/312) | 0.769 (160/208) | −0.12 |
+| Mathematics Mid-term | 0.923 (288/312) | 0.938 (195/208) | −0.02 |
+| Portuguese Early | 0.717 (129/180) | 0.682 (150/220) | +0.04 |
+| Portuguese Mid-term | 0.861 (155/180) | 0.759 (167/220) | +0.10 |
+
+**Caveat:** the 20 test sets overlap, so each student is counted about 4 times. The pooled counts are
+therefore not independent samples and must not be used for significance tests. The real number of At-Risk
+students is mat: 75 F / 55 M; por: 50 F / 50 M. Two gaps persist across splits and are reported in the app:
+Mathematics Early catches fewer At-Risk girls (−12 points), and Portuguese Mid-term catches fewer At-Risk
+boys (−10 points). Both models are left unchanged. Fixing this would need per-group cut-offs, which would
+mean using `sex` at prediction time; we decided against that (spec §6).
+
+### D7. Saved models are about 16 MB, not "< 1 MB"
+Grid search picked unlimited-depth trees for the Portuguese models (up to 400 trees), so the 4 classifier
+files total about 16 MB. That is well under GitHub's 100 MB per-file limit and loads fine on Streamlit
+Cloud. We keep the tuned parameters instead of shrinking the models.
