@@ -95,3 +95,39 @@ mean using `sex` at prediction time; we decided against that (spec §6).
 Grid search picked unlimited-depth trees for the Portuguese models (up to 400 trees), so the 4 classifier
 files total about 16 MB. That is well under GitHub's 100 MB per-file limit and loads fine on Streamlit
 Cloud. We keep the tuned parameters instead of shrinking the models.
+
+---
+
+## Phase 5 — Clustering
+
+### D8. `log1p(absences)` before scaling
+`absences` is very right-skewed (skewness 3.67 in Mathematics, 2.02 in Portuguese; after log1p 0.07 and
+0.18). The pipeline is `log1p(absences) → StandardScaler → KMeans`. Raw absences give slightly *higher*
+silhouettes (Mathematics k = 6: 0.197 raw vs 0.170 log1p), but only by splitting off small groups of
+absence outliers: raw k = 5 in Mathematics produces a 5-student cluster. With log1p, the smallest cluster
+at any k is 28 students in Mathematics and 30 in Portuguese. Silhouettes at the chosen k: Mathematics
+0.1729 with log1p vs 0.1736 raw; Portuguese 0.1626 vs 0.1685.
+
+### D9. Choosing k: best silhouette, with k = 3 preferred when within 0.02
+All silhouettes are low (0.15–0.18 with log1p), so these behaviour features do not form well-separated
+groups. The clusters are a useful *partition* of a continuum, not natural types, and the app says so.
+Rule: take the k with the best silhouette, but if k = 3 is within 0.02 of it, use k = 3. Three clusters
+are the easiest to explain, and they map one-to-one onto the three RL learner profiles (spec §8).
+- **Portuguese → k = 3.** Best is k = 6 (0.180); k = 3 scores 0.163 (−0.017, within tolerance).
+- **Mathematics → k = 5.** Best is k = 5 (0.173); k = 3 scores 0.153 (−0.020, just outside), so the rule
+  keeps k = 5. Its five clusters are distinct and readable, and the "High past failures" cluster has a 21%
+  pass rate (overall 67%). Phase 6 maps the 5 clusters onto the 3 learner profiles.
+
+### D10. Cluster names are generated, not hard-coded
+Each cluster gets up to 2 features whose cluster mean is at least 0.5 SD from the overall mean (in the
+standardized log1p space), strongest first, written as "High …" or "Low …". If no feature reaches 0.5 SD,
+the name is "Close to average". Names are recomputed on every training run and tested for uniqueness.
+Grades are never used to cluster; mean G3, pass rate and G3 = 0 counts are added afterwards for
+description only.
+
+### D11. G3 = 0 students do not pile into one cluster
+In Mathematics, the 38 G3 = 0 students are split 8 / 9 / 10 / 3 / 8 across the 5 clusters. The most is 26%,
+in "High past failures", which is 3.2× over-represented relative to its size (8% of students) but not a
+majority. In Portuguese, the 15 are split 3 / 5 / 7, almost proportional to cluster size. Their recorded
+0 absences (D2) is only one of six features, so it does not decide their cluster. No change to spec §14 is
+needed, and the students stay in.
