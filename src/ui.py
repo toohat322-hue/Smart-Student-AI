@@ -88,6 +88,21 @@ FORM_GROUPS = {
 STUDENT_FEATURES = [f for f in FEATURE_SPEC if f not in ("sex", "G3")]  # what the shared student holds
 
 
+def key_fields(scenario: str) -> list[str]:
+    """Questions shown first on the prediction form (the rest go in an optional section).
+
+    = the top KEY_FIELDS_PER_SUBJECT inputs by permutation importance in either subject's model for this
+    scenario, plus the six clustering habits (the Clustering and Study Planner pages need them).
+    Read from metrics.json, so the list follows the trained models.
+    """
+    from src.preprocessing import feature_columns
+
+    sup = metrics()["supervised"]["subjects"]
+    top = {d["feature"] for s in sup for d in sup[s][scenario]["permutation_importance"][:C.KEY_FIELDS_PER_SUBJECT]}
+    wanted = top | set(C.CLUSTER_FEATURES)
+    return [f for f in feature_columns(scenario) if f in wanted]
+
+
 def label(feature: str) -> str:
     """Plain-English label of a feature."""
     return FIELD_INFO.get(feature, {}).get("label", feature)

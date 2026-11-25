@@ -6,6 +6,9 @@ from pathlib import Path
 PROJECT_TEAM = "<team member names>"
 PROJECT_COURSE = "<course name>"
 PROJECT_INSTRUCTOR = "<instructor name>"
+APP_URL = "https://smart-student-ai.streamlit.app/"
+REPO_URL = "https://github.com/toohat322-hue/Smart-Student-AI"
+KEY_FIELDS_PER_SUBJECT = 5   # prediction form: top-N inputs by permutation importance, per subject
 
 # --- Paths -------------------------------------------------------------------
 ROOT_DIR = Path(__file__).resolve().parent.parent

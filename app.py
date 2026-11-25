@@ -9,6 +9,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import streamlit as st  # noqa: E402
 
+from src import config as C  # noqa: E402
 from src import ui  # noqa: E402
 
 
@@ -63,6 +64,7 @@ def home() -> None:
 
     st.caption(f"Subject: {ui.SUBJECT_LABELS[subj]} (change it in the sidebar). Model quality and limitations: "
                "see **Model Evaluation** and **About Project**.")
+    st.markdown(f"🌐 Live app: [{C.APP_URL}]({C.APP_URL}) · 💻 Source code: [GitHub]({C.REPO_URL})")
 
 
 PAGES = [

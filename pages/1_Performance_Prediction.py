@@ -70,16 +70,27 @@ def _submit() -> None:
     st.session_state["student"] = values
 
 
+key = ui.key_fields(scenario)
+order = (["G1", "G2"] if scenario == "midterm" else []) + [f for grp in ui.FORM_GROUPS.values() for f in grp]
+key = sorted(key, key=order.index)
+rest = [f for f in features if f not in key]
+
 with st.form("student_form"):
-    st.markdown("**Student details**  ·  only the information the model uses (sex is deliberately not used)")
-    groups = dict(ui.FORM_GROUPS)
-    if scenario == "midterm":
-        groups["Grades so far"] = ["G1", "G2"]
-    for name, fields in groups.items():
-        st.markdown(f"###### {name}")
-        cols = st.columns(3)
-        for i, f in enumerate([f for f in fields if f in features]):
-            widget(f, cols[i % 3])
+    st.markdown(f"**Key questions** ({len(key)} of {len(features)})")
+    cols = st.columns(3)
+    for i, f in enumerate(key):
+        widget(f, cols[i % 3])
+    with st.expander(f"More details (optional, {len(rest)} questions): typical values are used if you skip them"):
+        for name, fields in ui.FORM_GROUPS.items():
+            shown = [f for f in fields if f in rest]
+            if not shown:
+                continue
+            st.markdown(f"###### {name}")
+            cols = st.columns(3)
+            for i, f in enumerate(shown):
+                widget(f, cols[i % 3])
+    st.caption("Key questions = the inputs that matter most to the models (permutation importance, both subjects) "
+               "plus the six habits used for grouping and the study planner. Sex is deliberately not used.")
     st.form_submit_button("Predict", type="primary", on_click=_submit)
 
 # ---------------------------------------------------------------- result

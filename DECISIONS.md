@@ -393,6 +393,28 @@ compare both models at their own tuned thresholds.
 
 ---
 
+## Phase 10 — Deployment
+
+### D29. Shorter prediction form: 12 key questions, the rest optional
+User feedback after deployment: the form asked too many questions. It now shows **12 key questions** (Early:
+12 of 29 inputs; Mid-term: 12 of 31). They are chosen by a rule, read from `metrics.json`: the top 5 inputs by
+permutation importance in either subject's model for the scenario, plus the six clustering habits, which the
+Clustering and Study Planner pages need. The other inputs are in an optional "More details" section and keep
+the typical value (training median or most common value) unless changed. The models and their inputs are
+unchanged; the form only changes which questions are asked first.
+
+### D30. Deployment
+- **GitHub:** public repo https://github.com/toohat322-hue/Smart-Student-AI, created and pushed with the
+  GitHub CLI. All 79 tracked files were checked on GitHub, including every model file, both CSVs and
+  `reports/metrics.json`; the largest model's git hash matches the local one.
+- **Streamlit Community Cloud:** https://smart-student-ai.streamlit.app/ (Python 3.11). The first deployment
+  used a page file as the entry point instead of `app.py`, so the page navigation was missing. The entry point
+  must be `app.py`.
+- The live URL and the repo link are on the Home page (from `APP_URL` and `REPO_URL` in `src/config.py`) and in
+  the README.
+
+---
+
 ## Future work
 - **Cluster-specific action effectiveness.** For example, if videos helped weaker students more, the
   clusters would get different policies. Modelling that needs data on which study activities students

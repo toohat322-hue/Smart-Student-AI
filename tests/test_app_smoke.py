@@ -146,3 +146,12 @@ def test_out_of_range_number_is_never_stored():
     next(b for b in at.button if b.label == "Predict").click().run()
     assert not at.exception
     assert 0 <= at.session_state["student"]["absences"] <= 93
+
+
+def test_form_shows_key_questions_and_hides_the_rest_in_an_expander():
+    at = run("pages/1_Performance_Prediction.py")
+    key = ui.key_fields("early")
+    assert 6 <= len(key) < 29 and set(key) >= set(ui.C.CLUSTER_FEATURES)
+    assert any("More details (optional" in str(e.label) for e in at.expander)
+    next(b for b in at.button if b.label == "Predict").click().run()
+    assert not at.exception and set(at.session_state["student"]) == set(ui.STUDENT_FEATURES)

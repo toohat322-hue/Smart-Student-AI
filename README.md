@@ -12,7 +12,7 @@ on the UCI Student Performance dataset:
 
 One student entered in the app flows through all three: risk prediction → their group → a study strategy.
 
-**Live demo:** <link>
+**Live demo:** https://smart-student-ai.streamlit.app/  ·  **Code:** https://github.com/toohat322-hue/Smart-Student-AI
 
 ![Home page](reports/screenshots/01_home.png)
 
