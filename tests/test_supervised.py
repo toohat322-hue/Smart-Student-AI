@@ -318,3 +318,17 @@ def test_repeated_split_results_present(subject, scenario):
         total = sum(r["fairness_final"][g]["n_at_risk"] for r in rep["per_seed"])
         assert (pooled["n_caught"], pooled["n_at_risk"]) == (caught, total)
         assert pooled["at_risk_recall"] == round(caught / total, 4)
+
+
+# --------------------------------------------------------------------------- fair LogReg comparison (Phase 9b)
+@pytest.mark.parametrize("subject,scenario", CASES)
+def test_logreg_gets_the_same_threshold_rule(subject, scenario):
+    meta = load_metrics()["supervised"]["subjects"][subject][scenario]["models"]["logreg"]
+    tt = meta["threshold_tuning"]
+    assert tt["threshold"] == max(THRESHOLD_FLOOR, tt["threshold_raw"]) and tt["oof_at_risk_recall"] >= 0.70
+    assert meta["test_tuned"]["threshold"] == tt["threshold"]
+    rep = load_metrics()["supervised_repeated_splits"]["subjects"][subject][scenario]
+    assert all(r["logreg_threshold"] >= THRESHOLD_FLOOR for r in rep["per_seed"])
+    diff = rep["rf_minus_logreg_tuned"]["f1_macro"]["mean"]
+    paired = np.mean([r["rf_tuned"]["f1_macro"] - r["logreg_tuned"]["f1_macro"] for r in rep["per_seed"]])
+    assert diff == pytest.approx(paired, abs=1e-4)

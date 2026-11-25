@@ -35,7 +35,8 @@ SEEDS = list(range(20))
 SUBJECT_ORDER = ["mat", "por"]
 SUBJECT_NAMES = {"mat": "Mathematics", "por": "Portuguese"}
 SCENARIO_NAMES = {"early": "Early", "midterm": "Mid-term"}
-MODEL_KEYS = ("dummy", "logreg", "rf_default", "rf_tuned")  # rf_tuned = final cut-off (with 0.5 floor)
+# *_tuned = own threshold from training OOF predictions (>= 70% At-Risk recall, floor 0.5)
+MODEL_KEYS = ("dummy", "logreg", "logreg_tuned", "rf_default", "rf_tuned")
 C_BLUE, C_GRAY, C_ORANGE, C_TEXT2 = "#2a78d6", "#8a8984", "#eb6834", "#52514e"
 
 
@@ -57,6 +58,15 @@ def summarise(rows: list[dict], seed42: dict | None) -> dict:
     thr = np.array([r["rf_threshold"] for r in rows])
     out["rf_threshold"] = {"mean": round(thr.mean(), 4), "std": round(thr.std(ddof=1), 4),
                            "min": round(thr.min(), 4), "max": round(thr.max(), 4)}
+    lthr = np.array([r["logreg_threshold"] for r in rows])
+    out["logreg_threshold"] = {"mean": round(lthr.mean(), 4), "std": round(lthr.std(ddof=1), 4),
+                               "min": round(lthr.min(), 4), "max": round(lthr.max(), 4)}
+    # Paired comparison on the same splits: RF (final threshold) minus LogReg (its own tuned threshold).
+    out["rf_minus_logreg_tuned"] = {}
+    for k in ("f1_macro", "at_risk_recall", "at_risk_precision", "roc_auc", "false_alerts"):
+        d = np.array([r["rf_tuned"][k] - r["logreg_tuned"][k] for r in rows], dtype=float)
+        out["rf_minus_logreg_tuned"][k] = {"mean": round(d.mean(), 4), "se": round(d.std(ddof=1) / np.sqrt(len(d)), 4),
+                                           "share_splits_rf_higher": round(float((d > 0).mean()), 4)}
     raw = np.array([r["rf_threshold_raw"] for r in rows])
     out["rf_threshold_raw"] = {"mean": round(raw.mean(), 4), "std": round(raw.std(ddof=1), 4),
                                "share_floored": round(float((raw < 0.5).mean()), 4)}
@@ -156,6 +166,9 @@ def main() -> int:
             for mk in MODEL_KEYS:
                 print(f"  {mk:11s} " + "  ".join(
                     f"{k} {e[mk][k]['mean']:.3f}±{e[mk][k]['std']:.3f}" for k in REPEATED_KEYS))
+            dd = e["rf_minus_logreg_tuned"]
+            print("  RF - LogReg (both tuned, paired): " + "  ".join(
+                f"{k} {v['mean']:+.3f} (SE {v['se']:.3f})" for k, v in dd.items()))
             fp = e["fairness_pooled_final"]
             print(f"  pooled fairness @final: F {fp['F']['at_risk_recall']:.3f} ({fp['F']['n_caught']}/{fp['F']['n_at_risk']})"
                   f"   M {fp['M']['at_risk_recall']:.3f} ({fp['M']['n_caught']}/{fp['M']['n_at_risk']})"

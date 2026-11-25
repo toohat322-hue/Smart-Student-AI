@@ -306,6 +306,11 @@ def train_scenario(df: pd.DataFrame, train_idx: np.ndarray, test_idx: np.ndarray
             model.fit(X_tr, y_tr)
             models[name] = model
             metrics[name] = {"cv": cv, "test_default": evaluate(model, X_te, y_te, include_curves=include_curves)}
+        # Fair comparison (Phase 9b): LogReg gets the same threshold rule as the RF (OOF on train, floor 0.5).
+        thr = tune_threshold(make_logreg(features), X_tr, y_tr, n_jobs=n_jobs)
+        metrics["logreg"]["threshold_tuning"] = thr
+        metrics["logreg"]["test_tuned"] = evaluate(models["logreg"], X_te, y_te, thr["threshold"],
+                                                   include_curves=False)
 
     variants = [("rf", True)] + ([("rf_unconstrained", False)] if with_unconstrained else [])
     for name, monotonic in variants:
@@ -359,6 +364,8 @@ def run_split(subject: str, scenario: str, seed: int) -> dict[str, Any]:
         "subject": subject, "scenario": scenario, "seed": seed,
         "dummy": pick(m["dummy"]["test_default"]),
         "logreg": pick(m["logreg"]["test_default"]),
+        "logreg_tuned": pick(m["logreg"]["test_tuned"]),
+        "logreg_threshold": m["logreg"]["threshold_tuning"]["threshold"],
         "rf_default": pick(m["rf"]["test_default"]),
         "rf_tuned": pick(m["rf"]["test_tuned"]),
         "rf_cv_f1_macro": m["rf"]["cv"]["mean"],

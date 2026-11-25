@@ -149,21 +149,24 @@ DECISIONS.md               every decision that differs from or adds to PROJECT_S
 All numbers are the **mean ± std over 20 random stratified 80/20 train/test splits**
 (`metrics.json["supervised_repeated_splits"]`). "At Risk" = final grade below 10/20.
 
-| Subject | Scenario | Model | Macro F1 | At-Risk recall | At-Risk precision | ROC-AUC |
-|---|---|---|---|---|---|---|
-| Portuguese | Early | Logistic Regression | 0.67 ± 0.05 | 0.70 ± 0.10 | 0.38 ± 0.06 | 0.82 ± 0.04 |
-| Portuguese | Early | **Random Forest (saved)** | 0.69 ± 0.03 | 0.70 ± 0.11 | 0.40 ± 0.04 | 0.85 ± 0.03 |
-| Portuguese | Mid-term | Logistic Regression | 0.82 ± 0.03 | 0.84 ± 0.08 | 0.61 ± 0.06 | 0.95 ± 0.02 |
-| Portuguese | Mid-term | **Random Forest (saved)** | 0.86 ± 0.03 | 0.81 ± 0.08 | 0.73 ± 0.07 | 0.96 ± 0.01 |
-| Mathematics | Early | Logistic Regression | 0.60 ± 0.05 | 0.56 ± 0.11 | 0.45 ± 0.06 | 0.67 ± 0.06 |
-| Mathematics | Early | **Random Forest (saved)** | 0.56 ± 0.04 | 0.70 ± 0.09 | 0.41 ± 0.04 | 0.66 ± 0.06 |
-| Mathematics | Mid-term | Logistic Regression | 0.90 ± 0.04 | 0.90 ± 0.06 | 0.83 ± 0.07 | 0.97 ± 0.01 |
-| Mathematics | Mid-term | **Random Forest (saved)** | 0.90 ± 0.03 | 0.93 ± 0.04 | 0.83 ± 0.06 | 0.96 ± 0.02 |
+| Subject | Scenario | Model (own tuned threshold) | Macro F1 | At-Risk recall | At-Risk precision | ROC-AUC | False alerts per test set |
+|---|---|---|---|---|---|---|---|
+| Portuguese | Early | Logistic Regression | 0.65 ± 0.04 | 0.75 ± 0.10 | 0.35 ± 0.05 | 0.82 ± 0.04 | 27.9 of 110 |
+| Portuguese | Early | **Random Forest (saved)** | 0.69 ± 0.03 | 0.70 ± 0.11 | 0.40 ± 0.04 | 0.85 ± 0.03 | 20.7 of 110 |
+| Portuguese | Mid-term | Logistic Regression | 0.82 ± 0.03 | 0.84 ± 0.08 | 0.61 ± 0.06 | 0.95 ± 0.02 | 11.0 of 110 |
+| Portuguese | Mid-term | **Random Forest (saved)** | 0.86 ± 0.03 | 0.81 ± 0.08 | 0.73 ± 0.07 | 0.96 ± 0.01 | 6.0 of 110 |
+| Mathematics | Early | Logistic Regression | 0.57 ± 0.04 | 0.69 ± 0.11 | 0.41 ± 0.04 | 0.67 ± 0.06 | 25.4 of 53 |
+| Mathematics | Early | **Random Forest (saved)** | 0.56 ± 0.04 | 0.70 ± 0.09 | 0.41 ± 0.04 | 0.66 ± 0.06 | 26.1 of 53 |
+| Mathematics | Mid-term | Logistic Regression | 0.90 ± 0.04 | 0.90 ± 0.06 | 0.83 ± 0.07 | 0.97 ± 0.01 | 4.9 of 53 |
+| Mathematics | Mid-term | **Random Forest (saved)** | 0.90 ± 0.03 | 0.93 ± 0.04 | 0.83 ± 0.06 | 0.96 ± 0.02 | 5.0 of 53 |
 
 - **Early** (start of year, no grades) is the useful scenario. It catches about **70% of At-Risk students**,
   but only about 4 in 10 flagged students actually fail, so it is a screening tool.
-  - For Mathematics, the tuned threshold trades macro F1 (0.56 vs 0.60 for Logistic Regression) for clearly
-    higher At-Risk recall (0.70 vs 0.56).
+  - Both models use the same threshold rule (out-of-fold on training data, ≥ 70% At-Risk recall, never
+    below 0.5). Compared on the same 20 splits, the Random Forest is clearly better for Portuguese (macro F1
+    +0.035 Early / +0.042 Mid-term, and 7.2 / 5.0 fewer false alerts per test set; Logistic Regression
+    catches slightly more At-Risk students at the cost of those extra alerts), slightly better for Mathematics
+    Mid-term, and tied for Mathematics Early.
 - **Mid-term** is far more accurate, mainly because the period 2 grade is almost the final grade.
 - **Clustering:** Portuguese k = 3, Mathematics k = 5, chosen by silhouette with a preference for 3 when close.
   Silhouettes are low (0.16–0.17), so the clusters partition a continuum of habits rather than finding natural

@@ -651,6 +651,59 @@
                     1.0
                   ]
                 }
+              },
+              "threshold_tuning": {
+                "threshold": 0.59,
+                "threshold_raw": 0.59,
+                "threshold_floor": 0.5,
+                "target_at_risk_recall": 0.7,
+                "oof_at_risk_recall": 0.7115,
+                "oof_at_risk_recall_raw": 0.7115,
+                "oof_at_risk_precision_raw": 0.4744,
+                "oof_f1_macro_raw": 0.6341,
+                "oof_at_risk_recall_at_default": 0.6635
+              },
+              "test_tuned": {
+                "threshold": 0.59,
+                "n": 79,
+                "n_at_risk": 26,
+                "accuracy": 0.5443,
+                "at_risk_recall": 0.5769,
+                "at_risk_precision": 0.375,
+                "f1_macro": 0.5316,
+                "roc_auc": 0.5929,
+                "false_alerts": 25,
+                "false_alert_rate": 0.4717,
+                "per_class": {
+                  "At Risk": {
+                    "precision": 0.375,
+                    "recall": 0.5769,
+                    "f1-score": 0.4545,
+                    "support": 26.0
+                  },
+                  "Likely to Pass": {
+                    "precision": 0.7179,
+                    "recall": 0.5283,
+                    "f1-score": 0.6087,
+                    "support": 53.0
+                  }
+                },
+                "confusion_matrix": {
+                  "labels": [
+                    "At Risk",
+                    "Likely to Pass"
+                  ],
+                  "matrix": [
+                    [
+                      15,
+                      11
+                    ],
+                    [
+                      25,
+                      28
+                    ]
+                  ]
+                }
               }
             },
             "rf": {
@@ -1742,6 +1795,59 @@
                     1.0
                   ]
                 }
+              },
+              "threshold_tuning": {
+                "threshold": 0.5,
+                "threshold_raw": 0.16,
+                "threshold_floor": 0.5,
+                "target_at_risk_recall": 0.7,
+                "oof_at_risk_recall": 0.9519,
+                "oof_at_risk_recall_raw": 0.7019,
+                "oof_at_risk_precision_raw": 0.9481,
+                "oof_f1_macro_raw": 0.8645,
+                "oof_at_risk_recall_at_default": 0.9519
+              },
+              "test_tuned": {
+                "threshold": 0.5,
+                "n": 79,
+                "n_at_risk": 26,
+                "accuracy": 0.8608,
+                "at_risk_recall": 0.9231,
+                "at_risk_precision": 0.7273,
+                "f1_macro": 0.8512,
+                "roc_auc": 0.9543,
+                "false_alerts": 9,
+                "false_alert_rate": 0.1698,
+                "per_class": {
+                  "At Risk": {
+                    "precision": 0.7273,
+                    "recall": 0.9231,
+                    "f1-score": 0.8136,
+                    "support": 26.0
+                  },
+                  "Likely to Pass": {
+                    "precision": 0.9565,
+                    "recall": 0.8302,
+                    "f1-score": 0.8889,
+                    "support": 53.0
+                  }
+                },
+                "confusion_matrix": {
+                  "labels": [
+                    "At Risk",
+                    "Likely to Pass"
+                  ],
+                  "matrix": [
+                    [
+                      24,
+                      2
+                    ],
+                    [
+                      9,
+                      44
+                    ]
+                  ]
+                }
               }
             },
             "rf": {
@@ -2776,6 +2882,59 @@
                     0.9818,
                     0.9818,
                     1.0
+                  ]
+                }
+              },
+              "threshold_tuning": {
+                "threshold": 0.5,
+                "threshold_raw": 0.47,
+                "threshold_floor": 0.5,
+                "target_at_risk_recall": 0.7,
+                "oof_at_risk_recall": 0.75,
+                "oof_at_risk_recall_raw": 0.7,
+                "oof_at_risk_precision_raw": 0.4341,
+                "oof_f1_macro_raw": 0.7094,
+                "oof_at_risk_recall_at_default": 0.75
+              },
+              "test_tuned": {
+                "threshold": 0.5,
+                "n": 130,
+                "n_at_risk": 20,
+                "accuracy": 0.6462,
+                "at_risk_recall": 0.45,
+                "at_risk_precision": 0.2045,
+                "f1_macro": 0.5233,
+                "roc_auc": 0.6259,
+                "false_alerts": 35,
+                "false_alert_rate": 0.3182,
+                "per_class": {
+                  "At Risk": {
+                    "precision": 0.2045,
+                    "recall": 0.45,
+                    "f1-score": 0.2812,
+                    "support": 20.0
+                  },
+                  "Likely to Pass": {
+                    "precision": 0.8721,
+                    "recall": 0.6818,
+                    "f1-score": 0.7653,
+                    "support": 110.0
+                  }
+                },
+                "confusion_matrix": {
+                  "labels": [
+                    "At Risk",
+                    "Likely to Pass"
+                  ],
+                  "matrix": [
+                    [
+                      9,
+                      11
+                    ],
+                    [
+                      35,
+                      75
+                    ]
                   ]
                 }
               }
@@ -3877,6 +4036,59 @@
                     1.0
                   ]
                 }
+              },
+              "threshold_tuning": {
+                "threshold": 0.5,
+                "threshold_raw": 0.18,
+                "threshold_floor": 0.5,
+                "target_at_risk_recall": 0.7,
+                "oof_at_risk_recall": 0.875,
+                "oof_at_risk_recall_raw": 0.7,
+                "oof_at_risk_precision_raw": 0.8358,
+                "oof_f1_macro_raw": 0.8613,
+                "oof_at_risk_recall_at_default": 0.875
+              },
+              "test_tuned": {
+                "threshold": 0.5,
+                "n": 130,
+                "n_at_risk": 20,
+                "accuracy": 0.8846,
+                "at_risk_recall": 0.75,
+                "at_risk_precision": 0.6,
+                "f1_macro": 0.7984,
+                "roc_auc": 0.9255,
+                "false_alerts": 10,
+                "false_alert_rate": 0.0909,
+                "per_class": {
+                  "At Risk": {
+                    "precision": 0.6,
+                    "recall": 0.75,
+                    "f1-score": 0.6667,
+                    "support": 20.0
+                  },
+                  "Likely to Pass": {
+                    "precision": 0.9524,
+                    "recall": 0.9091,
+                    "f1-score": 0.9302,
+                    "support": 110.0
+                  }
+                },
+                "confusion_matrix": {
+                  "labels": [
+                    "At Risk",
+                    "Likely to Pass"
+                  ],
+                  "matrix": [
+                    [
+                      15,
+                      5
+                    ],
+                    [
+                      10,
+                      100
+                    ]
+                  ]
+                }
               }
             },
             "rf": {
@@ -4938,6 +5150,44 @@
               "max": 23.0
             }
           },
+          "logreg_tuned": {
+            "accuracy": {
+              "mean": 0.5759,
+              "std": 0.0439,
+              "min": 0.481,
+              "max": 0.6582
+            },
+            "f1_macro": {
+              "mean": 0.5671,
+              "std": 0.0434,
+              "min": 0.4726,
+              "max": 0.6471
+            },
+            "at_risk_recall": {
+              "mean": 0.6865,
+              "std": 0.1125,
+              "min": 0.5,
+              "max": 0.8462
+            },
+            "at_risk_precision": {
+              "mean": 0.4132,
+              "std": 0.0388,
+              "min": 0.3256,
+              "max": 0.4872
+            },
+            "roc_auc": {
+              "mean": 0.6663,
+              "std": 0.0601,
+              "min": 0.5421,
+              "max": 0.7808
+            },
+            "false_alerts": {
+              "mean": 25.35,
+              "std": 3.8426,
+              "min": 20.0,
+              "max": 33.0
+            }
+          },
           "rf_default": {
             "accuracy": {
               "mean": 0.6589,
@@ -5030,6 +5280,39 @@
             "min": 0.55,
             "max": 0.645
           },
+          "logreg_threshold": {
+            "mean": 0.6217,
+            "std": 0.0255,
+            "min": 0.58,
+            "max": 0.67
+          },
+          "rf_minus_logreg_tuned": {
+            "f1_macro": {
+              "mean": -0.0051,
+              "se": 0.0118,
+              "share_splits_rf_higher": 0.5
+            },
+            "at_risk_recall": {
+              "mean": 0.0096,
+              "se": 0.0238,
+              "share_splits_rf_higher": 0.5
+            },
+            "at_risk_precision": {
+              "mean": -0.0032,
+              "se": 0.0096,
+              "share_splits_rf_higher": 0.45
+            },
+            "roc_auc": {
+              "mean": -0.0061,
+              "se": 0.0087,
+              "share_splits_rf_higher": 0.5
+            },
+            "false_alerts": {
+              "mean": 0.8,
+              "se": 1.1644,
+              "share_splits_rf_higher": 0.35
+            }
+          },
           "rf_threshold_raw": {
             "mean": 0.5828,
             "std": 0.0286,
@@ -5066,6 +5349,15 @@
                 "roc_auc": 0.7025,
                 "false_alerts": 20
               },
+              "logreg_tuned": {
+                "accuracy": 0.5823,
+                "f1_macro": 0.582,
+                "at_risk_recall": 0.8462,
+                "at_risk_precision": 0.4314,
+                "roc_auc": 0.7025,
+                "false_alerts": 29
+              },
+              "logreg_threshold": 0.65,
               "rf_default": {
                 "accuracy": 0.5823,
                 "f1_macro": 0.5398,
@@ -5115,6 +5407,15 @@
                 "roc_auc": 0.6052,
                 "false_alerts": 22
               },
+              "logreg_tuned": {
+                "accuracy": 0.519,
+                "f1_macro": 0.501,
+                "at_risk_recall": 0.5,
+                "at_risk_precision": 0.3421,
+                "roc_auc": 0.6052,
+                "false_alerts": 25
+              },
+              "logreg_threshold": 0.595,
               "rf_default": {
                 "accuracy": 0.5949,
                 "f1_macro": 0.5212,
@@ -5164,6 +5465,15 @@
                 "roc_auc": 0.656,
                 "false_alerts": 22
               },
+              "logreg_tuned": {
+                "accuracy": 0.5063,
+                "f1_macro": 0.5063,
+                "at_risk_recall": 0.7692,
+                "at_risk_precision": 0.3774,
+                "roc_auc": 0.656,
+                "false_alerts": 33
+              },
+              "logreg_threshold": 0.67,
               "rf_default": {
                 "accuracy": 0.6203,
                 "f1_macro": 0.5611,
@@ -5213,6 +5523,15 @@
                 "roc_auc": 0.6335,
                 "false_alerts": 19
               },
+              "logreg_tuned": {
+                "accuracy": 0.5696,
+                "f1_macro": 0.5576,
+                "at_risk_recall": 0.6154,
+                "at_risk_precision": 0.4,
+                "roc_auc": 0.6335,
+                "false_alerts": 24
+              },
+              "logreg_threshold": 0.64,
               "rf_default": {
                 "accuracy": 0.6709,
                 "f1_macro": 0.5905,
@@ -5262,6 +5581,15 @@
                 "roc_auc": 0.6655,
                 "false_alerts": 15
               },
+              "logreg_tuned": {
+                "accuracy": 0.5949,
+                "f1_macro": 0.5869,
+                "at_risk_recall": 0.6923,
+                "at_risk_precision": 0.4286,
+                "roc_auc": 0.6655,
+                "false_alerts": 24
+              },
+              "logreg_threshold": 0.625,
               "rf_default": {
                 "accuracy": 0.6456,
                 "f1_macro": 0.6061,
@@ -5311,6 +5639,15 @@
                 "roc_auc": 0.7562,
                 "false_alerts": 18
               },
+              "logreg_tuned": {
+                "accuracy": 0.5949,
+                "f1_macro": 0.5944,
+                "at_risk_recall": 0.8462,
+                "at_risk_precision": 0.44,
+                "roc_auc": 0.7562,
+                "false_alerts": 28
+              },
+              "logreg_threshold": 0.65,
               "rf_default": {
                 "accuracy": 0.6835,
                 "f1_macro": 0.6451,
@@ -5360,6 +5697,15 @@
                 "roc_auc": 0.7496,
                 "false_alerts": 13
               },
+              "logreg_tuned": {
+                "accuracy": 0.6203,
+                "f1_macro": 0.6172,
+                "at_risk_recall": 0.8077,
+                "at_risk_precision": 0.4565,
+                "roc_auc": 0.7496,
+                "false_alerts": 25
+              },
+              "logreg_threshold": 0.64,
               "rf_default": {
                 "accuracy": 0.7342,
                 "f1_macro": 0.6737,
@@ -5409,6 +5755,15 @@
                 "roc_auc": 0.7097,
                 "false_alerts": 18
               },
+              "logreg_tuned": {
+                "accuracy": 0.6582,
+                "f1_macro": 0.6471,
+                "at_risk_recall": 0.7308,
+                "at_risk_precision": 0.4872,
+                "roc_auc": 0.7097,
+                "false_alerts": 20
+              },
+              "logreg_threshold": 0.615,
               "rf_default": {
                 "accuracy": 0.6582,
                 "f1_macro": 0.6235,
@@ -5458,6 +5813,15 @@
                 "roc_auc": 0.5914,
                 "false_alerts": 18
               },
+              "logreg_tuned": {
+                "accuracy": 0.5823,
+                "f1_macro": 0.5644,
+                "at_risk_recall": 0.5769,
+                "at_risk_precision": 0.4054,
+                "roc_auc": 0.5914,
+                "false_alerts": 22
+              },
+              "logreg_threshold": 0.61,
               "rf_default": {
                 "accuracy": 0.6709,
                 "f1_macro": 0.5905,
@@ -5507,6 +5871,15 @@
                 "roc_auc": 0.6495,
                 "false_alerts": 16
               },
+              "logreg_tuned": {
+                "accuracy": 0.5949,
+                "f1_macro": 0.5837,
+                "at_risk_recall": 0.6538,
+                "at_risk_precision": 0.425,
+                "roc_auc": 0.6495,
+                "false_alerts": 23
+              },
+              "logreg_threshold": 0.58,
               "rf_default": {
                 "accuracy": 0.6835,
                 "f1_macro": 0.6619,
@@ -5556,6 +5929,15 @@
                 "roc_auc": 0.6575,
                 "false_alerts": 16
               },
+              "logreg_tuned": {
+                "accuracy": 0.5949,
+                "f1_macro": 0.5869,
+                "at_risk_recall": 0.6923,
+                "at_risk_precision": 0.4286,
+                "roc_auc": 0.6575,
+                "false_alerts": 24
+              },
+              "logreg_threshold": 0.595,
               "rf_default": {
                 "accuracy": 0.6709,
                 "f1_macro": 0.6274,
@@ -5605,6 +5987,15 @@
                 "roc_auc": 0.7808,
                 "false_alerts": 19
               },
+              "logreg_tuned": {
+                "accuracy": 0.5443,
+                "f1_macro": 0.5442,
+                "at_risk_recall": 0.8462,
+                "at_risk_precision": 0.4074,
+                "roc_auc": 0.7808,
+                "false_alerts": 32
+              },
+              "logreg_threshold": 0.645,
               "rf_default": {
                 "accuracy": 0.7215,
                 "f1_macro": 0.6905,
@@ -5654,6 +6045,15 @@
                 "roc_auc": 0.6502,
                 "false_alerts": 17
               },
+              "logreg_tuned": {
+                "accuracy": 0.5949,
+                "f1_macro": 0.5753,
+                "at_risk_recall": 0.5769,
+                "at_risk_precision": 0.4167,
+                "roc_auc": 0.6502,
+                "false_alerts": 21
+              },
+              "logreg_threshold": 0.625,
               "rf_default": {
                 "accuracy": 0.6456,
                 "f1_macro": 0.5811,
@@ -5703,6 +6103,15 @@
                 "roc_auc": 0.7446,
                 "false_alerts": 16
               },
+              "logreg_tuned": {
+                "accuracy": 0.6203,
+                "f1_macro": 0.6172,
+                "at_risk_recall": 0.8077,
+                "at_risk_precision": 0.4565,
+                "roc_auc": 0.7446,
+                "false_alerts": 25
+              },
+              "logreg_threshold": 0.635,
               "rf_default": {
                 "accuracy": 0.6835,
                 "f1_macro": 0.6214,
@@ -5752,6 +6161,15 @@
                 "roc_auc": 0.5421,
                 "false_alerts": 21
               },
+              "logreg_tuned": {
+                "accuracy": 0.481,
+                "f1_macro": 0.4726,
+                "at_risk_recall": 0.5385,
+                "at_risk_precision": 0.3256,
+                "roc_auc": 0.5421,
+                "false_alerts": 29
+              },
+              "logreg_threshold": 0.585,
               "rf_default": {
                 "accuracy": 0.557,
                 "f1_macro": 0.5031,
@@ -5801,6 +6219,15 @@
                 "roc_auc": 0.6415,
                 "false_alerts": 13
               },
+              "logreg_tuned": {
+                "accuracy": 0.5949,
+                "f1_macro": 0.5701,
+                "at_risk_recall": 0.5385,
+                "at_risk_precision": 0.4118,
+                "roc_auc": 0.6415,
+                "false_alerts": 20
+              },
+              "logreg_threshold": 0.615,
               "rf_default": {
                 "accuracy": 0.6582,
                 "f1_macro": 0.6006,
@@ -5850,6 +6277,15 @@
                 "roc_auc": 0.6829,
                 "false_alerts": 14
               },
+              "logreg_tuned": {
+                "accuracy": 0.6076,
+                "f1_macro": 0.5983,
+                "at_risk_recall": 0.6923,
+                "at_risk_precision": 0.439,
+                "roc_auc": 0.6829,
+                "false_alerts": 23
+              },
+              "logreg_threshold": 0.635,
               "rf_default": {
                 "accuracy": 0.6835,
                 "f1_macro": 0.6451,
@@ -5899,6 +6335,15 @@
                 "roc_auc": 0.6502,
                 "false_alerts": 16
               },
+              "logreg_tuned": {
+                "accuracy": 0.5949,
+                "f1_macro": 0.5798,
+                "at_risk_recall": 0.6154,
+                "at_risk_precision": 0.4211,
+                "roc_auc": 0.6502,
+                "false_alerts": 22
+              },
+              "logreg_threshold": 0.58,
               "rf_default": {
                 "accuracy": 0.7468,
                 "f1_macro": 0.7134,
@@ -5948,6 +6393,15 @@
                 "roc_auc": 0.6103,
                 "false_alerts": 23
               },
+              "logreg_tuned": {
+                "accuracy": 0.519,
+                "f1_macro": 0.5127,
+                "at_risk_recall": 0.6154,
+                "at_risk_precision": 0.3636,
+                "roc_auc": 0.6103,
+                "false_alerts": 28
+              },
+              "logreg_threshold": 0.61,
               "rf_default": {
                 "accuracy": 0.6456,
                 "f1_macro": 0.5904,
@@ -5997,6 +6451,15 @@
                 "roc_auc": 0.6459,
                 "false_alerts": 19
               },
+              "logreg_tuned": {
+                "accuracy": 0.5443,
+                "f1_macro": 0.5436,
+                "at_risk_recall": 0.7692,
+                "at_risk_precision": 0.4,
+                "roc_auc": 0.6459,
+                "false_alerts": 30
+              },
+              "logreg_threshold": 0.635,
               "rf_default": {
                 "accuracy": 0.6203,
                 "f1_macro": 0.578,
@@ -6140,6 +6603,44 @@
               "max": 13.0
             }
           },
+          "logreg_tuned": {
+            "accuracy": {
+              "mean": 0.9063,
+              "std": 0.0375,
+              "min": 0.8228,
+              "max": 0.962
+            },
+            "f1_macro": {
+              "mean": 0.8965,
+              "std": 0.0401,
+              "min": 0.8162,
+              "max": 0.9574
+            },
+            "at_risk_recall": {
+              "mean": 0.9038,
+              "std": 0.0618,
+              "min": 0.7692,
+              "max": 1.0
+            },
+            "at_risk_precision": {
+              "mean": 0.8335,
+              "std": 0.0716,
+              "min": 0.6579,
+              "max": 0.96
+            },
+            "roc_auc": {
+              "mean": 0.9701,
+              "std": 0.0145,
+              "min": 0.9492,
+              "max": 0.9927
+            },
+            "false_alerts": {
+              "mean": 4.9,
+              "std": 2.6735,
+              "min": 1.0,
+              "max": 13.0
+            }
+          },
           "rf_default": {
             "accuracy": {
               "mean": 0.9133,
@@ -6232,6 +6733,39 @@
             "min": 0.5,
             "max": 0.5
           },
+          "logreg_threshold": {
+            "mean": 0.5,
+            "std": 0.0,
+            "min": 0.5,
+            "max": 0.5
+          },
+          "rf_minus_logreg_tuned": {
+            "f1_macro": {
+              "mean": 0.0084,
+              "se": 0.0051,
+              "share_splits_rf_higher": 0.6
+            },
+            "at_risk_recall": {
+              "mean": 0.025,
+              "se": 0.0119,
+              "share_splits_rf_higher": 0.45
+            },
+            "at_risk_precision": {
+              "mean": -0.0009,
+              "se": 0.0093,
+              "share_splits_rf_higher": 0.5
+            },
+            "roc_auc": {
+              "mean": -0.0062,
+              "se": 0.0042,
+              "share_splits_rf_higher": 0.4
+            },
+            "false_alerts": {
+              "mean": 0.1,
+              "se": 0.3154,
+              "share_splits_rf_higher": 0.3
+            }
+          },
           "rf_threshold_raw": {
             "mean": 0.2977,
             "std": 0.0126,
@@ -6268,6 +6802,15 @@
                 "roc_auc": 0.9739,
                 "false_alerts": 6
               },
+              "logreg_tuned": {
+                "accuracy": 0.8987,
+                "f1_macro": 0.8894,
+                "at_risk_recall": 0.9231,
+                "at_risk_precision": 0.8,
+                "roc_auc": 0.9739,
+                "false_alerts": 6
+              },
+              "logreg_threshold": 0.5,
               "rf_default": {
                 "accuracy": 0.8987,
                 "f1_macro": 0.8894,
@@ -6317,6 +6860,15 @@
                 "roc_auc": 0.963,
                 "false_alerts": 8
               },
+              "logreg_tuned": {
+                "accuracy": 0.8608,
+                "f1_macro": 0.8491,
+                "at_risk_recall": 0.8846,
+                "at_risk_precision": 0.7419,
+                "roc_auc": 0.963,
+                "false_alerts": 8
+              },
+              "logreg_threshold": 0.5,
               "rf_default": {
                 "accuracy": 0.8987,
                 "f1_macro": 0.891,
@@ -6366,6 +6918,15 @@
                 "roc_auc": 0.9804,
                 "false_alerts": 3
               },
+              "logreg_tuned": {
+                "accuracy": 0.9114,
+                "f1_macro": 0.8987,
+                "at_risk_recall": 0.8462,
+                "at_risk_precision": 0.88,
+                "roc_auc": 0.9804,
+                "false_alerts": 3
+              },
+              "logreg_threshold": 0.5,
               "rf_default": {
                 "accuracy": 0.9114,
                 "f1_macro": 0.9024,
@@ -6415,6 +6976,15 @@
                 "roc_auc": 0.9891,
                 "false_alerts": 5
               },
+              "logreg_tuned": {
+                "accuracy": 0.9367,
+                "f1_macro": 0.9314,
+                "at_risk_recall": 1.0,
+                "at_risk_precision": 0.8387,
+                "roc_auc": 0.9891,
+                "false_alerts": 5
+              },
+              "logreg_threshold": 0.5,
               "rf_default": {
                 "accuracy": 0.9367,
                 "f1_macro": 0.9303,
@@ -6464,6 +7034,15 @@
                 "roc_auc": 0.9753,
                 "false_alerts": 3
               },
+              "logreg_tuned": {
+                "accuracy": 0.9494,
+                "f1_macro": 0.9437,
+                "at_risk_recall": 0.9615,
+                "at_risk_precision": 0.8929,
+                "roc_auc": 0.9753,
+                "false_alerts": 3
+              },
+              "logreg_threshold": 0.5,
               "rf_default": {
                 "accuracy": 0.962,
                 "f1_macro": 0.9574,
@@ -6513,6 +7092,15 @@
                 "roc_auc": 0.9695,
                 "false_alerts": 5
               },
+              "logreg_tuned": {
+                "accuracy": 0.8861,
+                "f1_macro": 0.8722,
+                "at_risk_recall": 0.8462,
+                "at_risk_precision": 0.8148,
+                "roc_auc": 0.9695,
+                "false_alerts": 5
+              },
+              "logreg_threshold": 0.5,
               "rf_default": {
                 "accuracy": 0.8861,
                 "f1_macro": 0.8765,
@@ -6562,6 +7150,15 @@
                 "roc_auc": 0.9927,
                 "false_alerts": 2
               },
+              "logreg_tuned": {
+                "accuracy": 0.962,
+                "f1_macro": 0.9574,
+                "at_risk_recall": 0.9615,
+                "at_risk_precision": 0.9259,
+                "roc_auc": 0.9927,
+                "false_alerts": 2
+              },
+              "logreg_threshold": 0.5,
               "rf_default": {
                 "accuracy": 0.9494,
                 "f1_macro": 0.9427,
@@ -6611,6 +7208,15 @@
                 "roc_auc": 0.9652,
                 "false_alerts": 6
               },
+              "logreg_tuned": {
+                "accuracy": 0.8861,
+                "f1_macro": 0.8745,
+                "at_risk_recall": 0.8846,
+                "at_risk_precision": 0.7931,
+                "roc_auc": 0.9652,
+                "false_alerts": 6
+              },
+              "logreg_threshold": 0.5,
               "rf_default": {
                 "accuracy": 0.8734,
                 "f1_macro": 0.8593,
@@ -6660,6 +7266,15 @@
                 "roc_auc": 0.9492,
                 "false_alerts": 6
               },
+              "logreg_tuned": {
+                "accuracy": 0.8861,
+                "f1_macro": 0.8745,
+                "at_risk_recall": 0.8846,
+                "at_risk_precision": 0.7931,
+                "roc_auc": 0.9492,
+                "false_alerts": 6
+              },
+              "logreg_threshold": 0.5,
               "rf_default": {
                 "accuracy": 0.9241,
                 "f1_macro": 0.9156,
@@ -6709,6 +7324,15 @@
                 "roc_auc": 0.9521,
                 "false_alerts": 13
               },
+              "logreg_tuned": {
+                "accuracy": 0.8228,
+                "f1_macro": 0.8162,
+                "at_risk_recall": 0.9615,
+                "at_risk_precision": 0.6579,
+                "roc_auc": 0.9521,
+                "false_alerts": 13
+              },
+              "logreg_threshold": 0.5,
               "rf_default": {
                 "accuracy": 0.8354,
                 "f1_macro": 0.8284,
@@ -6758,6 +7382,15 @@
                 "roc_auc": 0.9543,
                 "false_alerts": 3
               },
+              "logreg_tuned": {
+                "accuracy": 0.8987,
+                "f1_macro": 0.883,
+                "at_risk_recall": 0.8077,
+                "at_risk_precision": 0.875,
+                "roc_auc": 0.9543,
+                "false_alerts": 3
+              },
+              "logreg_threshold": 0.5,
               "rf_default": {
                 "accuracy": 0.9114,
                 "f1_macro": 0.8987,
@@ -6807,6 +7440,15 @@
                 "roc_auc": 0.9557,
                 "false_alerts": 6
               },
+              "logreg_tuned": {
+                "accuracy": 0.9114,
+                "f1_macro": 0.9039,
+                "at_risk_recall": 0.9615,
+                "at_risk_precision": 0.8065,
+                "roc_auc": 0.9557,
+                "false_alerts": 6
+              },
+              "logreg_threshold": 0.5,
               "rf_default": {
                 "accuracy": 0.8987,
                 "f1_macro": 0.8894,
@@ -6856,6 +7498,15 @@
                 "roc_auc": 0.9898,
                 "false_alerts": 1
               },
+              "logreg_tuned": {
+                "accuracy": 0.962,
+                "f1_macro": 0.9566,
+                "at_risk_recall": 0.9231,
+                "at_risk_precision": 0.96,
+                "roc_auc": 0.9898,
+                "false_alerts": 1
+              },
+              "logreg_threshold": 0.5,
               "rf_default": {
                 "accuracy": 0.962,
                 "f1_macro": 0.9582,
@@ -6905,6 +7556,15 @@
                 "roc_auc": 0.9739,
                 "false_alerts": 3
               },
+              "logreg_tuned": {
+                "accuracy": 0.9367,
+                "f1_macro": 0.929,
+                "at_risk_recall": 0.9231,
+                "at_risk_precision": 0.8889,
+                "roc_auc": 0.9739,
+                "false_alerts": 3
+              },
+              "logreg_threshold": 0.5,
               "rf_default": {
                 "accuracy": 0.9241,
                 "f1_macro": 0.9156,
@@ -6954,6 +7614,15 @@
                 "roc_auc": 0.9761,
                 "false_alerts": 5
               },
+              "logreg_tuned": {
+                "accuracy": 0.9241,
+                "f1_macro": 0.917,
+                "at_risk_recall": 0.9615,
+                "at_risk_precision": 0.8333,
+                "roc_auc": 0.9761,
+                "false_alerts": 5
+              },
+              "logreg_threshold": 0.5,
               "rf_default": {
                 "accuracy": 0.9241,
                 "f1_macro": 0.9156,
@@ -7003,6 +7672,15 @@
                 "roc_auc": 0.9644,
                 "false_alerts": 3
               },
+              "logreg_tuned": {
+                "accuracy": 0.9114,
+                "f1_macro": 0.8987,
+                "at_risk_recall": 0.8462,
+                "at_risk_precision": 0.88,
+                "roc_auc": 0.9644,
+                "false_alerts": 3
+              },
+              "logreg_threshold": 0.5,
               "rf_default": {
                 "accuracy": 0.9114,
                 "f1_macro": 0.9039,
@@ -7052,6 +7730,15 @@
                 "roc_auc": 0.9782,
                 "false_alerts": 6
               },
+              "logreg_tuned": {
+                "accuracy": 0.9114,
+                "f1_macro": 0.9039,
+                "at_risk_recall": 0.9615,
+                "at_risk_precision": 0.8065,
+                "roc_auc": 0.9782,
+                "false_alerts": 6
+              },
+              "logreg_threshold": 0.5,
               "rf_default": {
                 "accuracy": 0.9241,
                 "f1_macro": 0.917,
@@ -7101,6 +7788,15 @@
                 "roc_auc": 0.9499,
                 "false_alerts": 7
               },
+              "logreg_tuned": {
+                "accuracy": 0.8608,
+                "f1_macro": 0.8466,
+                "at_risk_recall": 0.8462,
+                "at_risk_precision": 0.7586,
+                "roc_auc": 0.9499,
+                "false_alerts": 7
+              },
+              "logreg_threshold": 0.5,
               "rf_default": {
                 "accuracy": 0.8987,
                 "f1_macro": 0.8894,
@@ -7150,6 +7846,15 @@
                 "roc_auc": 0.9557,
                 "false_alerts": 5
               },
+              "logreg_tuned": {
+                "accuracy": 0.8608,
+                "f1_macro": 0.8408,
+                "at_risk_recall": 0.7692,
+                "at_risk_precision": 0.8,
+                "roc_auc": 0.9557,
+                "false_alerts": 5
+              },
+              "logreg_threshold": 0.5,
               "rf_default": {
                 "accuracy": 0.9114,
                 "f1_macro": 0.9006,
@@ -7199,6 +7904,15 @@
                 "roc_auc": 0.9927,
                 "false_alerts": 2
               },
+              "logreg_tuned": {
+                "accuracy": 0.9494,
+                "f1_macro": 0.9427,
+                "at_risk_recall": 0.9231,
+                "at_risk_precision": 0.9231,
+                "roc_auc": 0.9927,
+                "false_alerts": 2
+              },
+              "logreg_threshold": 0.5,
               "rf_default": {
                 "accuracy": 0.9241,
                 "f1_macro": 0.9156,
@@ -7344,6 +8058,44 @@
               "max": 32.0
             }
           },
+          "logreg_tuned": {
+            "accuracy": {
+              "mean": 0.7469,
+              "std": 0.0367,
+              "min": 0.6769,
+              "max": 0.8077
+            },
+            "f1_macro": {
+              "mean": 0.6545,
+              "std": 0.04,
+              "min": 0.5895,
+              "max": 0.7259
+            },
+            "at_risk_recall": {
+              "mean": 0.7475,
+              "std": 0.1032,
+              "min": 0.5,
+              "max": 0.85
+            },
+            "at_risk_precision": {
+              "mean": 0.3511,
+              "std": 0.0454,
+              "min": 0.28,
+              "max": 0.4359
+            },
+            "roc_auc": {
+              "mean": 0.8169,
+              "std": 0.0404,
+              "min": 0.7132,
+              "max": 0.8745
+            },
+            "false_alerts": {
+              "mean": 27.85,
+              "std": 4.671,
+              "min": 22.0,
+              "max": 36.0
+            }
+          },
           "rf_default": {
             "accuracy": {
               "mean": 0.8154,
@@ -7436,6 +8188,39 @@
             "min": 0.5,
             "max": 0.58
           },
+          "logreg_threshold": {
+            "mean": 0.5633,
+            "std": 0.032,
+            "min": 0.5,
+            "max": 0.625
+          },
+          "rf_minus_logreg_tuned": {
+            "f1_macro": {
+              "mean": 0.035,
+              "se": 0.0083,
+              "share_splits_rf_higher": 0.8
+            },
+            "at_risk_recall": {
+              "mean": -0.05,
+              "se": 0.0274,
+              "share_splits_rf_higher": 0.25
+            },
+            "at_risk_precision": {
+              "mean": 0.0536,
+              "se": 0.0096,
+              "share_splits_rf_higher": 0.85
+            },
+            "roc_auc": {
+              "mean": 0.0319,
+              "se": 0.0067,
+              "share_splits_rf_higher": 0.95
+            },
+            "false_alerts": {
+              "mean": -7.15,
+              "se": 0.9467,
+              "share_splits_rf_higher": 0.0
+            }
+          },
           "rf_threshold_raw": {
             "mean": 0.5375,
             "std": 0.03,
@@ -7472,6 +8257,15 @@
                 "roc_auc": 0.8595,
                 "false_alerts": 14
               },
+              "logreg_tuned": {
+                "accuracy": 0.7923,
+                "f1_macro": 0.7108,
+                "at_risk_recall": 0.85,
+                "at_risk_precision": 0.4146,
+                "roc_auc": 0.8595,
+                "false_alerts": 24
+              },
+              "logreg_threshold": 0.6,
               "rf_default": {
                 "accuracy": 0.8385,
                 "f1_macro": 0.696,
@@ -7521,6 +8315,15 @@
                 "roc_auc": 0.7591,
                 "false_alerts": 26
               },
+              "logreg_tuned": {
+                "accuracy": 0.7308,
+                "f1_macro": 0.6068,
+                "at_risk_recall": 0.55,
+                "at_risk_precision": 0.2973,
+                "roc_auc": 0.7591,
+                "false_alerts": 26
+              },
+              "logreg_threshold": 0.5,
               "rf_default": {
                 "accuracy": 0.7923,
                 "f1_macro": 0.6494,
@@ -7570,6 +8373,15 @@
                 "roc_auc": 0.8427,
                 "false_alerts": 19
               },
+              "logreg_tuned": {
+                "accuracy": 0.8077,
+                "f1_macro": 0.7259,
+                "at_risk_recall": 0.85,
+                "at_risk_precision": 0.4359,
+                "roc_auc": 0.8427,
+                "false_alerts": 22
+              },
+              "logreg_threshold": 0.575,
               "rf_default": {
                 "accuracy": 0.8769,
                 "f1_macro": 0.7636,
@@ -7619,6 +8431,15 @@
                 "roc_auc": 0.8277,
                 "false_alerts": 20
               },
+              "logreg_tuned": {
+                "accuracy": 0.7538,
+                "f1_macro": 0.6611,
+                "at_risk_recall": 0.75,
+                "at_risk_precision": 0.3571,
+                "roc_auc": 0.8277,
+                "false_alerts": 27
+              },
+              "logreg_threshold": 0.56,
               "rf_default": {
                 "accuracy": 0.8769,
                 "f1_macro": 0.7636,
@@ -7668,6 +8489,15 @@
                 "roc_auc": 0.8295,
                 "false_alerts": 25
               },
+              "logreg_tuned": {
+                "accuracy": 0.7,
+                "f1_macro": 0.6286,
+                "at_risk_recall": 0.85,
+                "at_risk_precision": 0.3208,
+                "roc_auc": 0.8295,
+                "false_alerts": 36
+              },
+              "logreg_threshold": 0.625,
               "rf_default": {
                 "accuracy": 0.7692,
                 "f1_macro": 0.6286,
@@ -7717,6 +8547,15 @@
                 "roc_auc": 0.7841,
                 "false_alerts": 20
               },
+              "logreg_tuned": {
+                "accuracy": 0.7692,
+                "f1_macro": 0.6494,
+                "at_risk_recall": 0.6,
+                "at_risk_precision": 0.3529,
+                "roc_auc": 0.7841,
+                "false_alerts": 22
+              },
+              "logreg_threshold": 0.555,
               "rf_default": {
                 "accuracy": 0.8231,
                 "f1_macro": 0.7195,
@@ -7766,6 +8605,15 @@
                 "roc_auc": 0.7768,
                 "false_alerts": 26
               },
+              "logreg_tuned": {
+                "accuracy": 0.7308,
+                "f1_macro": 0.6252,
+                "at_risk_recall": 0.65,
+                "at_risk_precision": 0.3171,
+                "roc_auc": 0.7768,
+                "false_alerts": 28
+              },
+              "logreg_threshold": 0.535,
               "rf_default": {
                 "accuracy": 0.7615,
                 "f1_macro": 0.6602,
@@ -7815,6 +8663,15 @@
                 "roc_auc": 0.7927,
                 "false_alerts": 32
               },
+              "logreg_tuned": {
+                "accuracy": 0.7,
+                "f1_macro": 0.6222,
+                "at_risk_recall": 0.8,
+                "at_risk_precision": 0.3137,
+                "roc_auc": 0.7927,
+                "false_alerts": 35
+              },
+              "logreg_threshold": 0.565,
               "rf_default": {
                 "accuracy": 0.7692,
                 "f1_macro": 0.6494,
@@ -7864,6 +8721,15 @@
                 "roc_auc": 0.8418,
                 "false_alerts": 26
               },
+              "logreg_tuned": {
+                "accuracy": 0.7077,
+                "f1_macro": 0.6216,
+                "at_risk_recall": 0.75,
+                "at_risk_precision": 0.3125,
+                "roc_auc": 0.8418,
+                "false_alerts": 33
+              },
+              "logreg_threshold": 0.555,
               "rf_default": {
                 "accuracy": 0.8077,
                 "f1_macro": 0.6754,
@@ -7913,6 +8779,15 @@
                 "roc_auc": 0.7132,
                 "false_alerts": 23
               },
+              "logreg_tuned": {
+                "accuracy": 0.7308,
+                "f1_macro": 0.5965,
+                "at_risk_recall": 0.5,
+                "at_risk_precision": 0.2857,
+                "roc_auc": 0.7132,
+                "false_alerts": 25
+              },
+              "logreg_threshold": 0.55,
               "rf_default": {
                 "accuracy": 0.8,
                 "f1_macro": 0.6308,
@@ -7962,6 +8837,15 @@
                 "roc_auc": 0.8745,
                 "false_alerts": 25
               },
+              "logreg_tuned": {
+                "accuracy": 0.7692,
+                "f1_macro": 0.6823,
+                "at_risk_recall": 0.8,
+                "at_risk_precision": 0.381,
+                "roc_auc": 0.8745,
+                "false_alerts": 26
+              },
+              "logreg_threshold": 0.53,
               "rf_default": {
                 "accuracy": 0.8,
                 "f1_macro": 0.7041,
@@ -8011,6 +8895,15 @@
                 "roc_auc": 0.8095,
                 "false_alerts": 29
               },
+              "logreg_tuned": {
+                "accuracy": 0.7,
+                "f1_macro": 0.6222,
+                "at_risk_recall": 0.8,
+                "at_risk_precision": 0.3137,
+                "roc_auc": 0.8095,
+                "false_alerts": 35
+              },
+              "logreg_threshold": 0.61,
               "rf_default": {
                 "accuracy": 0.7769,
                 "f1_macro": 0.6564,
@@ -8060,6 +8953,15 @@
                 "roc_auc": 0.85,
                 "false_alerts": 21
               },
+              "logreg_tuned": {
+                "accuracy": 0.7538,
+                "f1_macro": 0.6751,
+                "at_risk_recall": 0.85,
+                "at_risk_precision": 0.3696,
+                "roc_auc": 0.85,
+                "false_alerts": 29
+              },
+              "logreg_threshold": 0.585,
               "rf_default": {
                 "accuracy": 0.8154,
                 "f1_macro": 0.7269,
@@ -8109,6 +9011,15 @@
                 "roc_auc": 0.7718,
                 "false_alerts": 31
               },
+              "logreg_tuned": {
+                "accuracy": 0.6769,
+                "f1_macro": 0.5895,
+                "at_risk_recall": 0.7,
+                "at_risk_precision": 0.28,
+                "roc_auc": 0.7718,
+                "false_alerts": 36
+              },
+              "logreg_threshold": 0.57,
               "rf_default": {
                 "accuracy": 0.8077,
                 "f1_macro": 0.7191,
@@ -8158,6 +9069,15 @@
                 "roc_auc": 0.855,
                 "false_alerts": 22
               },
+              "logreg_tuned": {
+                "accuracy": 0.7692,
+                "f1_macro": 0.675,
+                "at_risk_recall": 0.75,
+                "at_risk_precision": 0.375,
+                "roc_auc": 0.855,
+                "false_alerts": 25
+              },
+              "logreg_threshold": 0.54,
               "rf_default": {
                 "accuracy": 0.8308,
                 "f1_macro": 0.7276,
@@ -8207,6 +9127,15 @@
                 "roc_auc": 0.845,
                 "false_alerts": 25
               },
+              "logreg_tuned": {
+                "accuracy": 0.7769,
+                "f1_macro": 0.6894,
+                "at_risk_recall": 0.8,
+                "at_risk_precision": 0.3902,
+                "roc_auc": 0.845,
+                "false_alerts": 25
+              },
+              "logreg_threshold": 0.515,
               "rf_default": {
                 "accuracy": 0.8385,
                 "f1_macro": 0.7273,
@@ -8256,6 +9185,15 @@
                 "roc_auc": 0.81,
                 "false_alerts": 27
               },
+              "logreg_tuned": {
+                "accuracy": 0.7308,
+                "f1_macro": 0.6334,
+                "at_risk_recall": 0.7,
+                "at_risk_precision": 0.3256,
+                "roc_auc": 0.81,
+                "false_alerts": 29
+              },
+              "logreg_threshold": 0.54,
               "rf_default": {
                 "accuracy": 0.8462,
                 "f1_macro": 0.716,
@@ -8305,6 +9243,15 @@
                 "roc_auc": 0.8109,
                 "false_alerts": 19
               },
+              "logreg_tuned": {
+                "accuracy": 0.7846,
+                "f1_macro": 0.6893,
+                "at_risk_recall": 0.75,
+                "at_risk_precision": 0.3947,
+                "roc_auc": 0.8109,
+                "false_alerts": 23
+              },
+              "logreg_threshold": 0.59,
               "rf_default": {
                 "accuracy": 0.8,
                 "f1_macro": 0.6678,
@@ -8354,6 +9301,15 @@
                 "roc_auc": 0.8509,
                 "false_alerts": 20
               },
+              "logreg_tuned": {
+                "accuracy": 0.7769,
+                "f1_macro": 0.6962,
+                "at_risk_recall": 0.85,
+                "at_risk_precision": 0.3953,
+                "roc_auc": 0.8509,
+                "false_alerts": 26
+              },
+              "logreg_threshold": 0.57,
               "rf_default": {
                 "accuracy": 0.8462,
                 "f1_macro": 0.716,
@@ -8403,6 +9359,15 @@
                 "roc_auc": 0.8327,
                 "false_alerts": 21
               },
+              "logreg_tuned": {
+                "accuracy": 0.7769,
+                "f1_macro": 0.6894,
+                "at_risk_recall": 0.8,
+                "at_risk_precision": 0.3902,
+                "roc_auc": 0.8327,
+                "false_alerts": 25
+              },
+              "logreg_threshold": 0.595,
               "rf_default": {
                 "accuracy": 0.8308,
                 "f1_macro": 0.7429,
@@ -8546,6 +9511,44 @@
               "max": 19.0
             }
           },
+          "logreg_tuned": {
+            "accuracy": {
+              "mean": 0.8908,
+              "std": 0.0219,
+              "min": 0.8385,
+              "max": 0.9154
+            },
+            "f1_macro": {
+              "mean": 0.8183,
+              "std": 0.0302,
+              "min": 0.7641,
+              "max": 0.8658
+            },
+            "at_risk_recall": {
+              "mean": 0.84,
+              "std": 0.0788,
+              "min": 0.7,
+              "max": 1.0
+            },
+            "at_risk_precision": {
+              "mean": 0.6096,
+              "std": 0.056,
+              "min": 0.4865,
+              "max": 0.6957
+            },
+            "roc_auc": {
+              "mean": 0.9505,
+              "std": 0.0167,
+              "min": 0.9136,
+              "max": 0.9895
+            },
+            "false_alerts": {
+              "mean": 11.0,
+              "std": 2.9912,
+              "min": 7.0,
+              "max": 19.0
+            }
+          },
           "rf_default": {
             "accuracy": {
               "mean": 0.9239,
@@ -8638,6 +9641,39 @@
             "min": 0.5,
             "max": 0.5
           },
+          "logreg_threshold": {
+            "mean": 0.5,
+            "std": 0.0,
+            "min": 0.5,
+            "max": 0.5
+          },
+          "rf_minus_logreg_tuned": {
+            "f1_macro": {
+              "mean": 0.0415,
+              "se": 0.0074,
+              "share_splits_rf_higher": 0.9
+            },
+            "at_risk_recall": {
+              "mean": -0.035,
+              "se": 0.0163,
+              "share_splits_rf_higher": 0.15
+            },
+            "at_risk_precision": {
+              "mean": 0.1253,
+              "se": 0.0151,
+              "share_splits_rf_higher": 1.0
+            },
+            "roc_auc": {
+              "mean": 0.014,
+              "se": 0.0028,
+              "share_splits_rf_higher": 0.8
+            },
+            "false_alerts": {
+              "mean": -5.0,
+              "se": 0.6198,
+              "share_splits_rf_higher": 0.0
+            }
+          },
           "rf_threshold_raw": {
             "mean": 0.395,
             "std": 0.0193,
@@ -8674,6 +9710,15 @@
                 "roc_auc": 0.9768,
                 "false_alerts": 15
               },
+              "logreg_tuned": {
+                "accuracy": 0.8769,
+                "f1_macro": 0.813,
+                "at_risk_recall": 0.95,
+                "at_risk_precision": 0.5588,
+                "roc_auc": 0.9768,
+                "false_alerts": 15
+              },
+              "logreg_threshold": 0.5,
               "rf_default": {
                 "accuracy": 0.9154,
                 "f1_macro": 0.8572,
@@ -8723,6 +9768,15 @@
                 "roc_auc": 0.9377,
                 "false_alerts": 10
               },
+              "logreg_tuned": {
+                "accuracy": 0.8923,
+                "f1_macro": 0.8151,
+                "at_risk_recall": 0.8,
+                "at_risk_precision": 0.6154,
+                "roc_auc": 0.9377,
+                "false_alerts": 10
+              },
+              "logreg_threshold": 0.5,
               "rf_default": {
                 "accuracy": 0.9231,
                 "f1_macro": 0.8523,
@@ -8772,6 +9826,15 @@
                 "roc_auc": 0.9605,
                 "false_alerts": 11
               },
+              "logreg_tuned": {
+                "accuracy": 0.9154,
+                "f1_macro": 0.8658,
+                "at_risk_recall": 1.0,
+                "at_risk_precision": 0.6452,
+                "roc_auc": 0.9605,
+                "false_alerts": 11
+              },
+              "logreg_threshold": 0.5,
               "rf_default": {
                 "accuracy": 0.9385,
                 "f1_macro": 0.8864,
@@ -8821,6 +9884,15 @@
                 "roc_auc": 0.9605,
                 "false_alerts": 10
               },
+              "logreg_tuned": {
+                "accuracy": 0.9077,
+                "f1_macro": 0.8467,
+                "at_risk_recall": 0.9,
+                "at_risk_precision": 0.6429,
+                "roc_auc": 0.9605,
+                "false_alerts": 10
+              },
+              "logreg_threshold": 0.5,
               "rf_default": {
                 "accuracy": 0.9385,
                 "f1_macro": 0.8864,
@@ -8870,6 +9942,15 @@
                 "roc_auc": 0.9618,
                 "false_alerts": 9
               },
+              "logreg_tuned": {
+                "accuracy": 0.9,
+                "f1_macro": 0.8253,
+                "at_risk_recall": 0.8,
+                "at_risk_precision": 0.64,
+                "roc_auc": 0.9618,
+                "false_alerts": 9
+              },
+              "logreg_threshold": 0.5,
               "rf_default": {
                 "accuracy": 0.9077,
                 "f1_macro": 0.8151,
@@ -8919,6 +10000,15 @@
                 "roc_auc": 0.9405,
                 "false_alerts": 8
               },
+              "logreg_tuned": {
+                "accuracy": 0.9154,
+                "f1_macro": 0.8522,
+                "at_risk_recall": 0.85,
+                "at_risk_precision": 0.68,
+                "roc_auc": 0.9405,
+                "false_alerts": 8
+              },
+              "logreg_threshold": 0.5,
               "rf_default": {
                 "accuracy": 0.9077,
                 "f1_macro": 0.8296,
@@ -8968,6 +10058,15 @@
                 "roc_auc": 0.9436,
                 "false_alerts": 9
               },
+              "logreg_tuned": {
+                "accuracy": 0.9,
+                "f1_macro": 0.8253,
+                "at_risk_recall": 0.8,
+                "at_risk_precision": 0.64,
+                "roc_auc": 0.9436,
+                "false_alerts": 9
+              },
+              "logreg_threshold": 0.5,
               "rf_default": {
                 "accuracy": 0.9154,
                 "f1_macro": 0.8407,
@@ -9017,6 +10116,15 @@
                 "roc_auc": 0.9655,
                 "false_alerts": 19
               },
+              "logreg_tuned": {
+                "accuracy": 0.8385,
+                "f1_macro": 0.7641,
+                "at_risk_recall": 0.9,
+                "at_risk_precision": 0.4865,
+                "roc_auc": 0.9655,
+                "false_alerts": 19
+              },
+              "logreg_threshold": 0.5,
               "rf_default": {
                 "accuracy": 0.9154,
                 "f1_macro": 0.8407,
@@ -9066,6 +10174,15 @@
                 "roc_auc": 0.9509,
                 "false_alerts": 16
               },
+              "logreg_tuned": {
+                "accuracy": 0.8538,
+                "f1_macro": 0.7749,
+                "at_risk_recall": 0.85,
+                "at_risk_precision": 0.5152,
+                "roc_auc": 0.9509,
+                "false_alerts": 16
+              },
+              "logreg_threshold": 0.5,
               "rf_default": {
                 "accuracy": 0.9,
                 "f1_macro": 0.8365,
@@ -9115,6 +10232,15 @@
                 "roc_auc": 0.9405,
                 "false_alerts": 7
               },
+              "logreg_tuned": {
+                "accuracy": 0.9154,
+                "f1_macro": 0.8467,
+                "at_risk_recall": 0.8,
+                "at_risk_precision": 0.6957,
+                "roc_auc": 0.9405,
+                "false_alerts": 7
+              },
+              "logreg_threshold": 0.5,
               "rf_default": {
                 "accuracy": 0.9231,
                 "f1_macro": 0.858,
@@ -9164,6 +10290,15 @@
                 "roc_auc": 0.9895,
                 "false_alerts": 12
               },
+              "logreg_tuned": {
+                "accuracy": 0.9077,
+                "f1_macro": 0.8558,
+                "at_risk_recall": 1.0,
+                "at_risk_precision": 0.625,
+                "roc_auc": 0.9895,
+                "false_alerts": 12
+              },
+              "logreg_threshold": 0.5,
               "rf_default": {
                 "accuracy": 0.9538,
                 "f1_macro": 0.9179,
@@ -9213,6 +10348,15 @@
                 "roc_auc": 0.9341,
                 "false_alerts": 12
               },
+              "logreg_tuned": {
+                "accuracy": 0.8769,
+                "f1_macro": 0.7956,
+                "at_risk_recall": 0.8,
+                "at_risk_precision": 0.5714,
+                "roc_auc": 0.9341,
+                "false_alerts": 12
+              },
+              "logreg_threshold": 0.5,
               "rf_default": {
                 "accuracy": 0.9615,
                 "f1_macro": 0.9276,
@@ -9262,6 +10406,15 @@
                 "roc_auc": 0.9477,
                 "false_alerts": 10
               },
+              "logreg_tuned": {
+                "accuracy": 0.9,
+                "f1_macro": 0.8312,
+                "at_risk_recall": 0.85,
+                "at_risk_precision": 0.6296,
+                "roc_auc": 0.9477,
+                "false_alerts": 10
+              },
+              "logreg_threshold": 0.5,
               "rf_default": {
                 "accuracy": 0.9308,
                 "f1_macro": 0.8746,
@@ -9311,6 +10464,15 @@
                 "roc_auc": 0.9136,
                 "false_alerts": 13
               },
+              "logreg_tuned": {
+                "accuracy": 0.8615,
+                "f1_macro": 0.77,
+                "at_risk_recall": 0.75,
+                "at_risk_precision": 0.5357,
+                "roc_auc": 0.9136,
+                "false_alerts": 13
+              },
+              "logreg_threshold": 0.5,
               "rf_default": {
                 "accuracy": 0.9077,
                 "f1_macro": 0.8296,
@@ -9360,6 +10522,15 @@
                 "roc_auc": 0.9509,
                 "false_alerts": 10
               },
+              "logreg_tuned": {
+                "accuracy": 0.8769,
+                "f1_macro": 0.7811,
+                "at_risk_recall": 0.7,
+                "at_risk_precision": 0.5833,
+                "roc_auc": 0.9509,
+                "false_alerts": 10
+              },
+              "logreg_threshold": 0.5,
               "rf_default": {
                 "accuracy": 0.9154,
                 "f1_macro": 0.8467,
@@ -9409,6 +10580,15 @@
                 "roc_auc": 0.9423,
                 "false_alerts": 10
               },
+              "logreg_tuned": {
+                "accuracy": 0.8923,
+                "f1_macro": 0.8151,
+                "at_risk_recall": 0.8,
+                "at_risk_precision": 0.6154,
+                "roc_auc": 0.9423,
+                "false_alerts": 10
+              },
+              "logreg_threshold": 0.5,
               "rf_default": {
                 "accuracy": 0.9308,
                 "f1_macro": 0.8582,
@@ -9458,6 +10638,15 @@
                 "roc_auc": 0.935,
                 "false_alerts": 13
               },
+              "logreg_tuned": {
+                "accuracy": 0.8769,
+                "f1_macro": 0.8019,
+                "at_risk_recall": 0.85,
+                "at_risk_precision": 0.5667,
+                "roc_auc": 0.935,
+                "false_alerts": 13
+              },
+              "logreg_threshold": 0.5,
               "rf_default": {
                 "accuracy": 0.8923,
                 "f1_macro": 0.8211,
@@ -9507,6 +10696,15 @@
                 "roc_auc": 0.9473,
                 "false_alerts": 8
               },
+              "logreg_tuned": {
+                "accuracy": 0.9154,
+                "f1_macro": 0.8522,
+                "at_risk_recall": 0.85,
+                "at_risk_precision": 0.68,
+                "roc_auc": 0.9473,
+                "false_alerts": 8
+              },
+              "logreg_threshold": 0.5,
               "rf_default": {
                 "accuracy": 0.9462,
                 "f1_macro": 0.8944,
@@ -9556,6 +10754,15 @@
                 "roc_auc": 0.9627,
                 "false_alerts": 9
               },
+              "logreg_tuned": {
+                "accuracy": 0.8923,
+                "f1_macro": 0.8085,
+                "at_risk_recall": 0.75,
+                "at_risk_precision": 0.625,
+                "roc_auc": 0.9627,
+                "false_alerts": 9
+              },
+              "logreg_threshold": 0.5,
               "rf_default": {
                 "accuracy": 0.9308,
                 "f1_macro": 0.8643,
@@ -9605,6 +10812,15 @@
                 "roc_auc": 0.9495,
                 "false_alerts": 9
               },
+              "logreg_tuned": {
+                "accuracy": 0.9,
+                "f1_macro": 0.8253,
+                "at_risk_recall": 0.8,
+                "at_risk_precision": 0.64,
+                "roc_auc": 0.9495,
+                "false_alerts": 9
+              },
+              "logreg_threshold": 0.5,
               "rf_default": {
                 "accuracy": 0.9231,
                 "f1_macro": 0.858,

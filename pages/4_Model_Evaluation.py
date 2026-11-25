@@ -28,7 +28,8 @@ st.markdown(f"Subject: **{ui.SUBJECT_LABELS[subj]}**. Headline numbers are the *
 tabs = st.tabs(["Prediction quality", "Saved model (seed 42)", "Early vs Mid-term & threshold", "Fairness",
                 "Data issues & fixes", "Study planner (RL)"])
 
-MODEL_ROWS = [("dummy", "Dummy (always 'pass')"), ("logreg", "Logistic Regression"),
+MODEL_ROWS = [("dummy", "Dummy (always 'pass')"), ("logreg", "Logistic Regression · threshold 0.5"),
+              ("logreg_tuned", "Logistic Regression · final threshold"),
               ("rf_default", "Random Forest · threshold 0.5"), ("rf_tuned", "Random Forest · final threshold (saved)")]
 
 # ---------------------------------------------------------------- 1. headline
@@ -45,13 +46,21 @@ with tabs[0]:
             "ROC-AUC": ui.pm(r[k]["roc_auc"]),
             "False alerts per test set": f"{r[k]['false_alerts']['mean']:.1f} of {split['n_test'] - split['test_at_risk']}",
         } for k, name in MODEL_ROWS]), hide_index=True, width="stretch")
+        d = r["rf_minus_logreg_tuned"]
+        st.caption(
+            "Same splits, both models at their own tuned threshold, Random Forest minus Logistic Regression: "
+            + " · ".join(f"{lbl} {d[k]['mean']:+.3f} (SE {d[k]['se']:.3f})" for k, lbl in (
+                ("f1_macro", "macro F1"), ("at_risk_recall", "At-Risk recall"),
+                ("at_risk_precision", "At-Risk precision"))) + f" · false alerts {d['false_alerts']['mean']:+.1f}")
     st.caption("At-Risk recall = share of students who really ended below 10/20 that the model flagged (the headline: "
                "missing a struggling student is the costly error). Precision = share of flagged students who really "
                "ended below 10/20. False alerts = passing students flagged.")
     with st.expander("Same table for the single seed-42 split (this saved model's split)"):
         for sc in SC:
             mm = sup[sc]["models"]
-            rows = [("Dummy", mm["dummy"]["test_default"]), ("Logistic Regression", mm["logreg"]["test_default"]),
+            rows = [("Dummy", mm["dummy"]["test_default"]),
+                    ("Logistic Regression · threshold 0.5", mm["logreg"]["test_default"]),
+                    ("Logistic Regression · final threshold", mm["logreg"]["test_tuned"]),
                     ("Random Forest · threshold 0.5", mm["rf"]["test_default"]),
                     ("Random Forest · final threshold (saved)", mm["rf"]["test_tuned"])]
             st.markdown(f"**{ui.SCENARIO_LABELS[sc]}**")

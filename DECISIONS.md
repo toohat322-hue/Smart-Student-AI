@@ -364,6 +364,35 @@ tools). Results:
 
 ---
 
+## Phase 9b — Fair threshold comparison with Logistic Regression
+
+### D28. Logistic Regression gets the same threshold rule; the Random Forest stays
+Until now the Random Forest had a tuned alert threshold and Logistic Regression used 0.5, which was not a fair
+comparison. Logistic Regression now gets the same rule: out-of-fold on training data, at least 70% At-Risk
+recall, never below 0.5. This applies on the seed-42 split and in all 20 repeated splits (mean LogReg
+threshold: Mathematics Early 0.62, Portuguese Early 0.56, Mid-term 0.50 in every split). Random Forest minus
+Logistic Regression, paired over the same 20 splits (mean, standard error):
+
+| Model | Macro F1 | At-Risk recall | At-Risk precision | False alerts per test set |
+|---|---|---|---|---|
+| Portuguese Early | **+0.035** (0.008) | −0.050 (0.027) | **+0.054** (0.010) | **−7.2** of 110 |
+| Portuguese Mid-term | **+0.042** (0.007) | −0.035 (0.016) | **+0.125** (0.015) | **−5.0** of 110 |
+| Mathematics Early | −0.005 (0.012) | +0.010 (0.024) | −0.003 (0.010) | +0.8 of 53 |
+| Mathematics Mid-term | +0.008 (0.005) | +0.025 (0.012) | −0.001 (0.009) | +0.1 of 53 |
+
+**Decision: the saved Random Forest models stay.** Logistic Regression is not better on the 20-split means:
+- **Portuguese:** the Random Forest is clearly ahead on macro F1 (4–6 standard errors), precision and false
+  alerts. Logistic Regression catches a few more At-Risk students only by flagging many more students overall.
+- **Mathematics:** the two models are tied for Early and the Random Forest is slightly ahead for Mid-term.
+
+On the single seed-42 split, Logistic Regression has slightly higher macro F1 in both Mid-term cases
+(Portuguese 0.798 vs 0.779, Mathematics 0.851 vs 0.839). This is the single-split noise D5 warns about.
+Retraining with `--full` left every model file and figure byte-identical; only the supervised sections of
+`metrics.json` gained the new LogReg entries. The README results table and the Model Evaluation page now
+compare both models at their own tuned thresholds.
+
+---
+
 ## Future work
 - **Cluster-specific action effectiveness.** For example, if videos helped weaker students more, the
   clusters would get different policies. Modelling that needs data on which study activities students
