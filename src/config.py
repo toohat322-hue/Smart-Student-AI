@@ -1,6 +1,12 @@
 """Central configuration: paths, seeds, feature lists, thresholds."""
 from pathlib import Path
 
+# --- Project info (About page) ---------------------------------------------
+# Fill these in once; the About page shows them.
+PROJECT_TEAM = "<team member names>"
+PROJECT_COURSE = "<course name>"
+PROJECT_INSTRUCTOR = "<instructor name>"
+
 # --- Paths -------------------------------------------------------------------
 ROOT_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = ROOT_DIR / "data"

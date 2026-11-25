@@ -3,3 +3,7 @@ primaryColor = "#1E3A8A"              # navy
 backgroundColor = "#FFFFFF"
 secondaryBackgroundColor = "#E0EDFF"  # light blue
 textColor = "#0F172A"
+
+[client]
+# Visitors see only the exception type, never a traceback; full details go to the server log.
+showErrorDetails = "type"

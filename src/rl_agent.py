@@ -102,14 +102,17 @@ def train(params: EnvParams, n_episodes: int = C.RL_EPISODES, seed: int = C.RAND
 
 # --------------------------------------------------------------------------- policies & evaluation
 def greedy(q: np.ndarray) -> Policy:
+    """Policy that always takes the action with the highest Q-value."""
     return lambda s, rng: int(np.argmax(q[s]))
 
 
 def random_policy() -> Policy:
+    """Policy that picks one of the 3 actions uniformly at random."""
     return lambda s, rng: int(rng.integers(N_ACTIONS))
 
 
 def fixed_policy(action: int) -> Policy:
+    """Policy that always takes the same action."""
     return lambda s, rng: action
 
 
@@ -152,6 +155,7 @@ def cluster_centroids(subject: str) -> dict[int, dict[str, float]]:
 
 
 def env_params(subject: str, cluster: int) -> EnvParams:
+    """Environment parameters of one (subject, cluster), from the saved K-Means centroid."""
     centroids = cluster_centroids(subject)
     if cluster not in centroids:
         raise ValueError(f"cluster must be one of {sorted(centroids)} for subject {subject!r}, got {cluster!r}")
@@ -160,6 +164,7 @@ def env_params(subject: str, cluster: int) -> EnvParams:
 
 @lru_cache(maxsize=None)
 def load_q_tables() -> dict[tuple[str, int], np.ndarray]:
+    """Load the saved Q-tables, keyed by (subject, cluster) (cached per process)."""
     if not Q_TABLES_PATH.is_file():
         raise FileNotFoundError(f"{Q_TABLES_PATH} not found. Run `python scripts/train_rl.py` first.")
     return joblib.load(Q_TABLES_PATH)

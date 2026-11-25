@@ -8,7 +8,6 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
@@ -90,10 +89,12 @@ STUDENT_FEATURES = [f for f in FEATURE_SPEC if f not in ("sex", "G3")]  # what t
 
 
 def label(feature: str) -> str:
+    """Plain-English label of a feature."""
     return FIELD_INFO.get(feature, {}).get("label", feature)
 
 
 def fmt_value(feature: str, value: Any) -> str:
+    """Plain-English text for a feature value (e.g. studytime 2 -> 2–5 h)."""
     opts = FIELD_INFO.get(feature, {}).get("options")
     if opts and value in opts:
         return opts[value]
@@ -105,6 +106,7 @@ def fmt_value(feature: str, value: Any) -> str:
 # --------------------------------------------------------------------------- cached loaders
 @st.cache_data(show_spinner=False)
 def metrics() -> dict:
+    """reports/metrics.json, cached for the Streamlit session."""
     from src.metrics_io import load_metrics
 
     return load_metrics()
@@ -112,6 +114,7 @@ def metrics() -> dict:
 
 @st.cache_data(show_spinner=False)
 def subject_data(subject: str) -> pd.DataFrame:
+    """One subject's validated data with the pass target, cached."""
     from src.supervised import prepare_subject
 
     return prepare_subject(subject)
@@ -119,6 +122,7 @@ def subject_data(subject: str) -> pd.DataFrame:
 
 @st.cache_resource(show_spinner=False)
 def classifier(subject: str, scenario: str):
+    """Saved classifier for (subject, scenario), shared across sessions."""
     from src.supervised import load_model
 
     return load_model(subject, scenario)
@@ -126,6 +130,7 @@ def classifier(subject: str, scenario: str):
 
 @st.cache_resource(show_spinner=False)
 def kmeans(subject: str):
+    """Saved K-Means pipeline for a subject, shared across sessions."""
     from src.unsupervised import load_kmeans
 
     return load_kmeans(subject)
@@ -133,6 +138,7 @@ def kmeans(subject: str):
 
 @st.cache_resource(show_spinner=False)
 def q_tables():
+    """Saved Q-tables, shared across sessions."""
     from src.rl_agent import load_q_tables
 
     return load_q_tables()
@@ -156,6 +162,7 @@ def require(models: list[str] = (), sections: list[str] = ()) -> dict:
 
 
 def classifier_files(subject: str) -> list[str]:
+    """File names of a subject's two classifiers (for require())."""
     return [f"clf_{subject}_{sc}.joblib" for sc in ("early", "midterm")]
 
 
@@ -169,10 +176,12 @@ def _init_state() -> None:
 
 
 def subject() -> str:
+    """Currently selected subject (por or mat)."""
     return st.session_state["subject"]
 
 
 def student() -> dict | None:
+    """The shared student dict, or None."""
     return st.session_state.get("student")
 
 
@@ -193,6 +202,7 @@ def set_student(values: dict, source: str, actual: dict | None = None) -> None:
 
 
 def clear_student() -> None:
+    """Forget the shared student."""
     for k in ("student", "student_label", "student_actual"):
         st.session_state[k] = None
 
@@ -236,6 +246,7 @@ def example_students(subj: str) -> dict[str, dict]:
 
 
 def load_example(key: str) -> None:
+    """Load one of the three real example students of the current subject (callback)."""
     subj = subject()
     ex = example_students(subj)[key]
     set_student(ex["record"], f"{EXAMPLES[key]} · real record, {SUBJECT_LABELS[subj]} line {ex['row']}",
@@ -243,6 +254,7 @@ def load_example(key: str) -> None:
 
 
 def example_buttons(prefix: str = "ex") -> None:
+    """The three load-example-student buttons."""
     st.caption("Load a **real, anonymised record from the UCI dataset** (taken from the held-out test set):")
     cols = st.columns(len(EXAMPLES))
     for col, (key, name) in zip(cols, EXAMPLES.items()):
@@ -250,12 +262,21 @@ def example_buttons(prefix: str = "ex") -> None:
 
 
 def _query_example() -> None:
+    """Handle ?example=pass|at_risk|dropout and ?subject=por|mat; unknown values get a clear warning."""
+    subj = st.query_params.get("subject")
+    if subj is not None and subj not in SUBJECT_LABELS:
+        st.warning(f"Unknown subject '{subj}' in the link. Use one of: {', '.join(SUBJECT_LABELS)}. "
+                   f"Showing {SUBJECT_LABELS[subject()]}.")
+        subj = None
     key = st.query_params.get("example")
-    if key in EXAMPLES and st.session_state.get("_query_example_done") != key:
-        if "subject" in st.query_params and st.query_params["subject"] in SUBJECT_LABELS:
-            st.session_state["subject"] = st.query_params["subject"]
+    if key is not None and key not in EXAMPLES:
+        st.warning(f"Unknown example '{key}' in the link. Use one of: {', '.join(EXAMPLES)}.")
+        return
+    if key is not None and st.session_state.get("_query_example_done") != (key, subj):
+        if subj is not None:
+            st.session_state["subject"] = subj
         load_example(key)
-        st.session_state["_query_example_done"] = key
+        st.session_state["_query_example_done"] = (key, subj)
 
 
 # --------------------------------------------------------------------------- page chrome
@@ -286,10 +307,29 @@ CSS = """
 """
 
 
+def _validate_student() -> None:
+    """Drop a stored student that is incomplete or invalid (e.g. a stale session after an app update)."""
+    from src.supervised import InputValidationError, validate_input
+
+    s = st.session_state.get("student")
+    if s is None:
+        return
+    try:
+        if not isinstance(s, dict):
+            raise InputValidationError("not a dict")
+        validate_input({k: v for k, v in s.items() if k in STUDENT_FEATURES}, STUDENT_FEATURES)
+    except InputValidationError:
+        clear_student()
+        st.warning("The stored student was incomplete or invalid and has been cleared. "
+                   "Please enter the student again or load an example.")
+
+
 def setup_page(title: str, icon: str) -> None:
+    """Page config, styling, shared state, ?example= handling and the sidebar (call first on every page)."""
     st.set_page_config(page_title=f"{title} · Smart Student AI", page_icon=icon, layout="wide")
     st.markdown(CSS, unsafe_allow_html=True)
     _init_state()
+    _validate_student()
     _query_example()
     _sidebar()
 
@@ -318,25 +358,30 @@ def _sidebar() -> None:
 
 
 def card(title: str, body: str) -> str:
+    """HTML for a feature card (title + text)."""
     return f'<div class="ssa-card"><h3>{title}</h3><p>{body}</p></div>'
 
 
 def kpi(value: str, label_: str, sub: str = "") -> str:
+    """HTML for a KPI card (big value, label, optional sub-text)."""
     return f'<div class="ssa-kpi"><div class="v">{value}</div><div class="l">{label_}</div>' + \
            (f'<div class="s">{sub}</div>' if sub else "") + "</div>"
 
 
 def note(text: str) -> None:
+    """A highlighted note box."""
     st.markdown(f'<div class="ssa-note">{text}</div>', unsafe_allow_html=True)
 
 
 def html_row(items: list[str], spec=None) -> None:
+    """Render HTML snippets side by side in columns."""
     cols = st.columns(spec or len(items))
     for c, item in zip(cols, items):
         c.markdown(item, unsafe_allow_html=True)
 
 
 def style(fig: go.Figure, height: int = 380, legend_top: bool = True) -> go.Figure:
+    """Apply the app's Plotly look (white template, fonts, legend below the plot)."""
     fig.update_layout(
         template="plotly_white", height=height, margin=dict(l=10, r=10, t=50, b=10),
         font=dict(family="Inter, Segoe UI, sans-serif", size=13, color="#0F172A"),
@@ -356,14 +401,13 @@ def pm(d: dict, pct: bool = False, digits: int = 2) -> str:
 
 
 def cluster_features(s: dict) -> dict:
+    """The six clustering features of a student."""
     return {f: s[f] for f in C.CLUSTER_FEATURES}
 
 
 def no_student_box(prefix: str) -> None:
+    """Message plus example buttons when no student is loaded yet."""
     st.info("No student selected yet. Load a real example below, or enter a student on the "
             "**Performance Prediction** page.")
     example_buttons(prefix)
 
-
-def as_int_array(values) -> np.ndarray:
-    return np.asarray(values, dtype=float)

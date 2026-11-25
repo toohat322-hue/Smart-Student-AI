@@ -36,10 +36,12 @@ TIMEOUT_S = 60
 
 
 def csvs_present() -> bool:
+    """True if both subject CSVs are already in data/."""
     return all((DATA_DIR / name).is_file() for name in CSV_NAMES)
 
 
 def download(url: str, dest: Path) -> None:
+    """Download a URL to dest, with clear errors if UCI cannot be reached."""
     dest.parent.mkdir(parents=True, exist_ok=True)
     print(f"Downloading {url}")
     req = urllib.request.Request(url, headers={"User-Agent": "smart-student-ai-downloader"})
@@ -84,6 +86,7 @@ def extract_csvs(outer_zip: Path) -> None:
 
 
 def main(argv: list[str] | None = None) -> int:
+    """Download and extract the two CSVs unless they are already present."""
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--force", action="store_true", help="re-download even if CSVs exist")
     args = parser.parse_args(argv)

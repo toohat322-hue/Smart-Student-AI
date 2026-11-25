@@ -63,6 +63,7 @@ plt.rcParams.update({
 
 
 def save(fig: plt.Figure, name: str) -> Path:
+    """Save a figure to reports/figures/ and close it."""
     FIGURES_DIR.mkdir(parents=True, exist_ok=True)
     path = FIGURES_DIR / name
     fig.savefig(path)
@@ -72,6 +73,7 @@ def save(fig: plt.Figure, name: str) -> Path:
 
 # --------------------------------------------------------------------------- figures
 def fig_g3_distribution(dfs: dict[str, pd.DataFrame]) -> Path:
+    """Figure 01: G3 histogram per subject with the pass threshold."""
     fig, axes = plt.subplots(1, 2, figsize=(11, 4), sharey=False)
     edges = np.arange(0, 22)  # bin [g, g+1) holds grade g, so x=10 is the pass boundary
     for ax, s in zip(axes, SUBJECT_ORDER):
@@ -94,6 +96,7 @@ def fig_g3_distribution(dfs: dict[str, pd.DataFrame]) -> Path:
 
 
 def fig_pass_counts(dfs: dict[str, pd.DataFrame]) -> Path:
+    """Figure 02: Likely to Pass vs At Risk counts per subject."""
     fig, ax = plt.subplots(figsize=(7, 4.2))
     x = np.arange(len(SUBJECT_ORDER))
     width = 0.38
@@ -114,10 +117,12 @@ def fig_pass_counts(dfs: dict[str, pd.DataFrame]) -> Path:
 
 
 def correlations_with_g3(df: pd.DataFrame) -> pd.Series:
+    """Pearson correlation of each numeric/ordinal feature with G3."""
     return df[NUMERIC_ORDINAL].corrwith(df["G3"]).sort_values()
 
 
 def fig_correlations(corrs: dict[str, pd.Series]) -> Path:
+    """Figure 03: sorted correlations with G3 per subject."""
     fig, axes = plt.subplots(1, 2, figsize=(11, 5.5))
     for ax, s in zip(axes, SUBJECT_ORDER):
         c = corrs[s]
@@ -137,12 +142,14 @@ def fig_correlations(corrs: dict[str, pd.Series]) -> Path:
 
 
 def pass_rate_table(df: pd.DataFrame, col: str) -> pd.DataFrame:
+    """Pass rate and group size for each value of a column."""
     return (df.groupby(col, observed=True)[TARGET_COL]
               .agg(pass_rate="mean", n="size")
               .reset_index())
 
 
 def fig_pass_rate_factors(dfs: dict[str, pd.DataFrame]) -> tuple[Path, dict]:
+    """Figure 04: pass rate by study time, failures and absence bins."""
     factors = [
         ("studytime", "Weekly study time category",
          {1: "<2h", 2: "2–5h", 3: "5–10h", 4: ">10h"}),
@@ -183,6 +190,7 @@ def fig_pass_rate_factors(dfs: dict[str, pd.DataFrame]) -> tuple[Path, dict]:
 
 
 def fig_grade_scatter(dfs: dict[str, pd.DataFrame]) -> Path:
+    """Figure 05: G1 and G2 vs G3, coloured by outcome."""
     rng = np.random.default_rng(RANDOM_STATE)
     fig, axes = plt.subplots(2, 2, figsize=(10, 9), sharex=True, sharey=True)
     for r, s in enumerate(SUBJECT_ORDER):
@@ -214,6 +222,7 @@ def fig_grade_scatter(dfs: dict[str, pd.DataFrame]) -> Path:
 
 # --------------------------------------------------------------------------- G3 = 0 check
 def g3_zero_check(df: pd.DataFrame) -> dict:
+    """Compare G3 = 0 students with the other At-Risk students."""
     at_risk = df[df[TARGET_COL] == 0]
     zero = at_risk[at_risk["G3"] == 0]
     other = at_risk[at_risk["G3"] > 0]
@@ -252,6 +261,7 @@ def g3_zero_check(df: pd.DataFrame) -> dict:
 
 
 def fig_g3_zero(dfs: dict[str, pd.DataFrame]) -> Path:
+    """Figure 06: G1, G2 and absences of G3 = 0 vs other At-Risk students."""
     fig, axes = plt.subplots(2, 3, figsize=(12, 7))
     c_zero, c_other = "#6250d6", C_RISK  # violet (slot 7) vs orange; groups also named on x-axis
     for r, s in enumerate(SUBJECT_ORDER):
@@ -278,6 +288,7 @@ def fig_g3_zero(dfs: dict[str, pd.DataFrame]) -> Path:
 
 # --------------------------------------------------------------------------- main
 def main() -> int:
+    """Run the EDA, save figures 01–06 and metrics.json['eda']."""
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")  # Windows consoles default to cp1252
     dfs: dict[str, pd.DataFrame] = {}

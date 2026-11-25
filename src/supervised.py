@@ -74,6 +74,7 @@ ABSENCE_BINS = {"0": (0, 0), "1–5": (1, 5), "6–10": (6, 10), ">10": (11, 10_
 
 # --------------------------------------------------------------------------- data & split
 def prepare_subject(subject: str) -> pd.DataFrame:
+    """Load one subject's data, add the pass target and validate the schema."""
     df = add_target(load_subject(subject))
     validate_schema(df)
     return df
@@ -87,11 +88,13 @@ def split_indices(df: pd.DataFrame, seed: int = RANDOM_STATE) -> tuple[np.ndarra
 
 
 def cv_splitter() -> StratifiedKFold:
+    """5-fold stratified cross-validation with the fixed seed."""
     return StratifiedKFold(n_splits=CV_FOLDS, shuffle=True, random_state=RANDOM_STATE)
 
 
 # --------------------------------------------------------------------------- models
 def make_dummy(features: list[str]) -> Pipeline:
+    """Baseline: always predict the majority class (pass)."""
     return Pipeline([
         ("prep", build_preprocessor(features)),
         ("clf", DummyClassifier(strategy="most_frequent")),
@@ -99,6 +102,7 @@ def make_dummy(features: list[str]) -> Pipeline:
 
 
 def make_logreg(features: list[str]) -> Pipeline:
+    """Baseline: class-balanced logistic regression on scaled numeric features."""
     return Pipeline([
         ("prep", build_preprocessor(features, scale_numeric=True)),
         ("clf", LogisticRegression(class_weight="balanced", max_iter=1000)),
@@ -106,6 +110,7 @@ def make_logreg(features: list[str]) -> Pipeline:
 
 
 def make_rf_search(features: list[str], monotonic: bool = True, n_jobs: int = -1) -> GridSearchCV:
+    """Grid search over the Random Forest (monotonic in absences unless monotonic=False)."""
     rf = RandomForestClassifier(
         class_weight="balanced", random_state=RANDOM_STATE, n_jobs=1,
         monotonic_cst=monotonic_constraints(features) if monotonic else None,
@@ -116,6 +121,7 @@ def make_rf_search(features: list[str], monotonic: bool = True, n_jobs: int = -1
 
 # --------------------------------------------------------------------------- threshold
 def proba_pass(model, X: pd.DataFrame) -> np.ndarray:
+    """Predicted probability of passing (class 1) for each row."""
     classes = list(model.classes_)
     return model.predict_proba(X)[:, classes.index(PASS)]
 
@@ -198,6 +204,7 @@ def evaluate(model, X: pd.DataFrame, y: pd.Series, threshold: float = DEFAULT_TH
 
 
 def baseline_cv(model: Pipeline, X: pd.DataFrame, y: pd.Series, n_jobs: int = -1) -> dict[str, float]:
+    """Cross-validated macro F1 (mean, std) of a baseline on the training rows."""
     scores = cross_val_score(clone(model), X, y, scoring=SCORING, cv=cv_splitter(), n_jobs=n_jobs)
     return {"metric": SCORING, "mean": round(scores.mean(), 4), "std": round(scores.std(), 4)}
 
@@ -214,6 +221,7 @@ def search_cv(search: GridSearchCV) -> dict[str, float]:
 
 
 def best_params(search: GridSearchCV) -> dict[str, Any]:
+    """GridSearchCV best parameters without the clf__ prefix."""
     return {k.removeprefix("clf__"): v for k, v in search.best_params_.items()}
 
 
@@ -323,6 +331,7 @@ def train_reference(X_train: pd.DataFrame) -> dict[str, Any]:
 
 
 def model_path(subject: str, scenario: str):
+    """Path of the saved classifier for (subject, scenario)."""
     return MODELS_DIR / f"clf_{subject}_{scenario}.joblib"
 
 
@@ -367,6 +376,7 @@ class InputValidationError(ValueError):
 
 @lru_cache(maxsize=None)
 def load_model(subject: str, scenario: str) -> FixedThresholdClassifier:
+    """Load the saved classifier for (subject, scenario) (cached per process)."""
     path = model_path(subject, scenario)
     if not path.is_file():
         raise FileNotFoundError(f"{path} not found. Run `python scripts/train_supervised.py` first.")

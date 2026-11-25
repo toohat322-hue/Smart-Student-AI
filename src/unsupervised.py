@@ -42,6 +42,7 @@ def log1p_absences(X: pd.DataFrame) -> pd.DataFrame:
 
 
 def build_pipeline(k: int, log_absences: bool = True) -> Pipeline:
+    """Unfitted log1p(absences) -> StandardScaler -> KMeans(k) pipeline."""
     steps = []
     if log_absences:
         steps.append(("log", FunctionTransformer(log1p_absences, feature_names_out="one-to-one")))
@@ -65,6 +66,7 @@ def transformed(pipe: Pipeline, X: pd.DataFrame) -> np.ndarray:
 
 # --------------------------------------------------------------------------- k selection
 def evaluate_k(X: pd.DataFrame, log_absences: bool = True) -> list[dict[str, Any]]:
+    """Inertia, silhouette and smallest cluster size for every k in K_RANGE."""
     rows = []
     for k in K_RANGE:
         pipe = fit_pipeline(k, X, log_absences)
@@ -119,6 +121,7 @@ def cluster_names(z_means: pd.DataFrame) -> dict[int, str]:
 
 
 def profile_clusters(df: pd.DataFrame, labels: np.ndarray, Z: np.ndarray) -> dict[str, Any]:
+    """Per-cluster size, feature means, z-scores, generated name and (after the fact) G3 / pass rate."""
     X = df[CLUSTER_FEATURES]
     k = int(labels.max()) + 1
     z_means = pd.DataFrame(Z, columns=CLUSTER_FEATURES).groupby(labels).mean()  # overall mean = 0 in Z space
@@ -169,6 +172,7 @@ def g3_zero_concentration(df: pd.DataFrame, labels: np.ndarray, threshold: float
 
 
 def pca_2d(pipe: Pipeline, X: pd.DataFrame) -> dict[str, Any]:
+    """2-D PCA of the clustering space: coordinates, explained variance and loadings."""
     Z = transformed(pipe, X)
     pca = PCA(n_components=2, random_state=RANDOM_STATE).fit(Z)
     coords = pca.transform(Z)
@@ -183,12 +187,14 @@ def pca_2d(pipe: Pipeline, X: pd.DataFrame) -> dict[str, Any]:
 
 
 def model_path(subject: str):
+    """Path of the saved K-Means pipeline for a subject."""
     return MODELS_DIR / f"kmeans_{subject}.joblib"
 
 
 # --------------------------------------------------------------------------- assignment
 @lru_cache(maxsize=None)
 def load_kmeans(subject: str) -> Pipeline:
+    """Load the saved K-Means pipeline for a subject (cached per process)."""
     path = model_path(subject)
     if not path.is_file():
         raise FileNotFoundError(f"{path} not found. Run `python scripts/train_clustering.py` first.")

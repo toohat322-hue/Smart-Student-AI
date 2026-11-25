@@ -6,6 +6,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 import streamlit as st  # noqa: E402
 
+from src import config as C  # noqa: E402
 from src import ui  # noqa: E402
 from src.supervised import TARGET_AT_RISK_RECALL  # noqa: E402
 
@@ -95,4 +96,8 @@ st.subheader("Project")
 st.markdown("Built with Python, scikit-learn, Streamlit and Plotly. All numbers in this app are read from "
             "`reports/metrics.json` or computed live from the saved models; `python scripts/train_all.py` "
             "regenerates everything. Design decisions are logged in `DECISIONS.md`.")
-st.caption("Team: _add names here_ · Course: _add course name here_")
+st.markdown("\n".join([
+    f"- **Team:** {C.PROJECT_TEAM}",
+    f"- **Course:** {C.PROJECT_COURSE}",
+    f"- **Instructor:** {C.PROJECT_INSTRUCTOR}",
+]))

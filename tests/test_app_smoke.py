@@ -104,3 +104,45 @@ def test_missing_models_show_retrain_message(tmp_path, monkeypatch):
     monkeypatch.setattr(ui, "ROOT_DIR", tmp_path)
     at = run("pages/1_Performance_Prediction.py")
     assert at.error and "python scripts/train_all.py" in at.error[0].value
+
+
+# --------------------------------------------------------------------------- error handling (Phase 9)
+@pytest.mark.parametrize("params,expected", [
+    ({"example": "bogus"}, "Unknown example 'bogus'"),
+    ({"example": ""}, "Unknown example ''"),
+    ({"subject": "bio"}, "Unknown subject 'bio'"),
+    ({"example": "pass", "subject": "xx"}, "Unknown subject 'xx'"),
+])
+def test_invalid_link_parameters_show_a_warning(params, expected):
+    at = app("pages/1_Performance_Prediction.py")
+    for k, v in params.items():
+        at.query_params[k] = v
+    at.run()
+    assert not at.exception
+    assert any(expected in w.value for w in at.warning)
+
+
+@pytest.mark.parametrize("page", PAGES)
+@pytest.mark.parametrize("bad", [{"age": 99}, "not a dict", {**{f: 1 for f in ui.STUDENT_FEATURES}, "school": "XX"}],
+                         ids=["incomplete", "wrong-type", "invalid-value"])
+def test_corrupt_stored_student_is_cleared_with_a_message(page, bad):
+    at = run(page, student=bad, student_label="stale")
+    assert not at.exception, [e.value for e in at.exception]
+    assert at.session_state["student"] is None
+    assert any("stored student was incomplete or invalid" in w.value for w in at.warning)
+
+
+@pytest.mark.parametrize("page", PAGES[1:])
+def test_missing_metrics_section_shows_retrain_message(page, monkeypatch):
+    monkeypatch.setattr(ui, "metrics", lambda: {})
+    at = run(page)
+    assert not at.exception
+    assert at.error and "python scripts/train_all.py" in at.error[0].value
+
+
+def test_out_of_range_number_is_never_stored():
+    at = run("pages/1_Performance_Prediction.py")
+    at.number_input(key="f_absences").set_value(500)
+    next(b for b in at.button if b.label == "Predict").click().run()
+    assert not at.exception
+    assert 0 <= at.session_state["student"]["absences"] <= 93

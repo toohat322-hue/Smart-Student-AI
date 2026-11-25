@@ -27,14 +27,17 @@ from src.supervised import prepare_subject  # noqa: E402
 
 
 def h(data: bytes) -> str:
+    """Short SHA-256 of some bytes."""
     return hashlib.sha256(data).hexdigest()[:16]
 
 
 def arr(a) -> bytes:
+    """Array as float64 bytes (for hashing)."""
     return np.ascontiguousarray(np.asarray(a, dtype=np.float64)).tobytes()
 
 
 def fingerprint() -> dict:
+    """Hashes of metrics.json sections, model behaviour and file bytes."""
     fp: dict = {"metrics.json": h((ROOT_DIR / "reports/metrics.json").read_bytes()),
                 "metrics_sections": {}, "behaviour": {}, "file_bytes": {}}
     metrics = json.loads((ROOT_DIR / "reports/metrics.json").read_text(encoding="utf-8"))
@@ -58,6 +61,7 @@ def fingerprint() -> dict:
 
 
 def compare(a: dict, b: dict) -> list[str]:
+    """Names of everything that differs between two fingerprints."""
     diffs = []
     for group in ("metrics_sections", "behaviour", "file_bytes"):
         for k in sorted(set(a[group]) | set(b[group])):
@@ -69,6 +73,7 @@ def compare(a: dict, b: dict) -> list[str]:
 
 
 def main() -> int:
+    """Write a fingerprint and optionally compare it with an older one."""
     out = Path(sys.argv[1])
     fp = fingerprint()
     out.write_text(json.dumps(fp, indent=2), encoding="utf-8")

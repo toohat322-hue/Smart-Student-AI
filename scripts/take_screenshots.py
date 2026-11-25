@@ -49,6 +49,7 @@ def fit_viewport(page, width: int) -> None:
 
 
 def shoot(page, base: str, name: str, path: str, example: str, after=None) -> None:
+    """Open one page with an example student and save a full-height screenshot."""
     page.goto(f"{base}/{path}?example={example}", wait_until="domcontentloaded")
     wait_for_app(page)
     if after:
@@ -61,12 +62,14 @@ def shoot(page, base: str, name: str, path: str, example: str, after=None) -> No
 
 
 def run_simulation(page) -> None:
+    """Click the Study Planner's simulate button and wait for the replay."""
     page.get_by_role("button", name="▶ Simulate a study session").click()
     time.sleep(1.0)
     wait_for_app(page)
 
 
 def main() -> int:
+    """Screenshot every page (desktop) and two pages at phone width."""
     parser = argparse.ArgumentParser()
     parser.add_argument("--url", default="http://localhost:8501")
     parser.add_argument("--example", default="at_risk")

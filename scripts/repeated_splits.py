@@ -40,6 +40,7 @@ C_BLUE, C_GRAY, C_ORANGE, C_TEXT2 = "#2a78d6", "#8a8984", "#eb6834", "#52514e"
 
 
 def summarise(rows: list[dict], seed42: dict | None) -> dict:
+    """Mean ± std per model and metric, pooled fairness, and where seed 42 falls."""
     out: dict = {"n_splits": len(rows), "seeds": [r["seed"] for r in rows]}
     for mk in MODEL_KEYS:
         out[mk] = {}
@@ -83,6 +84,7 @@ def summarise(rows: list[dict], seed42: dict | None) -> dict:
 
 
 def fig_repeated(summary: dict) -> str:
+    """Figure 13: per-split results with mean ± std."""
     fig, axes = plt.subplots(1, 2, figsize=(12, 4.8))
     labels = [f"{SUBJECT_NAMES[s]}\n{SCENARIO_NAMES[sc]}" for s in SUBJECT_ORDER for sc in SCENARIOS]
     for ax, metric, title in ((axes[0], "f1_macro", "Test macro-F1"),
@@ -116,6 +118,7 @@ def fig_repeated(summary: dict) -> str:
 
 
 def main() -> int:
+    """Run all subject × scenario × seed splits in parallel and save the summary."""
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
     t0 = time.time()

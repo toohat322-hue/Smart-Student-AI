@@ -302,6 +302,68 @@ Planner pages, all with the "Clear At Risk" example loaded.
 
 ---
 
+## Phase 9 — Testing and polish
+
+### D24. Clean-environment test (what Streamlit Cloud will do)
+The committed repo was cloned into an empty folder, with a new Python 3.11.9 venv and **only**
+`requirements.txt` installed (`pip install --no-cache-dir`, 205 s; no pytest, Playwright or other local
+tools). Results:
+- **App:** `streamlit run app.py` from the clone loaded all 6 pages with the committed models (no retraining),
+  for both subjects, with and without an example student: 24 page loads, 0 exceptions, 0 error boxes.
+- **Tests:** after adding `requirements-dev.txt`, all 261 tests passed in the clone (67 s), and running them
+  left no committed file modified.
+- **Only worked because of the local setup:** `threadpoolctl` is imported directly
+  (`src/unsupervised.py`, D19) but was not in `requirements.txt`. It was installed anyway as a scikit-learn
+  dependency, which is fragile, so it is now pinned (`threadpoolctl==3.8.0`).
+- Nothing else depended on the local machine:
+  - every file the code references is committed and matches its exact name and capitalisation (Linux file
+    names are case-sensitive);
+  - there are no absolute or backslash paths; all paths are built with `pathlib` from the project root;
+  - text files are stored with Linux line endings in git.
+
+### D25. Deployment readiness
+- **Memory:** with all 7 model files loaded and every page visited for both subjects, the server process
+  peaked at **259 MB** (Windows working set). Models and data are cached once per server with
+  `st.cache_resource` / `st.cache_data`, so extra visitors add only their small session state. Streamlit
+  Community Cloud's free tier has about 1 GB; check the current limit at deploy time. Low risk.
+- **Cold start:** the server is ready in about 3 s. The first page took 21 s on the very first launch of a fresh
+  install (first-time file access and virus scanning on Windows) and 8 s on the next restart. Later pages take
+  about 4–5 s each, including model loading on first use. The free tier puts the app to sleep when unused, so
+  open it a few minutes before presenting.
+- **Repo size:** 22.7 MB of tracked files. The largest are the classifiers (6.8, 5.6, 2.2 and 1.4 MB), then
+  screenshots (up to 0.6 MB) and `metrics.json` (0.6 MB). The git history is about 18 MB compressed, because
+  the models changed in several commits. Everything is far below GitHub's 100 MB per-file limit.
+- **Ignored by git:** `.venv/`, `__pycache__/`, `.pytest_cache/`, `data/raw/` and `*.zip`. The Playwright
+  venv lives outside the repo (in a temporary folder).
+- **Error details:** `.streamlit/config.toml` sets `client.showErrorDetails = "type"`, so an unexpected error
+  shows only its type to visitors, never a traceback; full details go to the server log.
+
+### D26. Input and error handling
+- **Form inputs:** every field is a selectbox, radio button, slider or bounded number box built from
+  `FEATURE_SPEC`, so an out-of-range or wrong-type value cannot be entered. Tests confirm that absences 500 or
+  −3, and a simulation seed of 10^9, are rejected by the widgets without any error. `predict()`,
+  `assign_cluster()` and `recommend()` still validate every value themselves (D1, Phase 4 tests).
+- **Link parameters:** an unknown `?example=` or `?subject=` value now shows a warning listing the valid values
+  (previously it was silently ignored).
+- **Stale session:** an incomplete, wrongly typed or invalid student left in the session (for example after
+  an app update) used to crash three pages with a `KeyError`. Every page now checks the stored student against
+  the data dictionary, clears it and shows a message.
+- **Missing files:** a missing model file or a missing `metrics.json` section shows "… Run
+  `python scripts/train_all.py`" on every page that needs it (tested).
+
+### D27. Code tidy-up without behaviour change
+- Removed the Phase 4c one-off migration `scripts/apply_threshold_floor.py` (training applies the floor
+  itself since Phase 7; the script remains in git history), one unused helper (`ui.as_int_array`) and two
+  unused `numpy` imports. pyflakes now reports nothing.
+- Added a one-line docstring to each of the 99 public functions that lacked one in `src/` and `scripts/`.
+- Moved the About page's Team / Course / Instructor lines into `src/config.py` (`PROJECT_TEAM`,
+  `PROJECT_COURSE`, `PROJECT_INSTRUCTOR`), so they are filled in one place.
+- **Proof of no behaviour change:** `scripts/fingerprint.py` before the tidy-up and after a full retrain with
+  the tidied code is **IDENTICAL**: every `metrics.json` section, the predictions of all 7 model files, and the
+  bytes of every model and figure file.
+
+---
+
 ## Future work
 - **Cluster-specific action effectiveness.** For example, if videos helped weaker students more, the
   clusters would get different policies. Modelling that needs data on which study activities students

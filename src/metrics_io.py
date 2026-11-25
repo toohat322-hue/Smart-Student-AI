@@ -28,6 +28,7 @@ def _to_builtin(obj: Any) -> Any:
 
 
 def load_metrics(path: Path = METRICS_PATH) -> dict:
+    """Return reports/metrics.json as a dict ({} if the file does not exist yet)."""
     if not path.is_file():
         return {}
     return json.loads(path.read_text(encoding="utf-8"))

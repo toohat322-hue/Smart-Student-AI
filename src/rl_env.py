@@ -28,10 +28,12 @@ CENTROID_FEATURES = ["studytime", "absences", "failures", "freetime", "health", 
 
 
 def state_index(knowledge: int, energy: int) -> int:
+    """Map (knowledge, energy) to a state index 0..14."""
     return knowledge * C.RL_N_ENERGY + energy
 
 
 def state_tuple(index: int) -> tuple[int, int]:
+    """Map a state index 0..14 back to (knowledge, energy)."""
     return divmod(index, C.RL_N_ENERGY)
 
 

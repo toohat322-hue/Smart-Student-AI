@@ -55,6 +55,7 @@ plt.rcParams.update({
 
 
 def save(fig, name: str) -> str:
+    """Save a figure to reports/figures/ and close it."""
     FIGURES_DIR.mkdir(parents=True, exist_ok=True)
     fig.savefig(FIGURES_DIR / name)
     plt.close(fig)
@@ -63,6 +64,7 @@ def save(fig, name: str) -> str:
 
 # --------------------------------------------------------------------------- training
 def run() -> dict:
+    """Train, evaluate and save the classifiers for every subject × scenario."""
     results: dict = {
         "config": {
             "test_size": TEST_SIZE, "random_state": RANDOM_STATE, "cv_folds": CV_FOLDS,
@@ -146,11 +148,13 @@ def run() -> dict:
 
 # --------------------------------------------------------------------------- figures
 def grid_axes(figsize=(10, 8.5), **kw):
+    """2 × 2 axes keyed by (subject, scenario)."""
     fig, axes = plt.subplots(2, 2, figsize=figsize, **kw)
     return fig, {(s, sc): axes[i, j] for i, s in enumerate(SUBJECT_ORDER) for j, sc in enumerate(SCENARIOS)}
 
 
 def fig_confusion(res: dict) -> str:
+    """Figure 07: confusion matrices at the final threshold."""
     fig, axes = grid_axes(figsize=(9, 8))
     for (s, sc), ax in axes.items():
         t = res["subjects"][s][sc]["models"]["rf"]["test_tuned"]
@@ -174,6 +178,7 @@ def fig_confusion(res: dict) -> str:
 
 
 def fig_roc(res: dict) -> str:
+    """Figure 08: ROC curves of RF, LogReg and Dummy."""
     fig, axes = grid_axes(figsize=(10, 9), sharex=True, sharey=True)
     styles = {"rf": ("Random Forest", C_BLUE, "-"), "logreg": ("Logistic Regression", C_ORANGE, "-"),
               "dummy": ("Dummy (most frequent)", C_GRAY, "--")}
@@ -195,6 +200,7 @@ def fig_roc(res: dict) -> str:
 
 
 def fig_importance(res: dict) -> str:
+    """Figure 09: permutation importance, top 10."""
     fig, axes = grid_axes(figsize=(11, 9))
     for (s, sc), ax in axes.items():
         imp = res["subjects"][s][sc]["permutation_importance"][::-1]
@@ -212,6 +218,7 @@ def fig_importance(res: dict) -> str:
 
 
 def fig_early_vs_midterm(res: dict) -> str:
+    """Figure 10: Early vs Mid-term at the final threshold."""
     keys = [("accuracy", "Accuracy"), ("f1_macro", "Macro F1"), ("at_risk_recall", "At-Risk recall"),
             ("at_risk_precision", "At-Risk precision"), ("roc_auc", "ROC-AUC")]
     fig, axes = plt.subplots(1, 2, figsize=(13, 4.8), sharey=True)
@@ -237,6 +244,7 @@ def fig_early_vs_midterm(res: dict) -> str:
 
 
 def fig_absences_pd(res: dict) -> str:
+    """Figure 11: partial dependence of P(pass) on absences."""
     fig, axes = plt.subplots(2, 2, figsize=(11, 8), sharex=True)
     lines = (("rf_unconstrained", "RF unconstrained (old)", C_GRAY, "--"),
              ("rf_main", "RF monotonic (saved)", C_BLUE, "-"),
@@ -286,12 +294,14 @@ def fig_threshold_effect(res: dict) -> str:
 
 # --------------------------------------------------------------------------- summary
 def row(name: str, t: dict) -> str:
+    """One formatted line of the console comparison table."""
     return (f"  {name:34s} {t['threshold']:6.3f} {t['accuracy']:6.3f} {t['f1_macro']:6.3f} "
             f"{t['at_risk_recall']:7.3f} {t['at_risk_precision']:7.3f} {t['roc_auc']:6.3f} "
             f"{t['false_alerts']:4d}/{t['n'] - t['n_at_risk']:<4d}")
 
 
 def print_summary(res: dict) -> None:
+    """Print the comparison table, thresholds, importance, fairness and absences check."""
     print("\n" + "=" * 104)
     print("TEST-SET COMPARISON (seed-42 split)")
     print("=" * 104)
@@ -353,6 +363,7 @@ def print_summary(res: dict) -> None:
 
 
 def main() -> int:
+    """Train the supervised models and write metrics.json['supervised']."""
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")  # Windows consoles default to cp1252
     t0 = time.time()

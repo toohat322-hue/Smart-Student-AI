@@ -46,6 +46,7 @@ plt.rcParams.update({
 
 
 def save(fig, name: str) -> str:
+    """Save a figure to reports/figures/ and close it."""
     FIGURES_DIR.mkdir(parents=True, exist_ok=True)
     fig.savefig(FIGURES_DIR / name)
     plt.close(fig)
@@ -53,6 +54,7 @@ def save(fig, name: str) -> str:
 
 
 def run() -> dict:
+    """Choose k, fit, profile and save the K-Means model for each subject."""
     res: dict = {
         "config": {
             "features": CLUSTER_FEATURES, "k_range": list(K_RANGE), "random_state": RANDOM_STATE, "n_init": 10,
@@ -89,6 +91,7 @@ def run() -> dict:
 
 # --------------------------------------------------------------------------- figures
 def fig_k_selection(res: dict) -> str:
+    """Figure 14: elbow and silhouette by k."""
     fig, axes = plt.subplots(2, 2, figsize=(11, 7.5))
     for i, s in enumerate(SUBJECT_ORDER):
         e = res["subjects"][s]
@@ -117,6 +120,7 @@ def fig_k_selection(res: dict) -> str:
 
 
 def fig_pca(res: dict) -> str:
+    """Figure 15: clusters on the first two principal components."""
     fig, axes = plt.subplots(1, 2, figsize=(13, 5.6))
     for ax, s in zip(axes, SUBJECT_ORDER):
         e = res["subjects"][s]
@@ -138,6 +142,7 @@ def fig_pca(res: dict) -> str:
 
 
 def fig_profiles(res: dict) -> str:
+    """Figure 16: cluster profile heatmap in standardized units."""
     fig, axes = plt.subplots(1, 2, figsize=(13, 4.2))
     for ax, s in zip(axes, SUBJECT_ORDER):
         cl = res["subjects"][s]["profile"]["clusters"]
@@ -162,6 +167,7 @@ def fig_profiles(res: dict) -> str:
 
 # --------------------------------------------------------------------------- summary
 def print_summary(res: dict) -> None:
+    """Print the silhouette table, chosen k, profiles and the G3 = 0 check."""
     for s in SUBJECT_ORDER:
         e = res["subjects"][s]
         print(f"\n=== {SUBJECT_NAMES[s]} (n={e['n_students']}) ===")
@@ -191,6 +197,7 @@ def print_summary(res: dict) -> None:
 
 
 def main() -> int:
+    """Train the clustering models and write metrics.json['clustering']."""
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
     res = run()

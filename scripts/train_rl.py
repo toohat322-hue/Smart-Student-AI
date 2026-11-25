@@ -50,6 +50,7 @@ plt.rcParams.update({
 
 
 def save(fig, name: str) -> str:
+    """Save a figure to reports/figures/ and close it."""
     C.FIGURES_DIR.mkdir(parents=True, exist_ok=True)
     fig.savefig(C.FIGURES_DIR / name)
     plt.close(fig)
@@ -57,6 +58,7 @@ def save(fig, name: str) -> str:
 
 
 def summary(ev: dict) -> dict:
+    """Evaluation dict without the raw per-episode rewards."""
     return {k: (round(v, 4) if isinstance(v, float) else v) for k, v in ev.items() if k != "rewards"}
 
 
@@ -75,6 +77,7 @@ def policy_grid(policy: np.ndarray) -> list[list[int | None]]:
 
 
 def run() -> tuple[dict, dict]:
+    """Train, evaluate and analyse one Q-table per (subject, cluster) environment."""
     clustering = load_metrics()["clustering"]["subjects"]
     q_tables: dict[tuple[str, int], np.ndarray] = {}
     res: dict = {
@@ -206,10 +209,12 @@ def run() -> tuple[dict, dict]:
 
 # --------------------------------------------------------------------------- figures
 def env_keys(res):
+    """All (subject, cluster) keys in metrics order."""
     return [(s, c) for s in SUBJECT_ORDER for c in res["environments"][s]]
 
 
 def fig_learning(res: dict) -> str:
+    """Figure 17: training reward and greedy-policy checkpoints."""
     fig, axes = plt.subplots(2, 2, figsize=(12, 8))
     colors = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4"]
     for i, s in enumerate(SUBJECT_ORDER):
@@ -242,6 +247,7 @@ def fig_learning(res: dict) -> str:
 
 
 def draw_policy(ax, grid, title, ref=None):
+    """Draw one policy grid (knowledge × energy) on an axis."""
     arr = np.array([[np.nan if v is None else v for v in row] for row in grid], dtype=float)
     ax.imshow(arr, cmap=ListedColormap(ACTION_COLORS), vmin=-0.5, vmax=2.5, origin="lower", aspect="auto")
     short = ["Quiz", "Video", "Review"]
@@ -262,6 +268,7 @@ def draw_policy(ax, grid, title, ref=None):
 
 
 def fig_policies(res: dict) -> str:
+    """Figure 18: learned policy per cluster and the exact optimum."""
     keys = env_keys(res)
     fig, axes = plt.subplots(3, 3, figsize=(11, 10.5))
     flat = axes.ravel()
@@ -284,6 +291,7 @@ def fig_policies(res: dict) -> str:
 
 
 def fig_comparison(res: dict) -> str:
+    """Figure 19: learned vs fixed vs random vs optimum per environment."""
     keys = env_keys(res)
     series = [("learned", "Learned (Q-learning)", "#2a78d6"), ("best_fixed", "Best single fixed action", "#1baf7a"),
               ("random", "Random", C_GRAY), ("always_quizzes", "Always quizzes", "#eda100")]
@@ -352,6 +360,7 @@ def fig_alpha_comparison(res: dict) -> str:
 
 # --------------------------------------------------------------------------- summary
 def print_summary(res: dict) -> None:
+    """Print parameters, evaluation, convergence and policy differences."""
     print("\nENVIRONMENT PARAMETERS")
     for s, c in env_keys(res):
         e = res["environments"][s][c]
@@ -389,6 +398,7 @@ def print_summary(res: dict) -> None:
 
 
 def main() -> int:
+    """Train the RL planner and write q_tables.joblib and metrics.json['rl']."""
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
     t0 = time.time()

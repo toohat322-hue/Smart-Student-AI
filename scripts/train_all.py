@@ -44,6 +44,7 @@ FULL_STEPS = [("repeated", [[PY, "scripts/repeated_splits.py"]])]
 
 
 def human(n: int) -> str:
+    """Human-readable file size."""
     for unit in ("B", "KB", "MB"):
         if n < 1024:
             return f"{n:.0f} {unit}" if unit == "B" else f"{n:.1f} {unit}"
@@ -52,6 +53,7 @@ def human(n: int) -> str:
 
 
 def main(argv: list[str] | None = None) -> int:
+    """Run every training step in order and print the time and file summary."""
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
     parser = argparse.ArgumentParser(description="Regenerate all models and reports.")
